@@ -11,9 +11,10 @@ type HomeScreenProps = {
   onAdd: (item: ServiceItem) => void;
   onCategoryPress: (category: ServiceCategory) => void;
   onLogout: () => void;
+  onRemove: (item: ServiceItem) => void;
 };
 
-export function HomeScreen({ cart, onAdd, onCategoryPress, onLogout }: HomeScreenProps) {
+export function HomeScreen({ cart, onAdd, onCategoryPress, onLogout, onRemove }: HomeScreenProps) {
   const [search, setSearch] = useState('');
   const currentLocation = useCurrentLocation();
   const { width } = useWindowDimensions();
@@ -32,8 +33,8 @@ export function HomeScreen({ cart, onAdd, onCategoryPress, onLogout }: HomeScree
   );
 
   const handleLocationPress = () => {
-    if (currentLocation.status === 'denied' && !currentLocation.canAskAgain) {
-      Alert.alert('Location permission needed', 'Enable location access in Settings to show services near you.', [
+    if ((currentLocation.status === 'denied' && !currentLocation.canAskAgain) || currentLocation.status === 'approximate') {
+      Alert.alert('Precise location needed', 'Enable precise location in Settings to show your nearest street or locality.', [
         { text: 'Cancel', style: 'cancel' },
         { text: 'Open Settings', onPress: () => void Linking.openSettings() },
       ]);
@@ -76,11 +77,11 @@ export function HomeScreen({ cart, onAdd, onCategoryPress, onLogout }: HomeScree
           >
             <Text style={{ fontSize: 10, lineHeight: 14, fontWeight: '800', letterSpacing: 1.2, color: '#DDD2FF' }}>YOUR LOCATION</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Text style={{ width: 15, fontSize: 14, lineHeight: 19, fontWeight: '700', color: '#FFFFFF', transform: [{ rotate: '-45deg' }] }}>➤</Text>
               {currentLocation.status === 'loading' && <ActivityIndicator size="small" color="#FFFFFF" />}
               <Text selectable numberOfLines={1} style={{ flexShrink: 1, fontSize: 14, lineHeight: 19, fontWeight: '700', color: '#FFFFFF' }}>
                 {currentLocation.label}
               </Text>
-              {currentLocation.status !== 'loading' && <Text style={{ fontSize: 13, color: '#E4DCFF' }}>⌄</Text>}
             </View>
           </Pressable>
           <Pressable
@@ -172,9 +173,38 @@ export function HomeScreen({ cart, onAdd, onCategoryPress, onLogout }: HomeScree
                       <Text style={{ fontSize: 10, color: '#77717D' }}>★ {item.rating} · {item.duration}</Text>
                       <Text selectable style={{ fontSize: 14, fontWeight: '800', color: '#211A28', fontVariant: ['tabular-nums'] }}>₹{item.price}</Text>
                     </View>
-                    <Pressable onPress={() => onAdd(item)} style={({ pressed }) => ({ width: 55, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: pressed ? '#5933C4' : '#6E45E2' })}>
-                      <Text style={{ fontSize: 11, fontWeight: '800', color: '#FFFFFF' }}>{cart[item.id] ? `+ ${cart[item.id]}` : 'ADD'}</Text>
-                    </Pressable>
+                    {(cart[item.id] ?? 0) === 0 ? (
+                      <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel={`Add ${item.title}`}
+                        onPress={() => onAdd(item)}
+                        style={({ pressed }) => ({ width: 58, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 11, backgroundColor: pressed ? '#5933C4' : '#6E45E2' })}
+                      >
+                        <Text style={{ fontSize: 11, fontWeight: '800', color: '#FFFFFF' }}>ADD</Text>
+                      </Pressable>
+                    ) : (
+                      <View style={{ height: 34, flexDirection: 'row', alignItems: 'center', borderRadius: 11, backgroundColor: '#6E45E2', overflow: 'hidden' }}>
+                        <Pressable
+                          accessibilityRole="button"
+                          accessibilityLabel={`Remove one ${item.title}`}
+                          onPress={() => onRemove(item)}
+                          style={({ pressed }) => ({ width: 28, height: 34, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.6 : 1 })}
+                        >
+                          <Text style={{ fontSize: 17, lineHeight: 20, color: '#FFFFFF' }}>−</Text>
+                        </Pressable>
+                        <Text selectable style={{ minWidth: 24, textAlign: 'center', fontSize: 11, fontWeight: '800', color: '#FFFFFF', fontVariant: ['tabular-nums'] }}>
+                          {cart[item.id]}
+                        </Text>
+                        <Pressable
+                          accessibilityRole="button"
+                          accessibilityLabel={`Add one ${item.title}`}
+                          onPress={() => onAdd(item)}
+                          style={({ pressed }) => ({ width: 28, height: 34, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.6 : 1 })}
+                        >
+                          <Text style={{ fontSize: 17, lineHeight: 20, color: '#FFFFFF' }}>+</Text>
+                        </Pressable>
+                      </View>
+                    )}
                   </View>
                 </View>
               ))}

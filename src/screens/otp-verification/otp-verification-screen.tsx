@@ -3,6 +3,7 @@ import { KeyboardAvoidingView, Pressable, ScrollView, Text, View } from 'react-n
 
 import { AuthHeader } from '../../components/auth-header';
 import { OtpInput } from '../../components/otp-input';
+import { VerificationMessageIcon } from '../../components/verification-message-icon';
 import { OTP_EXPIRY_SECONDS, OTP_LENGTH } from '../../config/auth';
 import {
   type AuthSession,
@@ -88,9 +89,7 @@ export function OtpVerificationScreen({ callingCode, onBack, onVerified, phoneNu
       >
         <AuthHeader onPress={onBack} />
         <View style={{ width: '100%', maxWidth: 560, alignSelf: 'center', padding: 24, paddingTop: 42, gap: 24 }}>
-          <Text accessibilityLabel="Verification message" style={{ fontSize: 36, lineHeight: 42, color: colors.primary }}>
-            ▣
-          </Text>
+          <VerificationMessageIcon />
           <View style={{ gap: 8 }}>
             <Text style={{ ...typography.title, color: colors.text }}>Enter verification code</Text>
             <Text style={{ ...typography.body, color: colors.textSecondary }}>

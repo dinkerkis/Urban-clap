@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 
 import { CountryPickerModal } from '../../components/country-picker-modal';
+import { PhoneMessageIcon } from '../../components/phone-message-icon';
 import { PrimaryButton } from '../../components/primary-button';
 import { defaultCountry, type Country } from '../../config/countries';
 import { getApiErrorMessage, requestLoginOtp } from '../../services/auth-api';
@@ -57,20 +58,7 @@ export function PhoneLoginScreen({ onContinue }: Props) {
         <View>
           <View style={{ gap: 30 }}>
             <View style={{ gap: 20 }}>
-              <View
-                accessibilityLabel="Phone verification"
-                style={{
-                  width: 58,
-                  height: 58,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: 18,
-                  borderCurve: 'continuous',
-                  backgroundColor: '#EDF3FF',
-                }}
-              >
-                <Text style={{ fontSize: 30, lineHeight: 35, color: colors.primary }}>☎︎</Text>
-              </View>
+              <PhoneMessageIcon />
               <View style={{ gap: 10 }}>
                 <Text style={{ ...typography.hero, color: colors.text }}>Enter your phone number</Text>
                 <Text style={{ ...typography.body, color: colors.textSecondary }}>

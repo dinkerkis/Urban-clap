@@ -35,6 +35,8 @@ PODS:
     - ExpoModulesCore
   - ExpoFont (57.0.0):
     - ExpoModulesCore
+  - ExpoImage (57.0.0):
+    - ExpoModulesCore
   - ExpoKeepAwake (57.0.0):
     - ExpoModulesCore
   - ExpoLocation (57.0.2):
@@ -1906,6 +1908,7 @@ DEPENDENCIES:
   - "ExpoDomWebView (from `../node_modules/expo/node_modules/@expo/dom-webview/ios`)"
   - ExpoFileSystem (from `../node_modules/expo/node_modules/expo-file-system/ios/ExpoFileSystem.podspec`)
   - ExpoFont (from `../node_modules/expo/node_modules/expo-font/ios/ExpoFont.podspec`)
+  - ExpoImage (from `../node_modules/expo-image/ios/ExpoImage.podspec`)
   - ExpoKeepAwake (from `../node_modules/expo/node_modules/expo-keep-awake/ios`)
   - ExpoLocation (from `../node_modules/expo-location/ios/ExpoLocation.podspec`)
   - "ExpoLogBox (from `../node_modules/expo/node_modules/@expo/log-box`)"
@@ -2003,6 +2006,8 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/expo/node_modules/expo-file-system/ios/ExpoFileSystem.podspec"
   ExpoFont:
     :podspec: "../node_modules/expo/node_modules/expo-font/ios/ExpoFont.podspec"
+  ExpoImage:
+    :podspec: "../node_modules/expo-image/ios/ExpoImage.podspec"
   ExpoKeepAwake:
     :path: "../node_modules/expo/node_modules/expo-keep-awake/ios"
   ExpoLocation:
@@ -2176,6 +2181,7 @@ SPEC CHECKSUMS:
   ExpoDomWebView: ae603aa2c151929ebb1ee68c4607e105b68b4ebc
   ExpoFileSystem: bf907fa86da7cc9088331f1930a572f43353ed50
   ExpoFont: 15dc02c38fcb621aa56c87c3ab840f281e92f6cf
+  ExpoImage: f58218d46b32b3b1a0c023e416f33da95dd4e7c8
   ExpoKeepAwake: c5a7e46e8f52c093370ea89457d73c060d0b2a2e
   ExpoLocation: a808bb82b56940bfe207730941c5d3518985960e
   ExpoLogBox: 71393ad8a15193044673cee88f6f41cf014bccd7
