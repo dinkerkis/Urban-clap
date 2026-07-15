@@ -78,7 +78,7 @@ export function DashboardScreen({ onLogout }: DashboardScreenProps) {
   } else if (activeTab === 'cart') {
     content = <CartScreen cart={cart} onAdd={addToCart} onRemove={removeFromCart} onExplore={() => changeTab('categories')} />;
   } else {
-    content = <HomeScreen cart={cart} onAdd={addToCart} onCategoryPress={openCategory} onLogout={onLogout} onRemove={removeFromCart} />;
+    content = <HomeScreen onCategoryPress={openCategory} onLogout={onLogout} />;
   }
 
   return (

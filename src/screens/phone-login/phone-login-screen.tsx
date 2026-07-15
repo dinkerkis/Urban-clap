@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CountryPickerModal } from '../../components/country-picker-modal';
 import { PhoneMessageIcon } from '../../components/phone-message-icon';
@@ -14,6 +15,7 @@ type Props = {
 };
 
 export function PhoneLoginScreen({ onContinue }: Props) {
+  const insets = useSafeAreaInsets();
   const [phone, setPhone] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [country, setCountry] = useState(defaultCountry);
@@ -53,7 +55,14 @@ export function PhoneLoginScreen({ onContinue }: Props) {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         style={{ flex: 1 }}
-        contentContainerStyle={{ width: '100%', maxWidth: 560, alignSelf: 'center', paddingHorizontal: 24, paddingTop: 28, paddingBottom: 24 }}
+        contentContainerStyle={{
+          width: '100%',
+          maxWidth: 560,
+          alignSelf: 'center',
+          paddingHorizontal: 24,
+          paddingTop: process.env.EXPO_OS === 'android' ? Math.max(insets.top, 12) : 28,
+          paddingBottom: 24,
+        }}
       >
         <View>
           <View style={{ gap: 30 }}>
@@ -142,7 +151,7 @@ export function PhoneLoginScreen({ onContinue }: Props) {
           alignSelf: 'center',
           paddingHorizontal: 24,
           paddingTop: 12,
-          paddingBottom: process.env.EXPO_OS === 'ios' ? 34 : 16,
+          paddingBottom: process.env.EXPO_OS === 'ios' ? 34 : Math.max(insets.bottom + 14, 30),
           gap: 14,
           backgroundColor: colors.background,
         }}

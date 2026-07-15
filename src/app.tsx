@@ -2,6 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
+import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { DashboardScreen } from './screens/dashboard';
 import { OtpVerificationScreen } from './screens/otp-verification';
@@ -42,43 +43,45 @@ export default function App() {
   }, []);
 
   return (
-    <View style={{ flex: 1, backgroundColor: screen === 'loading' || screen === 'dashboard' ? '#6E45E2' : colors.background }}>
-      <StatusBar style={screen === 'loading' || screen === 'dashboard' ? 'light' : 'dark'} />
-      {screen === 'loading' && <CustomSplashScreen />}
-      {screen === 'phone' && (
-        <PhoneLoginScreen
-          onContinue={({ callingCode: nextCallingCode, phoneNumber: phone }) => {
-            setPhoneNumber(phone);
-            setCallingCode(nextCallingCode);
-            setScreen('otp');
-          }}
-        />
-      )}
-      {screen === 'otp' && (
-        <OtpVerificationScreen
-          phoneNumber={phoneNumber}
-          callingCode={callingCode}
-          onBack={() => setScreen('phone')}
-          onVerified={async (session) => {
-            try {
-              await saveAuthSession(session);
-            } finally {
-              setSession(session);
-              setScreen('dashboard');
-            }
-          }}
-        />
-      )}
-      {screen === 'dashboard' && (
-        <DashboardScreen
-          onLogout={async () => {
-            await clearAuthSession();
-            setSession(null);
-            setPhoneNumber('');
-            setScreen('phone');
-          }}
-        />
-      )}
-    </View>
+    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+      <View style={{ flex: 1, backgroundColor: screen === 'loading' || screen === 'dashboard' ? '#6E45E2' : colors.background }}>
+        <StatusBar style={screen === 'loading' || screen === 'dashboard' ? 'light' : 'dark'} />
+        {screen === 'loading' && <CustomSplashScreen />}
+        {screen === 'phone' && (
+          <PhoneLoginScreen
+            onContinue={({ callingCode: nextCallingCode, phoneNumber: phone }) => {
+              setPhoneNumber(phone);
+              setCallingCode(nextCallingCode);
+              setScreen('otp');
+            }}
+          />
+        )}
+        {screen === 'otp' && (
+          <OtpVerificationScreen
+            phoneNumber={phoneNumber}
+            callingCode={callingCode}
+            onBack={() => setScreen('phone')}
+            onVerified={async (session) => {
+              try {
+                await saveAuthSession(session);
+              } finally {
+                setSession(session);
+                setScreen('dashboard');
+              }
+            }}
+          />
+        )}
+        {screen === 'dashboard' && (
+          <DashboardScreen
+            onLogout={async () => {
+              await clearAuthSession();
+              setSession(null);
+              setPhoneNumber('');
+              setScreen('phone');
+            }}
+          />
+        )}
+      </View>
+    </SafeAreaProvider>
   );
 }

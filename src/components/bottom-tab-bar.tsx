@@ -1,4 +1,5 @@
 import { Pressable, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export type DashboardTab = 'home' | 'bookings' | 'categories' | 'cart';
 
@@ -16,13 +17,15 @@ const tabs: { id: DashboardTab; icon: string; label: string }[] = [
 ];
 
 export function BottomTabBar({ activeTab, cartCount, onChange }: BottomTabBarProps) {
+  const insets = useSafeAreaInsets();
+
   return (
     <View
       style={{
         position: 'absolute',
         left: 12,
         right: 12,
-        bottom: process.env.EXPO_OS === 'ios' ? 12 : 10,
+        bottom: process.env.EXPO_OS === 'ios' ? 24  : insets.bottom + 12,
         minHeight: 72,
         flexDirection: 'row',
         alignItems: 'center',
@@ -33,7 +36,7 @@ export function BottomTabBar({ activeTab, cartCount, onChange }: BottomTabBarPro
         backgroundColor: '#FFFFFF',
         borderWidth: 1,
         borderColor: '#EEEAF4',
-        boxShadow: '0 10px 32px rgba(33, 22, 52, 0.16)',
+        boxShadow: '0 6px 20px rgba(33, 22, 52, 0.08)',
       }}
     >
       {tabs.map((tab) => {
@@ -48,15 +51,17 @@ export function BottomTabBar({ activeTab, cartCount, onChange }: BottomTabBarPro
           >
             <View
               style={{
-                minWidth: 48,
+                minWidth: 62,
                 height: 30,
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: 999,
                 backgroundColor: active ? '#6E45E2' : 'transparent',
+                borderWidth: process.env.EXPO_OS === 'android' ? 1.5 : 0,
+                borderColor: active ? '#5A31C5' : 'transparent',
               }}
             >
-              <Text style={{ fontSize: 20, lineHeight: 22, fontWeight: '800', color: active ? '#FFFFFF' : '#9A94A3' }}>
+              <Text style={{ fontSize: 25, lineHeight: 27, fontWeight: '800', color: active ? '#FFFFFF' : '#8A8795' }}>
                 {tab.icon}
               </Text>
               {tab.id === 'cart' && cartCount > 0 && (

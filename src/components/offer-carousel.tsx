@@ -122,11 +122,17 @@ export function OfferCarousel() {
               }}
             >
               <View style={{ position: 'absolute', width: 150, height: 150, borderRadius: 75, right: -30, top: -40, backgroundColor: offer.bubbleColor }} />
-              <Text style={{ fontSize: 9, lineHeight: 13, fontWeight: '800', letterSpacing: 1.2, color: offer.eyebrowColor }}>{offer.eyebrow}</Text>
-              <Text selectable style={{ maxWidth: 245, fontSize: 23, lineHeight: 28, fontWeight: '800', color: offer.titleColor }}>{offer.title}</Text>
-              <Text selectable style={{ fontSize: 11, lineHeight: 16, color: offer.subtitleColor }}>{offer.subtitle}</Text>
-              <View style={{ position: 'absolute', right: 24, bottom: 23, width: 52, height: 52, alignItems: 'center', justifyContent: 'center', borderRadius: 17, backgroundColor: offer.accent }}>
-                <Text style={{ fontSize: 25 }}>{offer.icon}</Text>
+              <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                <View style={{ flex: 1, minWidth: 0, paddingRight: 4, gap: 6 }}>
+                  <Text style={{ fontSize: 9, lineHeight: 13, fontWeight: '800', letterSpacing: 1.2, color: offer.eyebrowColor }}>{offer.eyebrow}</Text>
+                  <Text selectable style={{ fontSize: 23, lineHeight: 28, fontWeight: '800', color: offer.titleColor }}>{offer.title}</Text>
+                  <Text selectable style={{ fontSize: 11, lineHeight: 16, color: offer.subtitleColor }}>{offer.subtitle}</Text>
+                </View>
+                <View style={{ width: '22%', minWidth: 58, maxWidth: 76, alignItems: 'center', justifyContent: 'center' }}>
+                  <View style={{ width: 52, height: 52, alignItems: 'center', justifyContent: 'center', borderRadius: 17, backgroundColor: offer.accent }}>
+                    <Text style={{ fontSize: 25 }}>{offer.icon}</Text>
+                  </View>
+                </View>
               </View>
             </View>
           </View>

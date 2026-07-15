@@ -1,20 +1,19 @@
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, Linking, Pressable, ScrollView, Text, TextInput, useWindowDimensions, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { OfferCarousel } from '../../components/offer-carousel';
-import type { ServiceCategory, ServiceItem } from '../../data/service-catalog';
-import { featuredServices, serviceCategories } from '../../data/service-catalog';
+import type { ServiceCategory } from '../../data/service-catalog';
+import { serviceCategories } from '../../data/service-catalog';
 import { useCurrentLocation } from '../../hooks/use-current-location';
 
 type HomeScreenProps = {
-  cart: Record<string, number>;
-  onAdd: (item: ServiceItem) => void;
   onCategoryPress: (category: ServiceCategory) => void;
   onLogout: () => void;
-  onRemove: (item: ServiceItem) => void;
 };
 
-export function HomeScreen({ cart, onAdd, onCategoryPress, onLogout, onRemove }: HomeScreenProps) {
+export function HomeScreen({ onCategoryPress, onLogout }: HomeScreenProps) {
+  const insets = useSafeAreaInsets();
   const [search, setSearch] = useState('');
   const currentLocation = useCurrentLocation();
   const { width } = useWindowDimensions();
@@ -50,11 +49,11 @@ export function HomeScreen({ cart, onAdd, onCategoryPress, onLogout, onRemove }:
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
       style={{ flex: 1, backgroundColor: '#FAF9FB' }}
-      contentContainerStyle={{ paddingBottom: 116 }}
+      contentContainerStyle={{ paddingBottom: 126 + insets.bottom }}
     >
       <View
         style={{
-          paddingTop: process.env.EXPO_OS === 'ios' ? 56 : 26,
+          paddingTop: process.env.EXPO_OS === 'ios' ? 56 : insets.top + 16,
           paddingHorizontal: 20,
           paddingBottom: 24,
           gap: 17,
@@ -75,11 +74,11 @@ export function HomeScreen({ cart, onAdd, onCategoryPress, onLogout, onRemove }:
             onPress={handleLocationPress}
             style={({ pressed }) => ({ flex: 1, gap: 2, opacity: pressed ? 0.7 : 1 })}
           >
-            <Text style={{ fontSize: 10, lineHeight: 14, fontWeight: '800', letterSpacing: 1.2, color: '#DDD2FF' }}>YOUR LOCATION</Text>
+            <Text style={{ fontSize: 15, lineHeight: 20, fontWeight: '600', letterSpacing: 1.2, color: 'rgba(255, 255, 255, 0.88)' }}>Your Location</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
               <Text style={{ width: 15, fontSize: 14, lineHeight: 19, fontWeight: '700', color: '#FFFFFF', transform: [{ rotate: '-45deg' }] }}>➤</Text>
               {currentLocation.status === 'loading' && <ActivityIndicator size="small" color="#FFFFFF" />}
-              <Text selectable numberOfLines={1} style={{ flexShrink: 1, fontSize: 14, lineHeight: 19, fontWeight: '700', color: '#FFFFFF' }}>
+              <Text selectable numberOfLines={2} style={{ flex: 1, fontSize: 15, lineHeight: 20, fontWeight: '600', color: '#FFFFFF' }}>
                 {currentLocation.label}
               </Text>
             </View>
@@ -99,8 +98,8 @@ export function HomeScreen({ cart, onAdd, onCategoryPress, onLogout, onRemove }:
           </Pressable>
         </View>
 
-        <View style={{ gap: 3 }}>
-          <Text selectable style={{ fontSize: 14, lineHeight: 19, color: '#E4DCFF' }}>Good afternoon</Text>
+        <View style={{ gap: 0 }}>
+          <Text selectable style={{ fontSize: 18, lineHeight: 22, fontWeight: '500', color: 'rgba(255, 255, 255, 0.90)' }}>Good afternoon</Text>
           <Text selectable style={{ fontSize: 27, lineHeight: 33, fontWeight: '800', letterSpacing: -0.6, color: '#FFFFFF' }}>
             What can we help with?
           </Text>
@@ -157,60 +156,6 @@ export function HomeScreen({ cart, onAdd, onCategoryPress, onLogout, onRemove }:
             </View>
           )}
         </View>
-
-        {!normalizedSearch && (
-          <View style={{ gap: 14 }}>
-            <Text selectable style={{ fontSize: 19, lineHeight: 25, fontWeight: '800', color: '#211A28' }}>Popular near you</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingRight: 20 }}>
-              {featuredServices.map((item) => (
-                <View key={item.id} style={{ width: 202, padding: 12, gap: 9, borderRadius: 21, borderCurve: 'continuous', backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#ECE9EF' }}>
-                  <View style={{ height: 94, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: item.tint }}>
-                    <Text style={{ fontSize: 39 }}>{item.icon}</Text>
-                  </View>
-                  <Text selectable numberOfLines={1} style={{ fontSize: 13, fontWeight: '800', color: '#211A28' }}>{item.title}</Text>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <View style={{ flex: 1, gap: 2 }}>
-                      <Text style={{ fontSize: 10, color: '#77717D' }}>★ {item.rating} · {item.duration}</Text>
-                      <Text selectable style={{ fontSize: 14, fontWeight: '800', color: '#211A28', fontVariant: ['tabular-nums'] }}>₹{item.price}</Text>
-                    </View>
-                    {(cart[item.id] ?? 0) === 0 ? (
-                      <Pressable
-                        accessibilityRole="button"
-                        accessibilityLabel={`Add ${item.title}`}
-                        onPress={() => onAdd(item)}
-                        style={({ pressed }) => ({ width: 58, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 11, backgroundColor: pressed ? '#5933C4' : '#6E45E2' })}
-                      >
-                        <Text style={{ fontSize: 11, fontWeight: '800', color: '#FFFFFF' }}>ADD</Text>
-                      </Pressable>
-                    ) : (
-                      <View style={{ height: 34, flexDirection: 'row', alignItems: 'center', borderRadius: 11, backgroundColor: '#6E45E2', overflow: 'hidden' }}>
-                        <Pressable
-                          accessibilityRole="button"
-                          accessibilityLabel={`Remove one ${item.title}`}
-                          onPress={() => onRemove(item)}
-                          style={({ pressed }) => ({ width: 28, height: 34, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.6 : 1 })}
-                        >
-                          <Text style={{ fontSize: 17, lineHeight: 20, color: '#FFFFFF' }}>−</Text>
-                        </Pressable>
-                        <Text selectable style={{ minWidth: 24, textAlign: 'center', fontSize: 11, fontWeight: '800', color: '#FFFFFF', fontVariant: ['tabular-nums'] }}>
-                          {cart[item.id]}
-                        </Text>
-                        <Pressable
-                          accessibilityRole="button"
-                          accessibilityLabel={`Add one ${item.title}`}
-                          onPress={() => onAdd(item)}
-                          style={({ pressed }) => ({ width: 28, height: 34, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.6 : 1 })}
-                        >
-                          <Text style={{ fontSize: 17, lineHeight: 20, color: '#FFFFFF' }}>+</Text>
-                        </Pressable>
-                      </View>
-                    )}
-                  </View>
-                </View>
-              ))}
-            </ScrollView>
-          </View>
-        )}
 
         {!normalizedSearch && (
           <View style={{ padding: 18, flexDirection: 'row', gap: 14, alignItems: 'center', borderRadius: 22, borderCurve: 'continuous', backgroundColor: '#EAF7F1' }}>
