@@ -30,7 +30,7 @@ export default function App() {
 
     Promise.all([
       getStoredAuthSession().catch(() => null),
-      new Promise<void>((resolve) => setTimeout(resolve, 1000)),
+      new Promise<void>((resolve) => setTimeout(resolve, 1600)),
     ]).then(([storedSession]) => {
         if (!active) return;
         setSession(storedSession);

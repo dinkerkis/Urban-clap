@@ -1,18 +1,23 @@
+import { Image } from 'expo-image';
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, Linking, Pressable, ScrollView, Text, TextInput, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { OfferCarousel } from '../../components/offer-carousel';
 import type { ServiceCategory } from '../../data/service-catalog';
-import { serviceCategories } from '../../data/service-catalog';
 import { useCurrentLocation } from '../../hooks/use-current-location';
 
 type HomeScreenProps = {
+  categories: ServiceCategory[];
+  errorMessage: string;
+  isLoading: boolean;
   onCategoryPress: (category: ServiceCategory) => void;
+  onSeeAllCategories: () => void;
   onLogout: () => void;
+  onRetry: () => void;
 };
 
-export function HomeScreen({ onCategoryPress, onLogout }: HomeScreenProps) {
+export function HomeScreen({ categories, errorMessage, isLoading, onCategoryPress, onSeeAllCategories, onLogout, onRetry }: HomeScreenProps) {
   const insets = useSafeAreaInsets();
   const [search, setSearch] = useState('');
   const currentLocation = useCurrentLocation();
@@ -22,13 +27,13 @@ export function HomeScreen({ onCategoryPress, onLogout }: HomeScreenProps) {
   const visibleCategories = useMemo(
     () =>
       normalizedSearch
-        ? serviceCategories.filter(
+        ? categories.filter(
             (category) =>
               category.title.toLowerCase().includes(normalizedSearch) ||
               category.subcategories.some((subcategory) => subcategory.title.toLowerCase().includes(normalizedSearch)),
           )
-        : serviceCategories,
-    [normalizedSearch],
+        : categories,
+    [categories, normalizedSearch],
   );
 
   const handleLocationPress = () => {
@@ -128,9 +133,33 @@ export function HomeScreen({ onCategoryPress, onLogout }: HomeScreenProps) {
             <Text selectable style={{ flex: 1, fontSize: 19, lineHeight: 25, fontWeight: '800', color: '#211A28' }}>
               {normalizedSearch ? 'Search results' : 'Book a service'}
             </Text>
-            {!normalizedSearch && <Text style={{ fontSize: 11, fontWeight: '700', color: '#6E45E2' }}>All categories</Text>}
+            {!normalizedSearch && (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="View all categories"
+                hitSlop={10}
+                onPress={onSeeAllCategories}
+                style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 6, opacity: pressed ? 0.6 : 1 })}
+              >
+                <Text style={{ fontSize: 11, fontWeight: '800', color: '#6E45E2' }}>All categories</Text>
+                <Text style={{ fontSize: 16, lineHeight: 16, fontWeight: '700', color: '#6E45E2' }}>›</Text>
+              </Pressable>
+            )}
           </View>
-          {visibleCategories.length > 0 ? (
+          {isLoading ? (
+            <View style={{ minHeight: 150, alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+              <ActivityIndicator color="#6E45E2" />
+              <Text style={{ fontSize: 12, color: '#77717D' }}>Loading categories...</Text>
+            </View>
+          ) : errorMessage ? (
+            <View style={{ minHeight: 150, alignItems: 'center', justifyContent: 'center', gap: 9, paddingHorizontal: 24 }}>
+              <Text style={{ fontSize: 28 }}>⚠️</Text>
+              <Text selectable style={{ textAlign: 'center', fontSize: 12, lineHeight: 17, color: '#77717D' }}>{errorMessage}</Text>
+              <Pressable accessibilityRole="button" onPress={onRetry} style={{ paddingHorizontal: 18, paddingVertical: 9, borderRadius: 999, backgroundColor: '#6E45E2' }}>
+                <Text style={{ fontSize: 12, fontWeight: '800', color: '#FFFFFF' }}>Try again</Text>
+              </Pressable>
+            </View>
+          ) : visibleCategories.length > 0 ? (
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
               {visibleCategories.map((category) => (
                 <Pressable
@@ -141,6 +170,14 @@ export function HomeScreen({ onCategoryPress, onLogout }: HomeScreenProps) {
                 >
                   <View style={{ width: categoryWidth, height: categoryWidth, maxHeight: 84, alignItems: 'center', justifyContent: 'center', borderRadius: 21, borderCurve: 'continuous', backgroundColor: category.tint }}>
                     <Text style={{ fontSize: 29 }}>{category.icon}</Text>
+                    {category.imageUrl ? (
+                      <Image
+                        source={category.imageUrl}
+                        contentFit="cover"
+                        transition={180}
+                        style={{ position: 'absolute', inset: 0, borderRadius: 21 }}
+                      />
+                    ) : null}
                   </View>
                   <Text numberOfLines={2} style={{ minHeight: 30, textAlign: 'center', fontSize: 10, lineHeight: 14, fontWeight: '700', color: '#49414F' }}>
                     {category.title}

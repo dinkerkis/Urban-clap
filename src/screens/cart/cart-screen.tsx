@@ -2,17 +2,18 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 
 import { DashboardScreenHeader } from '../../components/dashboard-screen-header';
 import { ServiceCard } from '../../components/service-card';
-import { allServices, type ServiceItem } from '../../data/service-catalog';
+import type { ServiceItem } from '../../data/service-catalog';
 
 type CartScreenProps = {
   cart: Record<string, number>;
+  items: ServiceItem[];
   onAdd: (item: ServiceItem) => void;
   onExplore: () => void;
   onRemove: (item: ServiceItem) => void;
 };
 
-export function CartScreen({ cart, onAdd, onExplore, onRemove }: CartScreenProps) {
-  const cartItems = allServices.filter((item) => (cart[item.id] ?? 0) > 0);
+export function CartScreen({ cart, items, onAdd, onExplore, onRemove }: CartScreenProps) {
+  const cartItems = items.filter((item) => (cart[item.id] ?? 0) > 0);
   const subtotal = cartItems.reduce((total, item) => total + item.price * (cart[item.id] ?? 0), 0);
   const taxes = cartItems.length > 0 ? 49 : 0;
 

@@ -17,7 +17,6 @@ type Props = {
 export function PhoneLoginScreen({ onContinue }: Props) {
   const insets = useSafeAreaInsets();
   const [phone, setPhone] = useState('');
-  const [isFocused, setIsFocused] = useState(false);
   const [country, setCountry] = useState(defaultCountry);
   const [isCountryPickerOpen, setIsCountryPickerOpen] = useState(false);
   const [isSending, setIsSending] = useState(false);
@@ -79,16 +78,15 @@ export function PhoneLoginScreen({ onContinue }: Props) {
             <View style={{ gap: 9 }}>
               <View
                 style={{
-                  minHeight: 64,
+                  height: 64,
                   flexDirection: 'row',
                   alignItems: 'center',
-                  borderWidth: isFocused ? 1.5 : 1,
-                  borderColor: isFocused ? colors.primary : colors.border,
+                  borderWidth: 1,
+                  borderColor: colors.border,
                   borderRadius: 14,
                   borderCurve: 'continuous',
                   overflow: 'hidden',
                   backgroundColor: colors.surface,
-                  boxShadow: isFocused ? '0 0 0 3px rgba(6, 73, 216, 0.08)' : 'none',
                 }}
               >
                 <Pressable
@@ -117,21 +115,21 @@ export function PhoneLoginScreen({ onContinue }: Props) {
                 </Pressable>
                 <View style={{ width: 1, height: '52%', backgroundColor: colors.border }} />
                 <TextInput
+                  autoCorrect={false}
                   keyboardType="phone-pad"
                   maxLength={country.phoneLength}
-                  onBlur={() => setIsFocused(false)}
                   onChangeText={(text) => {
                     setErrorMessage('');
                     setPhone(text.replace(/\D/g, '').slice(0, country.phoneLength));
                   }}
-                  onFocus={() => setIsFocused(true)}
                   placeholder="Enter Phone Number"
                   placeholderTextColor={colors.placeholder}
                   returnKeyType="done"
+                  showSoftInputOnFocus
                   textContentType="telephoneNumber"
                   value={phone}
                   onSubmitEditing={continueToOtp}
-                  style={{ flex: 1, height: '100%', paddingHorizontal: 16, ...typography.input, color: colors.text, fontVariant: ['tabular-nums'] }}
+                  style={{ flex: 1, alignSelf: 'stretch', paddingHorizontal: 16, paddingVertical: 0, ...typography.input, color: colors.text, fontVariant: ['tabular-nums'] }}
                 />
               </View>
               {errorMessage ? (

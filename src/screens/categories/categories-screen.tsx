@@ -1,14 +1,18 @@
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Image } from 'expo-image';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 
 import { DashboardScreenHeader } from '../../components/dashboard-screen-header';
 import type { ServiceCategory } from '../../data/service-catalog';
-import { serviceCategories } from '../../data/service-catalog';
 
 type CategoriesScreenProps = {
+  categories: ServiceCategory[];
+  errorMessage: string;
+  isLoading: boolean;
   onCategoryPress: (category: ServiceCategory) => void;
+  onRetry: () => void;
 };
 
-export function CategoriesScreen({ onCategoryPress }: CategoriesScreenProps) {
+export function CategoriesScreen({ categories, errorMessage, isLoading, onCategoryPress, onRetry }: CategoriesScreenProps) {
   return (
     <View style={{ flex: 1, backgroundColor: '#FAF9FB' }}>
       <DashboardScreenHeader title="All categories" subtitle="Choose a service for your home" />
@@ -17,7 +21,25 @@ export function CategoriesScreen({ onCategoryPress }: CategoriesScreenProps) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ padding: 20, paddingBottom: 116, gap: 12 }}
       >
-        {serviceCategories.map((category) => (
+        {isLoading ? (
+          <View style={{ minHeight: 260, alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+            <ActivityIndicator color="#6E45E2" />
+            <Text style={{ fontSize: 12, color: '#77717D' }}>Loading categories...</Text>
+          </View>
+        ) : errorMessage ? (
+          <View style={{ minHeight: 260, alignItems: 'center', justifyContent: 'center', gap: 10, paddingHorizontal: 24 }}>
+            <Text style={{ fontSize: 30 }}>⚠️</Text>
+            <Text selectable style={{ textAlign: 'center', fontSize: 12, lineHeight: 18, color: '#77717D' }}>{errorMessage}</Text>
+            <Pressable accessibilityRole="button" onPress={onRetry} style={{ paddingHorizontal: 18, paddingVertical: 10, borderRadius: 999, backgroundColor: '#6E45E2' }}>
+              <Text style={{ fontSize: 12, fontWeight: '800', color: '#FFFFFF' }}>Try again</Text>
+            </Pressable>
+          </View>
+        ) : categories.length === 0 ? (
+          <View style={{ minHeight: 260, alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+            <Text style={{ fontSize: 30 }}>📂</Text>
+            <Text selectable style={{ fontSize: 13, fontWeight: '700', color: '#514A58' }}>No categories available</Text>
+          </View>
+        ) : categories.map((category) => (
           <Pressable
             key={category.id}
             accessibilityRole="button"
@@ -38,6 +60,9 @@ export function CategoriesScreen({ onCategoryPress }: CategoriesScreenProps) {
           >
             <View style={{ width: 68, height: 68, alignItems: 'center', justifyContent: 'center', borderRadius: 19, borderCurve: 'continuous', backgroundColor: category.tint }}>
               <Text style={{ fontSize: 31 }}>{category.icon}</Text>
+              {category.imageUrl ? (
+                <Image source={category.imageUrl} contentFit="cover" transition={180} style={{ position: 'absolute', inset: 0, borderRadius: 19 }} />
+              ) : null}
             </View>
             <View style={{ flex: 1, gap: 4 }}>
               <Text selectable style={{ fontSize: 15, lineHeight: 20, fontWeight: '800', color: '#211A28' }}>{category.title}</Text>
