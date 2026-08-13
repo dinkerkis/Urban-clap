@@ -10,11 +10,13 @@ import { CartScreen } from '../cart';
 import { CategoriesScreen } from '../categories';
 import { CategoryDetailScreen } from '../category-detail';
 import { HomeScreen } from '../home';
+import { LocationPickerScreen } from '../location-picker';
 import { ProductDetailScreen } from '../product-detail';
 import { ServiceListScreen } from '../service-list';
 
 type DashboardPage =
   | { type: 'root' }
+  | { type: 'location' }
   | { type: 'category'; category: ServiceCategory }
   | { type: 'services'; category: ServiceCategory; subcategory: ServiceSubcategory }
   | { type: 'product'; category: ServiceCategory; subcategory: ServiceSubcategory; item: ServiceItem }
@@ -29,6 +31,7 @@ type DashboardScreenProps = {
 export function DashboardScreen({ authToken, onLogout }: DashboardScreenProps) {
   const [activeTab, setActiveTab] = useState<DashboardTab>('home');
   const [page, setPage] = useState<DashboardPage>({ type: 'root' });
+  const [selectedLocation, setSelectedLocation] = useState<{ subtitle: string; title: string } | null>(null);
   const cartState = useCart(authToken);
   const { categories, errorMessage: categoriesError, isLoading: categoriesLoading, retry: retryCategories } = useServiceCategories();
   const isCartScreenVisible = page.type === 'checkout-cart' || (page.type === 'root' && activeTab === 'cart');
@@ -71,7 +74,22 @@ export function DashboardScreen({ authToken, onLogout }: DashboardScreenProps) {
 
   let content;
 
-  if (page.type === 'checkout-cart') {
+  if (page.type === 'location') {
+    content = (
+      <LocationPickerScreen
+        authToken={authToken}
+        onBack={() => setPage({ type: 'root' })}
+        onSelectAddress={(title, subtitle) => {
+          setSelectedLocation({ title, subtitle });
+          setPage({ type: 'root' });
+        }}
+        onUseCurrentLocation={() => {
+          setSelectedLocation(null);
+          setPage({ type: 'root' });
+        }}
+      />
+    );
+  } else if (page.type === 'checkout-cart') {
     content = (
       <CartScreen
         cart={cartState.quantities}
@@ -195,10 +213,14 @@ export function DashboardScreen({ authToken, onLogout }: DashboardScreenProps) {
   } else {
     content = (
       <HomeScreen
+        authToken={authToken}
         categories={categories}
         errorMessage={categoriesError}
         isLoading={categoriesLoading}
+        locationSubtitle={selectedLocation?.subtitle}
+        locationTitle={selectedLocation?.title}
         onCategoryPress={openCategory}
+        onLocationPress={() => setPage({ type: 'location' })}
         onSeeAllCategories={() => changeTab('categories')}
         onLogout={onLogout}
         onRetry={retryCategories}

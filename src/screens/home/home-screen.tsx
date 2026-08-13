@@ -1,25 +1,82 @@
 import { Image } from 'expo-image';
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, Linking, Pressable, ScrollView, Text, TextInput, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, ScrollView, Text, TextInput, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { DEFAULT_OFFER_HEADER_COLOR, OfferCarousel } from '../../components/offer-carousel';
 import type { ServiceCategory } from '../../data/service-catalog';
 import { useCurrentLocation } from '../../hooks/use-current-location';
+import { useSaveCurrentLocationAddress } from '../../hooks/use-save-current-location-address';
 
 const SEARCH_SUGGESTIONS = ['AC service', 'Facial', 'Kitchen cleaning'];
 
+function LocationPinIcon() {
+  return (
+    <View style={{ width: 18, height: 22, alignItems: 'center' }}>
+      <View style={{ width: 14, height: 14, alignItems: 'center', justifyContent: 'center', borderRadius: 7, borderWidth: 1.8, borderColor: '#FFFFFF' }}>
+        <View style={{ width: 4.5, height: 4.5, borderRadius: 2.25, backgroundColor: '#FFFFFF' }} />
+      </View>
+      <View
+        style={{
+          width: 0,
+          height: 0,
+          marginTop: -2,
+          borderLeftWidth: 4,
+          borderRightWidth: 4,
+          borderTopWidth: 7,
+          borderLeftColor: 'transparent',
+          borderRightColor: 'transparent',
+          borderTopColor: '#FFFFFF',
+        }}
+      />
+    </View>
+  );
+}
+
+function ChevronDownIcon() {
+  return (
+    <View style={{ width: 10, height: 7, alignItems: 'center', justifyContent: 'center' }}>
+      <View
+        style={{
+          width: 7,
+          height: 7,
+          marginTop: -3,
+          borderRightWidth: 1.7,
+          borderBottomWidth: 1.7,
+          borderColor: '#FFFFFF',
+          transform: [{ rotate: '45deg' }],
+        }}
+      />
+    </View>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <Image
+      source={require('../../../assets/search.png')}
+      contentFit="contain"
+      tintColor="#8B8590"
+      style={{ width: 18, height: 18 }}
+    />
+  );
+}
+
 type HomeScreenProps = {
+  authToken?: string;
   categories: ServiceCategory[];
   errorMessage: string;
   isLoading: boolean;
+  locationSubtitle?: string;
+  locationTitle?: string;
   onCategoryPress: (category: ServiceCategory) => void;
+  onLocationPress: () => void;
   onSeeAllCategories: () => void;
   onLogout: () => void;
   onRetry: () => void;
 };
 
-export function HomeScreen({ categories, errorMessage, isLoading, onCategoryPress, onLogout, onRetry }: HomeScreenProps) {
+export function HomeScreen({ authToken, categories, errorMessage, isLoading, locationSubtitle, locationTitle, onCategoryPress, onLocationPress, onLogout, onRetry }: HomeScreenProps) {
   const insets = useSafeAreaInsets();
   const [search, setSearch] = useState('');
   const [searchSuggestionIndex, setSearchSuggestionIndex] = useState(0);
@@ -27,8 +84,9 @@ export function HomeScreen({ categories, errorMessage, isLoading, onCategoryPres
   const [isDeletingSuggestion, setIsDeletingSuggestion] = useState(false);
   const [headerColor, setHeaderColor] = useState(DEFAULT_OFFER_HEADER_COLOR);
   const currentLocation = useCurrentLocation();
+  useSaveCurrentLocationAddress(authToken, currentLocation);
   const { width } = useWindowDimensions();
-  const categoryWidth = Math.max(92, Math.floor((width - 40 - 20) / 3));
+  const categoryWidth = Math.max(92, Math.floor((width - 32 - 24) / 3));
   const normalizedSearch = search.trim().toLowerCase();
   const visibleCategories = useMemo(
     () =>
@@ -75,17 +133,8 @@ export function HomeScreen({ categories, errorMessage, isLoading, onCategoryPres
     return () => clearTimeout(timer);
   }, [displayedSuggestion, isDeletingSuggestion, searchSuggestionIndex]);
 
-  const handleLocationPress = () => {
-    if ((currentLocation.status === 'denied' && !currentLocation.canAskAgain) || currentLocation.status === 'approximate') {
-      Alert.alert('Precise location needed', 'Enable precise location in Settings to show your nearest street or locality.', [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Open Settings', onPress: () => void Linking.openSettings() },
-      ]);
-      return;
-    }
-
-    void currentLocation.refresh();
-  };
+  const locationHeading = locationTitle || 'In 44 minutes';
+  const locationLine = locationSubtitle || currentLocation.label;
 
   return (
     <ScrollView
@@ -105,20 +154,23 @@ export function HomeScreen({ categories, errorMessage, isLoading, onCategoryPres
           backgroundColor: headerColor,
         }}
       >
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={`Current location: ${currentLocation.label}`}
-            onPress={handleLocationPress}
-            style={({ pressed }) => ({ flex: 1, gap: 2, opacity: pressed ? 0.7 : 1 })}
+            accessibilityLabel={`Current location: ${locationLine}`}
+            onPress={onLocationPress}
+            style={({ pressed }) => ({ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, opacity: pressed ? 0.7 : 1 })}
           >
-            <Text style={{ fontSize: 15, lineHeight: 20, fontWeight: '600', color: 'rgba(255, 255, 255, 0.90)' }}>Your location</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <Text style={{ width: 15, fontSize: 14, lineHeight: 19, fontWeight: '700', color: '#FFFFFF', transform: [{ rotate: '-45deg' }] }}>➤</Text>
-              {currentLocation.status === 'loading' && <ActivityIndicator size="small" color="#FFFFFF" />}
-              <Text selectable numberOfLines={1} ellipsizeMode="tail" style={{ flex: 1, fontSize: 13, lineHeight: 18, fontWeight: '500', color: 'rgba(255, 255, 255, 0.90)' }}>
-                {currentLocation.label}
-              </Text>
+            <LocationPinIcon />
+            <View style={{ flex: 1, gap: 2 }}>
+              <Text style={{ fontSize: 14, lineHeight: 19, fontWeight: '700', color: 'rgba(255, 255, 255, 0.90)' }}>{locationHeading}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                {!locationSubtitle && currentLocation.status === 'loading' && <ActivityIndicator size="small" color="#FFFFFF" />}
+                <Text selectable numberOfLines={1} ellipsizeMode="tail" style={{ flexShrink: 1, fontSize: 12, lineHeight: 17, fontWeight: '500', color: 'rgba(255, 255, 255, 0.90)' }}>
+                  {locationLine}
+                </Text>
+                <ChevronDownIcon />
+              </View>
             </View>
           </Pressable>
           <Pressable
@@ -130,18 +182,15 @@ export function HomeScreen({ categories, errorMessage, isLoading, onCategoryPres
                 { text: 'Log out', style: 'destructive', onPress: onLogout },
               ])
             }
-            style={({ pressed }) => ({ width: 42, height: 42, alignItems: 'center', justifyContent: 'center', borderRadius: 21, backgroundColor: '#FFFFFFE8', opacity: pressed ? 0.7 : 1 })}
+            style={({ pressed }) => ({ width: 35, height: 35, alignItems: 'center', justifyContent: 'center', borderRadius: 6, backgroundColor: '#FFFFFF', opacity: pressed ? 0.7 : 1 })}
           >
-            <Text style={{ fontSize: 18 }}>👤</Text>
+            <Text style={{ fontSize: 16, lineHeight: 18, textAlign: 'center', includeFontPadding: false }}>👤</Text>
           </Pressable>
         </View>
 
-        <View style={{ height: 44, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, borderRadius: 12, borderCurve: 'continuous', backgroundColor: '#FFFFFF' }}>
-          <View style={{ width: 17, height: 17 }}>
-            <View style={{ position: 'absolute', left: 1, top: 1, width: 11, height: 11, borderRadius: 6, borderWidth: 1.7, borderColor: '#645C6C' }} />
-            <View style={{ position: 'absolute', width: 7, height: 1.7, right: 0, bottom: 2, borderRadius: 1, backgroundColor: '#645C6C', transform: [{ rotate: '45deg' }] }} />
-          </View>
-          <View style={{ flex: 1, height: 44, justifyContent: 'center' }}>
+        <View style={{ height: 40, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, borderRadius: 10, borderCurve: 'continuous', backgroundColor: '#FFFFFF' }}>
+          <SearchIcon />
+          <View style={{ flex: 1, height: 40, justifyContent: 'center' }}>
             {!search ? (
               <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, flexDirection: 'row', alignItems: 'center' }}>
                 <Text style={{ fontSize: 13, color: '#918A97' }}>Search for '</Text>
@@ -157,7 +206,7 @@ export function HomeScreen({ categories, errorMessage, isLoading, onCategoryPres
               onChangeText={setSearch}
               accessibilityLabel="Search for services"
               returnKeyType="search"
-              style={{ flex: 1, minHeight: 44, paddingVertical: 8, fontSize: 13, color: '#241D2B' }}
+              style={{ flex: 1, minHeight: 40, paddingVertical: 6, fontSize: 13, color: '#241D2B' }}
             />
           </View>
         </View>
@@ -165,7 +214,7 @@ export function HomeScreen({ categories, errorMessage, isLoading, onCategoryPres
         {!normalizedSearch && <OfferCarousel embeddedOnPurple onHeaderColorChange={setHeaderColor} />}
       </View>
 
-      <View style={{ paddingHorizontal: 20, paddingTop: 24, gap: 25 }}>
+      <View style={{ paddingHorizontal: 20, paddingTop: 16, gap: 25 }}>
         <View style={{ gap: 15 }}>
           {normalizedSearch ? (
             <Text selectable style={{ fontSize: 19, lineHeight: 25, fontWeight: '600', color: '#211A28' }}>
@@ -186,26 +235,38 @@ export function HomeScreen({ categories, errorMessage, isLoading, onCategoryPres
               </Pressable>
             </View>
           ) : visibleCategories.length > 0 ? (
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+            <View style={{ marginHorizontal: -4, flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
               {visibleCategories.map((category) => (
                 <Pressable
                   key={category.id}
                   accessibilityRole="button"
                   onPress={() => onCategoryPress(category)}
-                  style={({ pressed }) => ({ width: categoryWidth, alignItems: 'center', gap: 8, opacity: pressed ? 0.62 : 1 })}
+                  style={({ pressed }) => ({ width: categoryWidth, alignItems: 'center', gap: 6, opacity: pressed ? 0.62 : 1 })}
                 >
-                  <View style={{ width: categoryWidth, height: 76, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderRadius: 12, borderCurve: 'continuous', backgroundColor: '#EEEEEE' }}>
-                    <Text style={{ fontSize: 29 }}>{category.icon}</Text>
+                  <View style={{ width: categoryWidth, height: 64, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderRadius: 12, borderCurve: 'continuous', backgroundColor: '#F1F1F1' }}>
+                    <Text style={{ fontSize: 22 }}>{category.icon}</Text>
                     {category.imageUrl ? (
                       <Image
                         source={category.imageUrl}
                         contentFit="contain"
                         transition={180}
-                        style={{ position: 'absolute', inset: 8 }}
+                        style={{ position: 'absolute', inset: 12 }}
                       />
                     ) : null}
                   </View>
-                  <Text numberOfLines={2} style={{ minHeight: 30, textAlign: 'center', fontSize: 10, lineHeight: 14, fontWeight: '700', color: '#49414F' }}>
+                  <Text
+                    numberOfLines={2}
+                    style={{
+                      width: categoryWidth,
+                      minHeight: 34,
+                      paddingHorizontal: category.title.toLowerCase().includes('electric') ? 0 : 2,
+                      textAlign: category.title.toLowerCase().includes('electric') ? 'left' : 'center',
+                      fontSize: 13,
+                      lineHeight: 17,
+                      fontWeight: '400',
+                      color: '#2B2433',
+                    }}
+                  >
                     {category.title}
                   </Text>
                 </Pressable>

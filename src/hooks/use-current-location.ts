@@ -1,18 +1,34 @@
 import * as Location from 'expo-location';
 import { useCallback, useEffect, useState } from 'react';
 
-type LocationStatus = 'loading' | 'ready' | 'denied' | 'disabled' | 'approximate' | 'error';
+export type LocationStatus = 'loading' | 'ready' | 'denied' | 'disabled' | 'approximate' | 'error';
 
-type CurrentLocation = {
+export type CurrentLocationCoords = {
+  latitude: number;
+  longitude: number;
+};
+
+export type CurrentLocation = {
   canAskAgain: boolean;
+  coords: CurrentLocationCoords | null;
+  geocodedAddress: Location.LocationGeocodedAddress | null;
   label: string;
   refresh: () => Promise<void>;
   status: LocationStatus;
 };
 
-function logLocation(label: string, value: unknown): void {
-  if (__DEV__) console.log(`[Location] ${label}`, value);
-}
+type LocationSnapshot = Omit<CurrentLocation, 'refresh'>;
+
+const loadingSnapshot: LocationSnapshot = {
+  canAskAgain: true,
+  coords: null,
+  geocodedAddress: null,
+  label: 'Finding your location...',
+  status: 'loading',
+};
+
+let cachedSnapshot: LocationSnapshot | null = null;
+let inFlight: Promise<LocationSnapshot> | null = null;
 
 function formatAddress(address: Location.LocationGeocodedAddress | undefined): string | null {
   if (!address) return null;
@@ -39,61 +55,82 @@ function formatAddress(address: Location.LocationGeocodedAddress | undefined): s
   return uniqueParts.slice(0, 4).join(', ') || null;
 }
 
-export function useCurrentLocation(): CurrentLocation {
-  const [label, setLabel] = useState('Finding your location...');
-  const [status, setStatus] = useState<LocationStatus>('loading');
-  const [canAskAgain, setCanAskAgain] = useState(true);
+async function fetchCurrentLocation(): Promise<LocationSnapshot> {
+  if (cachedSnapshot?.status === 'ready') return cachedSnapshot;
+  if (inFlight) return inFlight;
 
-  const refresh = useCallback(async () => {
-    setStatus('loading');
-    setLabel('Finding your location...');
-
+  inFlight = (async () => {
     try {
       let permission = await Location.getForegroundPermissionsAsync();
       if (permission.status !== Location.PermissionStatus.GRANTED && permission.canAskAgain) {
         permission = await Location.requestForegroundPermissionsAsync();
       }
-      setCanAskAgain(permission.canAskAgain);
       if (permission.status !== Location.PermissionStatus.GRANTED) {
-        setStatus('denied');
-        setLabel('Allow location access');
-        return;
+        return { ...loadingSnapshot, canAskAgain: permission.canAskAgain, status: 'denied', label: 'Allow location access' };
       }
 
       const hasApproximateLocation = permission.ios?.accuracy === 'reduced' || permission.android?.accuracy === 'coarse';
       if (hasApproximateLocation) {
-        setStatus('approximate');
-        setLabel('Enable precise location');
-        return;
+        return { ...loadingSnapshot, canAskAgain: permission.canAskAgain, status: 'approximate', label: 'Enable precise location' };
       }
 
       const locationServicesEnabled = await Location.hasServicesEnabledAsync();
       if (!locationServicesEnabled) {
-        setStatus('disabled');
-        setLabel('Turn on location services');
-        return;
+        return { ...loadingSnapshot, canAskAgain: permission.canAskAgain, status: 'disabled', label: 'Turn on location services' };
       }
 
       const position = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Highest });
-      
-      const addresses = await Location.reverseGeocodeAsync({
+      const coords = {
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
-      });
-      
+      };
+      const addresses = await Location.reverseGeocodeAsync(coords);
       const addressLabel = formatAddress(addresses[0]);
-      setLabel(addressLabel ?? `${position.coords.latitude.toFixed(5)}, ${position.coords.longitude.toFixed(5)}`);
-      setStatus('ready');
-    } catch (error) {
-      
-      setStatus('error');
-      setLabel('Tap to retry location');
+      const snapshot: LocationSnapshot = {
+        canAskAgain: permission.canAskAgain,
+        coords,
+        geocodedAddress: addresses[0] ?? null,
+        label: addressLabel ?? `${coords.latitude.toFixed(5)}, ${coords.longitude.toFixed(5)}`,
+        status: 'ready',
+      };
+      cachedSnapshot = snapshot;
+      return snapshot;
+    } catch {
+      return { ...loadingSnapshot, status: 'error', label: 'Tap to retry location' };
+    } finally {
+      inFlight = null;
     }
+  })();
+
+  return inFlight;
+}
+
+export function useCurrentLocation(): CurrentLocation {
+  const [snapshot, setSnapshot] = useState<LocationSnapshot>(cachedSnapshot ?? loadingSnapshot);
+
+  const refresh = useCallback(async () => {
+    if (cachedSnapshot?.status === 'ready') {
+      setSnapshot(cachedSnapshot);
+      return;
+    }
+    setSnapshot(loadingSnapshot);
+    setSnapshot(await fetchCurrentLocation());
   }, []);
 
   useEffect(() => {
-    void refresh();
-  }, [refresh]);
+    if (cachedSnapshot?.status === 'ready') {
+      setSnapshot(cachedSnapshot);
+      return;
+    }
 
-  return { canAskAgain, label, refresh, status };
+    let cancelled = false;
+    void fetchCurrentLocation().then((next) => {
+      if (!cancelled) setSnapshot(next);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return { ...snapshot, refresh };
 }

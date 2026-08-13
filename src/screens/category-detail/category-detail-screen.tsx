@@ -21,44 +21,42 @@ export function CategoryDetailScreen({ category, onBack, onSubcategoryPress }: C
     <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
       <View
         style={{
-          paddingTop: insets.top + 8,
-          paddingHorizontal: 20,
-          paddingBottom: 14,
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 12,
+          height: insets.top + 66,
+          paddingTop: insets.top,
           backgroundColor: '#FFFFFF',
         }}
       >
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-          hitSlop={10}
-          onPress={onBack}
-          style={({ pressed }) => ({ width: 34, height: 40, alignItems: 'flex-start', justifyContent: 'center', opacity: pressed ? 0.55 : 1 })}
-        >
-          <Text style={{ fontSize: 23, lineHeight: 25, fontWeight: '400', color: '#171419' }}>←</Text>
-        </Pressable>
+        <View style={{ height: 66, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+            hitSlop={8}
+            onPress={onBack}
+            style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, opacity: pressed ? 0.58 : 1 })}
+          >
+            <Text style={{ fontSize: 23, lineHeight: 25, fontWeight: '400', color: '#171419' }}>←</Text>
+          </Pressable>
 
-        <Text selectable numberOfLines={2} style={{ flex: 1, fontSize: 20, lineHeight: 26, fontWeight: '600', color: '#171419' }}>
-          {category.title}
-        </Text>
+          <Text selectable numberOfLines={2} style={{ flex: 1, fontSize: 20, lineHeight: 26, fontWeight: '600', color: '#171419' }}>
+            {category.title}
+          </Text>
 
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={`Share ${category.title}`}
-          hitSlop={10}
-          onPress={shareCategory}
-          style={({ pressed }) => ({ width: 38, height: 40, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.55 : 1 })}
-        >
-          <View style={{ width: 19, height: 19 }}>
-            <View style={{ position: 'absolute', left: 4.5, top: 6, width: 10, height: 1.7, borderRadius: 2, backgroundColor: '#171419', transform: [{ rotate: '-29deg' }] }} />
-            <View style={{ position: 'absolute', left: 4.5, top: 11.5, width: 10, height: 1.7, borderRadius: 2, backgroundColor: '#171419', transform: [{ rotate: '29deg' }] }} />
-            <View style={{ position: 'absolute', left: 1, top: 7, width: 5, height: 5, borderRadius: 2.5, backgroundColor: '#171419' }} />
-            <View style={{ position: 'absolute', right: 1, top: 1.5, width: 5, height: 5, borderRadius: 2.5, backgroundColor: '#171419' }} />
-            <View style={{ position: 'absolute', right: 1, bottom: 1.5, width: 5, height: 5, borderRadius: 2.5, backgroundColor: '#171419' }} />
-          </View>
-        </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`Share ${category.title}`}
+            hitSlop={8}
+            onPress={shareCategory}
+            style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, opacity: pressed ? 0.58 : 1 })}
+          >
+            <View style={{ width: 19, height: 19 }}>
+              <View style={{ position: 'absolute', left: 4.5, top: 6, width: 10, height: 1.7, borderRadius: 2, backgroundColor: '#171419', transform: [{ rotate: '-29deg' }] }} />
+              <View style={{ position: 'absolute', left: 4.5, top: 11.5, width: 10, height: 1.7, borderRadius: 2, backgroundColor: '#171419', transform: [{ rotate: '29deg' }] }} />
+              <View style={{ position: 'absolute', left: 1, top: 7, width: 5, height: 5, borderRadius: 2.5, backgroundColor: '#171419' }} />
+              <View style={{ position: 'absolute', right: 1, top: 1.5, width: 5, height: 5, borderRadius: 2.5, backgroundColor: '#171419' }} />
+              <View style={{ position: 'absolute', right: 1, bottom: 1.5, width: 5, height: 5, borderRadius: 2.5, backgroundColor: '#171419' }} />
+            </View>
+          </Pressable>
+        </View>
       </View>
 
       <ScrollView

@@ -67,7 +67,8 @@ export function useCart(authToken?: string) {
       setState((current) => {
         const itemsById: Record<string, ServiceItem> = {};
         const quantities: Record<string, number> = {};
-        data.items.forEach((cartItem) => {
+        const items = Array.isArray(data.items) ? data.items : [];
+        items.forEach((cartItem) => {
           const key = cartKey(cartItem.product_id, cartItem.variant?.key);
           itemsById[key] = mapCartItem(cartItem, current.itemsById[key]);
           quantities[key] = cartItem.quantity;
@@ -77,8 +78,8 @@ export function useCart(authToken?: string) {
           isLoading: false,
           itemsById,
           quantities,
-          totalItems: data.totalItems,
-          totalPrice: data.totalPrice,
+          totalItems: data.totalItems ?? 0,
+          totalPrice: data.totalPrice ?? 0,
         };
       });
     } catch (error) {

@@ -57,7 +57,7 @@ export function useCategoryProducts(categoryId: string) {
           id: section._id,
           title: section.name,
           imageUrl: resolveProductCategoryImage(section.category_image),
-          products: section.products.map((product, productIndex) => ({
+          products: (section.products ?? []).map((product, productIndex) => ({
             id: product._id,
             title: product.name,
             description: product.shortDescription || product.description || 'Professional service at your doorstep',

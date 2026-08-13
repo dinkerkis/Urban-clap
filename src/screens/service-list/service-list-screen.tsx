@@ -1,9 +1,11 @@
 import { Image } from 'expo-image';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Modal, Pressable, ScrollView, Share, Text, TextInput, View, useWindowDimensions } from 'react-native';
-import Animated, { FadeIn, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { Easing, FadeIn, interpolate, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { DottedUnderline } from '../../components/dotted-underline';
+import { EstimateNoteIcon } from '../../components/estimate-note-icon';
 import type { ServiceItem, ServiceSubcategory } from '../../data/service-catalog';
 import { useCategoryProducts, type ProductSection } from '../../hooks/use-category-products';
 
@@ -18,6 +20,9 @@ type ServiceListScreenProps = {
 };
 
 const HERO_DURATION = 4_500;
+const NAV_HEIGHT = 66;
+const SECTION_HEADER_HEIGHT = 46;
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 function ShareIcon() {
   return (
@@ -31,19 +36,6 @@ function ShareIcon() {
   );
 }
 
-function EstimateNoteIcon() {
-  const color = '#9A6C00';
-  return (
-    <View style={{ width: 15, height: 16, alignItems: 'center', justifyContent: 'center' }}>
-      <View style={{ width: 11, height: 13, paddingHorizontal: 2, paddingTop: 2.5, gap: 2, borderWidth: 1.2, borderColor: color, borderRadius: 1.5 }}>
-        <View style={{ width: 6, height: 1.1, borderRadius: 1, backgroundColor: color }} />
-        <View style={{ width: 6, height: 1.1, borderRadius: 1, backgroundColor: color }} />
-        <View style={{ width: 4.5, height: 1.1, borderRadius: 1, backgroundColor: color }} />
-      </View>
-    </View>
-  );
-}
-
 function ProductRow({ item, quantity, onAdd, onPress, onRemove }: { item: ServiceItem; quantity: number; onAdd: (item: ServiceItem) => void; onPress: (item: ServiceItem) => void; onRemove: (item: ServiceItem) => void }) {
   return (
     <Pressable onPress={() => onPress(item)} style={({ pressed }) => ({ paddingVertical: 22, opacity: pressed ? 0.72 : 1 })}>
@@ -51,14 +43,26 @@ function ProductRow({ item, quantity, onAdd, onPress, onRemove }: { item: Servic
         <View style={{ flex: 1, gap: 7 }}>
           <Text selectable numberOfLines={3} style={{ fontSize: 18, lineHeight: 25, fontWeight: '600', color: '#171419' }}>{item.title}</Text>
           {item.rating > 0 ? (
-            <Text selectable style={{ fontSize: 14, color: '#625D64' }}>★ {item.rating} ({item.reviews} reviews)</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 4 }}>
+              <Text style={{ fontSize: 12, lineHeight: 18, color: '#625D64' }}>★</Text>
+              <DottedUnderline>
+                <Text selectable style={{ fontSize: 12, lineHeight: 18, color: '#625D64' }}>{item.rating} ({item.reviews} reviews)</Text>
+              </DottedUnderline>
+            </View>
           ) : null}
-          <Text selectable style={{ fontSize: 15, lineHeight: 21, color: '#625D64' }}>
-            <Text style={{ fontWeight: '600', color: '#171419' }}>{item.variants?.length ? 'Starts at ' : ''}₹{item.price.toLocaleString('en-IN')}</Text>
-            {item.duration ? `  •  ${item.duration}` : ''}
-          </Text>
+          <DottedUnderline fullWidth lineMarginTop={10} dotColor="#DDD9DE">
+            <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 7 }}>
+              <Text selectable style={{ fontSize: 13, lineHeight: 19, fontWeight: '600', color: '#171419' }}>{item.variants?.length ? 'Starts at ' : ''}₹{item.price.toLocaleString('en-IN')}</Text>
+              {item.duration ? (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                  <Text style={{ fontSize: 16, lineHeight: 18, color: '#625D64' }}>•</Text>
+                  <Text selectable style={{ fontSize: 12, lineHeight: 18, color: '#625D64' }}>{item.duration}</Text>
+                </View>
+              ) : null}
+            </View>
+          </DottedUnderline>
           {item.description ? <Text selectable numberOfLines={3} style={{ fontSize: 13, lineHeight: 19, color: '#625D64' }}>{item.description}</Text> : null}
-          <Text style={{ paddingTop: 5, fontSize: 15, lineHeight: 20, fontWeight: '600', color: '#6E45E2' }}>View details and estimate</Text>
+          <Text style={{ paddingTop: 5, fontSize: 14, lineHeight: 19, fontWeight: '600', color: '#6E45E2' }}>View details and estimate</Text>
         </View>
 
         <View style={{ width: 132, alignItems: 'center' }}>
@@ -73,15 +77,15 @@ function ProductRow({ item, quantity, onAdd, onPress, onRemove }: { item: Servic
                 if (item.variants?.length) onPress(item);
                 else onAdd(item);
               }}
-              style={({ pressed }) => ({ width: 96, height: 42, marginTop: -20, alignItems: 'center', justifyContent: 'center', borderRadius: 10, borderCurve: 'continuous', borderWidth: 1, borderColor: '#E3DFE7', backgroundColor: pressed ? '#F4F0FF' : '#FFFFFF' })}
+              style={({ pressed }) => ({ width: 78, height: 32, marginTop: -20, alignItems: 'center', justifyContent: 'center', borderRadius: 10, borderCurve: 'continuous', backgroundColor: pressed ? '#F4F0FF' : '#FFFFFF', boxShadow: '0 1px 6px rgba(23, 20, 25, 0.16)' })}
             >
-              <Text style={{ fontSize: 17, fontWeight: '600', color: '#6E45E2' }}>Add</Text>
+              <Text style={{ fontSize: 16, fontWeight: '500', color: '#6E45E2' }}>Add</Text>
             </Pressable>
           ) : (
-            <View style={{ height: 42, marginTop: -20, flexDirection: 'row', alignItems: 'center', overflow: 'hidden', borderRadius: 10, backgroundColor: '#6E45E2' }}>
-              <Pressable onPress={(event) => { event.stopPropagation(); onRemove(item); }} style={{ width: 34, height: 42, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 20, color: '#FFFFFF' }}>−</Text></Pressable>
-              <Text style={{ minWidth: 25, textAlign: 'center', fontSize: 14, fontWeight: '600', color: '#FFFFFF', fontVariant: ['tabular-nums'] }}>{quantity}</Text>
-              <Pressable onPress={(event) => { event.stopPropagation(); onAdd(item); }} style={{ width: 34, height: 42, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 20, color: '#FFFFFF' }}>+</Text></Pressable>
+            <View style={{ width: 78, height: 32, marginTop: -20, flexDirection: 'row', alignItems: 'center', overflow: 'hidden', borderRadius: 10, backgroundColor: '#6E45E2' }}>
+              <Pressable onPress={(event) => { event.stopPropagation(); onRemove(item); }} style={{ width: 26, height: 32, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 20, color: '#FFFFFF' }}>−</Text></Pressable>
+              <Text style={{ flex: 1, textAlign: 'center', fontSize: 14, fontWeight: '600', color: '#FFFFFF', fontVariant: ['tabular-nums'] }}>{quantity}</Text>
+              <Pressable onPress={(event) => { event.stopPropagation(); onAdd(item); }} style={{ width: 26, height: 32, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 20, color: '#FFFFFF' }}>+</Text></Pressable>
             </View>
           )}
         </View>
@@ -101,7 +105,9 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
   const [searchVisible, setSearchVisible] = useState(false);
   const [search, setSearch] = useState('');
   const [stickyHeaderVisible, setStickyHeaderVisible] = useState(false);
+  const [stickySection, setStickySection] = useState<ProductSection | null>(null);
   const heroProgress = useSharedValue(0);
+  const menuProgress = useSharedValue(0);
 
   const heroItems = useMemo(() => {
     const items = sections.flatMap((section) => section.products.map((product) => ({ imageUrl: product.imageUrl || section.imageUrl, title: product.title, subtitle: product.description })));
@@ -131,16 +137,40 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
   }, [heroIndex, heroItems.length]);
 
   const activeProgressStyle = useAnimatedStyle(() => ({ transform: [{ scaleX: heroProgress.value }] }));
+  const menuFadeStyle = useAnimatedStyle(() => ({ opacity: menuProgress.value }));
+  const menuCardStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(menuProgress.value, [0, 0.18, 1], [0, 0, 1]),
+    transform: [{ scale: interpolate(menuProgress.value, [0, 0.18, 1], [0.82, 0.82, 1]) }],
+  }));
+
+  const openMenu = () => {
+    menuProgress.value = 0;
+    setMenuVisible(true);
+  };
+
+  useEffect(() => {
+    if (!menuVisible) return;
+    menuProgress.value = withTiming(1, { duration: 560, easing: Easing.out(Easing.cubic) });
+  }, [menuProgress, menuVisible]);
+
+  const closeMenu = () => {
+    menuProgress.value = withTiming(0, { duration: 380, easing: Easing.in(Easing.cubic) }, (finished) => {
+      'worklet';
+      if (finished) runOnJS(setMenuVisible)(false);
+    });
+  };
+
   const productCount = sections.reduce((total, section) => total + section.products.length, 0);
   const ratedProducts = sections.flatMap((section) => section.products).filter((item) => item.rating > 0);
   const averageRating = ratedProducts.length ? ratedProducts.reduce((total, item) => total + item.rating, 0) / ratedProducts.length : 0;
   const sectionCardWidth = Math.floor((Math.min(width, 520) - 80) / 3);
-  const modalCardWidth = Math.floor((Math.min(width, 520) - 108) / 3);
+  const modalCardWidth = Math.floor((Math.min(width, 520) - 80) / 3);
+  const modalImageSize = Math.floor(modalCardWidth * 0.82);
 
   const scrollToSection = (section: ProductSection) => {
-    setMenuVisible(false);
+    closeMenu();
     const offset = sectionOffsets.current[section.id];
-    if (offset !== undefined) requestAnimationFrame(() => scrollRef.current?.scrollTo({ y: Math.max(0, offset - 70), animated: true }));
+    if (offset !== undefined) requestAnimationFrame(() => scrollRef.current?.scrollTo({ y: Math.max(0, offset - (insets.top + NAV_HEIGHT + SECTION_HEADER_HEIGHT) + 10), animated: true }));
   };
 
   const share = () => void Share.share({ message: `Explore ${categoryTitle} services on Urban Clap.` });
@@ -161,10 +191,22 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
         onScroll={(event) => {
-          const shouldShow = event.nativeEvent.contentOffset.y >= 238;
+          const y = event.nativeEvent.contentOffset.y;
+          const shouldShow = y >= 238;
           if (shouldShow !== stickyHeaderVisible) setStickyHeaderVisible(shouldShow);
+
+          const navBottom = y + insets.top + NAV_HEIGHT;
+          const pinLine = navBottom + SECTION_HEADER_HEIGHT;
+          let nextSection: ProductSection | null = null;
+          for (const section of visibleSections) {
+            const offset = sectionOffsets.current[section.id];
+            if (offset !== undefined && offset <= pinLine) nextSection = section;
+          }
+          const firstOffset = visibleSections[0] ? sectionOffsets.current[visibleSections[0].id] : undefined;
+          if (firstOffset === undefined || navBottom < firstOffset) nextSection = null;
+          if (nextSection?.id !== stickySection?.id) setStickySection(nextSection);
         }}
-        contentContainerStyle={{ paddingBottom: 190 + insets.bottom }}
+        contentContainerStyle={{ paddingBottom: 118 + insets.bottom }}
       >
         <View style={{ height: 310, backgroundColor: '#CBC6DD' }}>
           {heroItems[heroIndex]?.imageUrl ? (
@@ -181,27 +223,38 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
 
         <View style={{ paddingHorizontal: 20, paddingTop: 25, paddingBottom: 22, gap: 7 }}>
           <Text selectable style={{ fontSize: 25, lineHeight: 32, fontWeight: '600', color: '#171419' }}>{categoryTitle}</Text>
-          <Text selectable style={{ fontSize: 15, color: '#3F3A42' }}>{averageRating > 0 ? `★  ${averageRating.toFixed(2)} · ` : ''}{productCount} services available</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'flex-start', flexWrap: 'wrap', gap: 4 }}>
+            {averageRating > 0 ? (
+              <>
+                <Text style={{ fontSize: 13, lineHeight: 18, color: '#171419' }}>★</Text>
+                <DottedUnderline>
+                  <Text selectable style={{ fontSize: 13, lineHeight: 18, color: '#171419' }}>{averageRating.toFixed(2)} ({productCount} services available)</Text>
+                </DottedUnderline>
+              </>
+            ) : (
+              <Text selectable style={{ fontSize: 13, lineHeight: 18, color: '#171419' }}>{productCount} services available</Text>
+            )}
+          </View>
         </View>
 
-        <View style={{ height: 9, backgroundColor: '#F5F4F5' }} />
+        <View style={{ height: 8, backgroundColor: '#F5F4F5' }} />
 
         <View style={{ paddingHorizontal: 20, paddingVertical: 25, flexDirection: 'row', flexWrap: 'wrap', columnGap: 16, rowGap: 22 }}>
           {sections.map((section) => (
             <Pressable key={section.id} onPress={() => scrollToSection(section)} style={({ pressed }) => ({ width: sectionCardWidth, alignItems: 'center', gap: 8, opacity: pressed ? 0.65 : 1 })}>
-              <View style={{ width: sectionCardWidth, height: sectionCardWidth, overflow: 'hidden', borderRadius: 13, backgroundColor: '#F2F1F3' }}>{section.imageUrl ? <Image source={section.imageUrl} contentFit="cover" style={{ position: 'absolute', inset: 0 }} /> : null}</View>
+              <View style={{ width: sectionCardWidth, height: sectionCardWidth, overflow: 'hidden', borderRadius: 8, borderCurve: 'continuous', backgroundColor: '#EEEEEE' }}>{section.imageUrl ? <Image source={section.imageUrl} contentFit="cover" style={{ position: 'absolute', inset: 0 }} /> : null}</View>
               <Text selectable numberOfLines={3} style={{ minHeight: 37, textAlign: 'center', fontSize: 13, lineHeight: 18, color: '#171419' }}>{section.title}</Text>
             </Pressable>
           ))}
         </View>
 
-        <View style={{ height: 9, backgroundColor: '#F5F4F5' }} />
+        <View style={{ height: 8, backgroundColor: '#F5F4F5' }} />
 
-        {visibleSections.map((section) => (
+        {visibleSections.map((section, sectionIndex) => (
           <View key={section.id} onLayout={(event) => { sectionOffsets.current[section.id] = event.nativeEvent.layout.y; }} style={{ paddingHorizontal: 20 }}>
             <Text selectable style={{ paddingTop: 30, paddingBottom: 4, fontSize: 23, lineHeight: 30, fontWeight: '600', color: '#171419' }}>{section.title}</Text>
             {section.products.length > 0 ? section.products.map((item, index) => <View key={item.id}><ProductRow item={item} quantity={cart[item.id] ?? 0} onAdd={onAdd} onPress={onProductPress} onRemove={onRemove} />{index < section.products.length - 1 ? <View style={{ height: 1, backgroundColor: '#E5E2E6' }} /> : null}</View>) : <Text selectable style={{ paddingVertical: 24, fontSize: 14, color: '#77717D' }}>Products coming soon</Text>}
-            <View style={{ height: 9, marginHorizontal: -20, backgroundColor: '#F5F4F5' }} />
+            {sectionIndex < visibleSections.length - 1 ? <View style={{ height: 8, marginHorizontal: -20, backgroundColor: '#F5F4F5' }} /> : null}
           </View>
         ))}
       </ScrollView>
@@ -213,15 +266,13 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
           left: 0,
           right: 0,
           top: 0,
-          height: insets.top + 66,
+          height: insets.top + NAV_HEIGHT + (stickySection ? SECTION_HEADER_HEIGHT : 0),
           paddingTop: insets.top,
-          backgroundColor: stickyHeaderVisible ? '#FFFFFF' : 'transparent',
-          borderBottomWidth: stickyHeaderVisible ? 1 : 0,
-          borderBottomColor: '#E7E5E8',
-          boxShadow: stickyHeaderVisible ? '0 3px 12px rgba(25, 20, 30, 0.07)' : undefined,
+          backgroundColor: stickyHeaderVisible || stickySection ? '#FFFFFF' : 'transparent',
+          boxShadow: stickyHeaderVisible || stickySection ? '0 3px 12px rgba(25, 20, 30, 0.07)' : undefined,
         }}
       >
-          <View style={{ height: 66, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+          <View style={{ height: NAV_HEIGHT, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', gap: 10, borderBottomWidth: stickyHeaderVisible || stickySection ? 1 : 0, borderBottomColor: '#E7E5E8' }}>
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Go back"
@@ -275,9 +326,16 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
               </Pressable>
             ) : null}
           </View>
+          {stickySection ? (
+            <View style={{ height: SECTION_HEADER_HEIGHT, paddingHorizontal: 20, justifyContent: 'center', backgroundColor: '#FFFFFF', borderBottomWidth: 1, borderBottomColor: '#E7E5E8' }}>
+              <Text selectable numberOfLines={1} ellipsizeMode="tail" style={{ fontSize: 18, lineHeight: 24, fontWeight: '600', color: '#171419' }}>
+                {stickySection.title}
+              </Text>
+            </View>
+          ) : null}
       </View>
 
-      {sections.length > 0 ? <Pressable onPress={() => setMenuVisible(true)} style={({ pressed }) => ({ position: 'absolute', bottom: insets.bottom + 130, alignSelf: 'center', height: 48, paddingHorizontal: 25, flexDirection: 'row', alignItems: 'center', gap: 9, borderRadius: 24, backgroundColor: '#272529', boxShadow: '0 5px 16px rgba(0,0,0,0.22)', opacity: pressed ? 0.78 : 1 })}><Text style={{ fontSize: 19, color: '#FFFFFF' }}>☰</Text><Text style={{ fontSize: 17, fontWeight: '600', color: '#FFFFFF' }}>Menu</Text></Pressable> : null}
+      {sections.length > 0 ? <Pressable onPress={openMenu} style={({ pressed }) => ({ position: 'absolute', bottom: insets.bottom + 130, alignSelf: 'center', height: 36, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', gap: 6, borderRadius: 18, backgroundColor: '#272529', boxShadow: '0 5px 16px rgba(0,0,0,0.22)', opacity: pressed ? 0.78 : 1 })}><Text style={{ fontSize: 19, color: '#FFFFFF' }}>☰</Text><Text style={{ fontSize: 17, fontWeight: '600', color: '#FFFFFF' }}>Menu</Text></Pressable> : null}
 
       <View
         style={{
@@ -309,19 +367,22 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
         </View>
       </View>
 
-      <Modal visible={menuVisible} transparent animationType="fade" onRequestClose={() => setMenuVisible(false)}>
-        <View style={{ flex: 1, justifyContent: 'center', paddingHorizontal: 20, backgroundColor: 'rgba(0,0,0,0.72)' }}>
-          <View style={{ paddingHorizontal: 18, paddingTop: 22, paddingBottom: 25, borderRadius: 22, borderCurve: 'continuous', backgroundColor: '#FFFFFF' }}>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', columnGap: 16, rowGap: 22 }}>
-              {sections.map((section) => (
-                <Pressable key={section.id} onPress={() => scrollToSection(section)} style={({ pressed }) => ({ width: modalCardWidth, alignItems: 'center', gap: 8, opacity: pressed ? 0.62 : 1 })}>
-                  <View style={{ width: modalCardWidth, height: modalCardWidth, overflow: 'hidden', borderRadius: 12, backgroundColor: '#F2F1F3' }}>{section.imageUrl ? <Image source={section.imageUrl} contentFit="cover" style={{ position: 'absolute', inset: 0 }} /> : null}</View>
-                  <Text selectable numberOfLines={3} style={{ minHeight: 36, textAlign: 'center', fontSize: 13, lineHeight: 18, color: '#171419' }}>{section.title}</Text>
-                </Pressable>
-              ))}
+      <Modal visible={menuVisible} transparent animationType="none" onRequestClose={closeMenu}>
+        <View style={{ flex: 1, justifyContent: 'flex-end', paddingBottom: 72 + insets.bottom }}>
+          <AnimatedPressable onPress={closeMenu} style={[{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.72)' }, menuFadeStyle]} />
+          <Animated.View style={[{ paddingHorizontal: 16 }, menuCardStyle]}>
+            <View style={{ paddingHorizontal: 12, paddingTop: 22, paddingBottom: 25, borderRadius: 22, borderCurve: 'continuous', backgroundColor: '#FFFFFF' }}>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', columnGap: 12, rowGap: 22 }}>
+                {sections.map((section) => (
+                  <Pressable key={section.id} onPress={() => scrollToSection(section)} style={({ pressed }) => ({ width: modalCardWidth, alignItems: 'center', gap: 8, opacity: pressed ? 0.62 : 1 })}>
+                    <View style={{ width: modalImageSize, height: modalImageSize, overflow: 'hidden', borderRadius: 8, borderCurve: 'continuous', backgroundColor: '#EEEEEE' }}>{section.imageUrl ? <Image source={section.imageUrl} contentFit="cover" style={{ position: 'absolute', inset: 0 }} /> : null}</View>
+                    <Text selectable numberOfLines={2} style={{ width: '100%', minHeight: 36, textAlign: 'center', fontSize: 13, lineHeight: 18, color: '#171419' }}>{section.title}</Text>
+                  </Pressable>
+                ))}
+              </View>
             </View>
-          </View>
-          <Pressable accessibilityLabel="Close menu" onPress={() => setMenuVisible(false)} style={({ pressed }) => ({ width: 54, height: 54, marginTop: 22, alignSelf: 'center', alignItems: 'center', justifyContent: 'center', borderRadius: 27, backgroundColor: '#FFFFFF', opacity: pressed ? 0.72 : 1 })}><Text style={{ fontSize: 32, lineHeight: 34, fontWeight: '300', color: '#171419' }}>×</Text></Pressable>
+            <Pressable accessibilityLabel="Close menu" onPress={closeMenu} style={({ pressed }) => ({ width: 44, height: 44, marginTop: 22, alignSelf: 'center', alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: '#FFFFFF', opacity: pressed ? 0.72 : 1 })}><Text style={{ fontSize: 28, lineHeight: 30, fontWeight: '300', color: '#171419' }}>×</Text></Pressable>
+          </Animated.View>
         </View>
       </Modal>
     </View>

@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { DottedUnderline } from '../../components/dotted-underline';
+import { EstimateNoteIcon } from '../../components/estimate-note-icon';
 import type { ServiceItem } from '../../data/service-catalog';
 
 type ProductDetailScreenProps = {
@@ -88,10 +90,12 @@ export function ProductDetailScreen({ cart, cartItemsById, categoryTitle, item, 
         >
           <View style={{ paddingHorizontal: 20, paddingTop: 36, paddingBottom: 34, gap: 12 }}>
             <Text selectable style={{ fontSize: 24, lineHeight: 32, fontWeight: '600', color: '#171419' }}>{item.title} estimate</Text>
-            <Text selectable style={{ fontSize: 13, lineHeight: 19, color: '#4C474E' }}>
-              <Text style={{ fontWeight: '600', color: '#171419' }}>Starts at ₹{item.price.toLocaleString('en-IN')}</Text>
-              {item.duration ? `  •  ${item.duration}` : ''}
-            </Text>
+            <DottedUnderline fullWidth lineMarginTop={10} dotColor="#DDD9DE">
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 7 }}>
+                <Text selectable style={{ fontSize: 13, lineHeight: 19, fontWeight: '600', color: '#171419' }}>Starts at ₹{item.price.toLocaleString('en-IN')}</Text>
+                {item.duration ? <Text selectable style={{ fontSize: 13, lineHeight: 19, color: '#4C474E' }}>•  {item.duration}</Text> : null}
+              </View>
+            </DottedUnderline>
           </View>
 
           <View style={{ height: 1, backgroundColor: '#E4E1E5' }} />
@@ -179,9 +183,9 @@ export function ProductDetailScreen({ cart, cartItemsById, categoryTitle, item, 
         </ScrollView>
 
         <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingBottom: Math.max(insets.bottom, 10), backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: '#E8E5E9', boxShadow: '0 -4px 16px rgba(25,20,30,0.06)' }}>
-          <View style={{ minHeight: 39, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: canContinue ? '#EAF8F1' : '#FFF8E7' }}>
-            <Text style={{ fontSize: 16, color: canContinue ? '#087A4B' : '#9A6C00' }}>▧</Text>
-            <Text selectable style={{ fontSize: 11, lineHeight: 16, fontWeight: '600', color: canContinue ? '#087A4B' : '#9A6C00' }}>
+          <View style={{ minHeight: 39, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, backgroundColor: canContinue ? '#EAF8F1' : '#FFF8E7' }}>
+            <EstimateNoteIcon color={canContinue ? '#087A4B' : '#9A6C00'} />
+            <Text selectable style={{ fontSize: 13, lineHeight: 18, fontWeight: '600', color: canContinue ? '#087A4B' : '#9A6C00' }}>
               {!isAvailable ? 'This service is currently unavailable' : !hasRequiredSelection ? 'Please select an option to generate your estimate' : `Your estimate is ₹${price.toLocaleString('en-IN')}`}
             </Text>
           </View>
