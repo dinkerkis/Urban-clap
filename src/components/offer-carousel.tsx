@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Image } from 'expo-image';
 import type { LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 
@@ -6,47 +7,48 @@ const AUTO_SCROLL_INTERVAL_MS = 4_000;
 
 const offers = [
   {
-    id: 'welcome',
-    eyebrow: 'NEW USER OFFER',
-    title: 'Get 20% off your first service',
-    subtitle: 'Use code WELCOME20 at checkout',
-    icon: '✨',
-    background: '#18141F',
-    accent: '#8A66EF',
+    id: 'salon',
+    eyebrow: 'SALON AT HOME',
+    title: 'Get additional 25% off on your first booking',
+    subtitle: 'Book now  →',
+    image: require('../../assets/offer-salon-transparent.png'),
+    headerColor: '#8662E8',
     titleColor: '#FFFFFF',
-    eyebrowColor: '#C5B4FF',
-    subtitleColor: '#C5C0CB',
-    bubbleColor: '#2F2740',
+    eyebrowColor: '#FFFFFF',
+    subtitleColor: 'rgba(255, 255, 255, 0.88)',
   },
   {
     id: 'ac-care',
-    eyebrow: 'SUMMER READY',
-    title: 'Power jet AC service from ₹599',
-    subtitle: 'Deep cleaning for stronger cooling',
-    icon: '❄️',
-    background: '#DCEEFF',
-    accent: '#3A78D4',
-    titleColor: '#173457',
-    eyebrowColor: '#34679F',
-    subtitleColor: '#53708F',
-    bubbleColor: '#C5E2FF',
+    eyebrow: 'AC SERVICE',
+    title: '25% off on your first AC servicing',
+    subtitle: 'Get up to ₹100 off',
+    image: require('../../assets/offer-ac-service-transparent.png'),
+    headerColor: '#079DE2',
+    titleColor: '#FFFFFF',
+    eyebrowColor: '#FFFFFF',
+    subtitleColor: 'rgba(255, 255, 255, 0.88)',
   },
   {
-    id: 'home-care',
-    eyebrow: 'COMPLETE HOME CARE',
-    title: 'Refresh every corner of your home',
-    subtitle: 'Cleaning packages starting at ₹449',
-    icon: '🏠',
-    background: '#E5F6EC',
-    accent: '#2D8A61',
-    titleColor: '#183E2D',
-    eyebrowColor: '#36795A',
-    subtitleColor: '#527160',
-    bubbleColor: '#CDECD9',
+    id: 'water-care',
+    eyebrow: 'SMART WATER CARE',
+    title: 'Pure water, made effortless',
+    subtitle: 'Explore smart purification  →',
+    image: require('../../assets/offer-water-purifier-transparent.png'),
+    headerColor: '#060A13',
+    titleColor: '#FFFFFF',
+    eyebrowColor: '#87AFFF',
+    subtitleColor: 'rgba(255, 255, 255, 0.82)',
   },
 ];
 
-export function OfferCarousel() {
+export const DEFAULT_OFFER_HEADER_COLOR = offers[0].headerColor;
+
+type OfferCarouselProps = {
+  embeddedOnPurple?: boolean;
+  onHeaderColorChange?: (color: string) => void;
+};
+
+export function OfferCarousel({ embeddedOnPurple = false, onHeaderColorChange }: OfferCarouselProps) {
   const scrollRef = useRef<ScrollView>(null);
   const activeIndexRef = useRef(0);
   const isDraggingRef = useRef(false);
@@ -57,6 +59,7 @@ export function OfferCarousel() {
     if (!pageWidth) return;
     activeIndexRef.current = index;
     setActiveIndex(index);
+    onHeaderColorChange?.(offers[index].headerColor);
     scrollRef.current?.scrollTo({ x: pageWidth * index, animated });
   };
 
@@ -85,11 +88,21 @@ export function OfferCarousel() {
     const nextIndex = Math.max(0, Math.min(offers.length - 1, Math.round(event.nativeEvent.contentOffset.x / pageWidth)));
     activeIndexRef.current = nextIndex;
     setActiveIndex(nextIndex);
+    onHeaderColorChange?.(offers[nextIndex].headerColor);
     isDraggingRef.current = false;
   };
 
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    if (!pageWidth) return;
+    const visibleIndex = Math.max(0, Math.min(offers.length - 1, Math.round(event.nativeEvent.contentOffset.x / pageWidth)));
+    if (visibleIndex === activeIndexRef.current) return;
+    activeIndexRef.current = visibleIndex;
+    setActiveIndex(visibleIndex);
+    onHeaderColorChange?.(offers[visibleIndex].headerColor);
+  };
+
   return (
-    <View onLayout={handleLayout} style={{ gap: 10 }}>
+    <View onLayout={handleLayout} style={{ marginHorizontal: embeddedOnPurple ? -20 : 0, gap: embeddedOnPurple ? 0 : 10 }}>
       <ScrollView
         ref={scrollRef}
         horizontal
@@ -101,6 +114,7 @@ export function OfferCarousel() {
           isDraggingRef.current = true;
         }}
         onMomentumScrollEnd={handleScrollEnd}
+        onScroll={handleScroll}
         onScrollEndDrag={(event) => {
           if (event.nativeEvent.velocity?.x === 0) handleScrollEnd(event);
         }}
@@ -112,34 +126,27 @@ export function OfferCarousel() {
           <View key={offer.id} style={{ width: pageWidth || undefined }}>
             <View
               style={{
-                minHeight: 142,
+                minHeight: embeddedOnPurple ? 162 : 142,
                 overflow: 'hidden',
-                padding: 20,
-                gap: 6,
-                borderRadius: 24,
+                paddingHorizontal: 18,
+                paddingVertical: 17,
+                borderRadius: embeddedOnPurple ? 0 : 24,
                 borderCurve: 'continuous',
-                backgroundColor: offer.background,
+                backgroundColor: 'transparent',
               }}
             >
-              <View style={{ position: 'absolute', width: 150, height: 150, borderRadius: 75, right: -30, top: -40, backgroundColor: offer.bubbleColor }} />
-              <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                <View style={{ flex: 1, minWidth: 0, paddingRight: 4, gap: 6 }}>
-                  <Text style={{ fontSize: 9, lineHeight: 13, fontWeight: '800', letterSpacing: 1.2, color: offer.eyebrowColor }}>{offer.eyebrow}</Text>
-                  <Text selectable style={{ fontSize: 23, lineHeight: 28, fontWeight: '800', color: offer.titleColor }}>{offer.title}</Text>
-                  <Text selectable style={{ fontSize: 11, lineHeight: 16, color: offer.subtitleColor }}>{offer.subtitle}</Text>
-                </View>
-                <View style={{ width: '22%', minWidth: 58, maxWidth: 76, alignItems: 'center', justifyContent: 'center' }}>
-                  <View style={{ width: 52, height: 52, alignItems: 'center', justifyContent: 'center', borderRadius: 17, backgroundColor: offer.accent }}>
-                    <Text style={{ fontSize: 25 }}>{offer.icon}</Text>
-                  </View>
-                </View>
+              <Image source={offer.image} contentFit="contain" contentPosition="right center" style={{ position: 'absolute', inset: 0 }} />
+              <View style={{ width: '54%', minHeight: 128, justifyContent: 'center', gap: 7 }}>
+                <Text style={{ fontSize: 10, lineHeight: 13, fontWeight: '600', letterSpacing: 0.8, color: offer.eyebrowColor }}>{offer.eyebrow}</Text>
+                <Text selectable style={{ fontSize: 19, lineHeight: 24, fontWeight: '600', color: offer.titleColor }}>{offer.title}</Text>
+                <Text selectable style={{ fontSize: 11, lineHeight: 16, fontWeight: '600', color: offer.subtitleColor }}>{offer.subtitle}</Text>
               </View>
             </View>
           </View>
         ))}
       </ScrollView>
 
-      <View style={{ minHeight: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+      <View style={{ position: embeddedOnPurple ? 'absolute' : 'relative', right: embeddedOnPurple ? 18 : undefined, bottom: embeddedOnPurple ? 12 : undefined, minHeight: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
         {offers.map((offer, index) => {
           const active = index === activeIndex;
           return (
@@ -153,7 +160,9 @@ export function OfferCarousel() {
                 width: active ? 22 : 7,
                 height: 7,
                 borderRadius: 999,
-                backgroundColor: active ? '#6E45E2' : '#D6D1DC',
+                backgroundColor: embeddedOnPurple
+                  ? active ? '#FFFFFF' : 'rgba(255, 255, 255, 0.38)'
+                  : active ? '#6E45E2' : '#D6D1DC',
                 opacity: pressed ? 0.6 : 1,
               })}
             />

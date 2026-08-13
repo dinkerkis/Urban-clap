@@ -31,7 +31,7 @@ export function CategoriesScreen({ categories, errorMessage, isLoading, onCatego
             <Text style={{ fontSize: 30 }}>⚠️</Text>
             <Text selectable style={{ textAlign: 'center', fontSize: 12, lineHeight: 18, color: '#77717D' }}>{errorMessage}</Text>
             <Pressable accessibilityRole="button" onPress={onRetry} style={{ paddingHorizontal: 18, paddingVertical: 10, borderRadius: 999, backgroundColor: '#6E45E2' }}>
-              <Text style={{ fontSize: 12, fontWeight: '800', color: '#FFFFFF' }}>Try again</Text>
+              <Text style={{ fontSize: 12, fontWeight: '600', color: '#FFFFFF' }}>Try again</Text>
             </Pressable>
           </View>
         ) : categories.length === 0 ? (
@@ -65,7 +65,7 @@ export function CategoriesScreen({ categories, errorMessage, isLoading, onCatego
               ) : null}
             </View>
             <View style={{ flex: 1, gap: 4 }}>
-              <Text selectable style={{ fontSize: 15, lineHeight: 20, fontWeight: '800', color: '#211A28' }}>{category.title}</Text>
+              <Text selectable style={{ fontSize: 15, lineHeight: 20, fontWeight: '600', color: '#211A28' }}>{category.title}</Text>
               <Text selectable style={{ fontSize: 11, lineHeight: 16, color: '#77717D' }}>{category.subtitle}</Text>
               <Text style={{ fontSize: 10, fontWeight: '700', color: '#6E45E2' }}>{category.subcategories.length} service types</Text>
             </View>

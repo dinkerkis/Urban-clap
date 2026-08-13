@@ -1,16 +1,8 @@
-import { fetch } from 'expo/fetch';
-
 import { getCategoryImageUrl } from './categories-api';
-
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
-const REQUEST_TIMEOUT_MS = 15_000;
-
-if (!API_BASE_URL) {
-  throw new Error('Missing EXPO_PUBLIC_API_URL. Add it to your .env file.');
-}
+import { apiRequest, ApiClientError } from './api-client';
 
 export type ApiProductVariant = {
-  image?: string;
+  image?: string | null;
   key?: string;
   label: string;
   price: number;
@@ -65,64 +57,26 @@ type ProductsWithCategoryResponse = {
   success: boolean;
 };
 
-export class ProductsApiError extends Error {
-  constructor(
-    message: string,
-    public readonly status: number,
-  ) {
-    super(message);
-    this.name = 'ProductsApiError';
-  }
-}
-
 export function resolveProductCategoryImage(path?: string): string | undefined {
   if (!path) return undefined;
   if (path.includes('/')) return getCategoryImageUrl(path);
   return getCategoryImageUrl(`uploads/categories/${path}`);
 }
 
-export function resolveProductImage(path?: string): string | undefined {
-  return getCategoryImageUrl(path);
+export function resolveProductImage(path?: string | null): string | undefined {
+  return getCategoryImageUrl(path ?? undefined);
 }
 
 export async function fetchProductsWithCategory(categoryId: string, signal?: AbortSignal): Promise<ProductsWithCategoryData> {
-  const timeoutController = new AbortController();
-  const timeout = setTimeout(() => timeoutController.abort(), REQUEST_TIMEOUT_MS);
-  const abortRequest = () => timeoutController.abort();
-  signal?.addEventListener('abort', abortRequest, { once: true });
   const path = `/products-with-category/${encodeURIComponent(categoryId)}`;
-
-  try {
-    if (__DEV__) console.log(`[Products API] Request\nGET ${API_BASE_URL}${path}`);
-
-    const response = await fetch(`${API_BASE_URL}${path}`, {
-      headers: { Accept: 'application/json' },
-      signal: timeoutController.signal,
-    });
-    const payload = (await response.json().catch(() => null)) as ProductsWithCategoryResponse | null;
-
-    if (__DEV__) {
-      console.log(
-        `[Products API] Response\nStatus: ${response.status}\n${JSON.stringify(payload, null, 2)}`,
-      );
-    }
-
-    const result = payload?.data ?? payload;
-
-    if (!response.ok || !payload?.success || !result?.category || !Array.isArray(result.product_details)) {
-      throw new ProductsApiError(payload?.message || 'Unable to load products. Please try again.', response.status);
-    }
-
-    return { category: result.category, productDetails: result.product_details };
-  } catch (error) {
-    if (error instanceof ProductsApiError) throw error;
-    if (error instanceof Error && error.name === 'AbortError') {
-      if (signal?.aborted) throw error;
-      throw new ProductsApiError('The products request timed out. Please try again.', 408);
-    }
-    throw new ProductsApiError('Unable to load products. Check your internet connection and try again.', 0);
-  } finally {
-    clearTimeout(timeout);
-    signal?.removeEventListener('abort', abortRequest);
+  const payload = await apiRequest<ProductsWithCategoryResponse>(path, {
+    logScope: 'Products API',
+    signal,
+    defaultErrorMessage: 'Unable to load products. Please try again.',
+  });
+  const result = payload.data ?? payload;
+  if (!payload.success || !result.category || !Array.isArray(result.product_details)) {
+    throw new ApiClientError(payload.message || 'The products response is invalid. Please try again.', 200, 'INVALID_RESPONSE');
   }
+  return { category: result.category, productDetails: result.product_details };
 }

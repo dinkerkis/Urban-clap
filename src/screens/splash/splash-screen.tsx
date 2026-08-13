@@ -58,11 +58,11 @@ export function CustomSplashScreen() {
             logoAnimatedStyle,
           ]}
         >
-          <Text style={{ color: splashColor, fontSize: 45, lineHeight: 52, fontWeight: '800', letterSpacing: -2.2 }}>UC</Text>
+          <Text style={{ color: splashColor, fontSize: 45, lineHeight: 52, fontWeight: '600', letterSpacing: -2.2 }}>UC</Text>
         </Animated.View>
 
         <Animated.View style={[{ alignItems: 'center', gap: 8 }, textAnimatedStyle]}>
-          <Text style={{ color: '#FFFFFF', fontSize: 44, lineHeight: 52, fontWeight: '800', letterSpacing: -1 }}>Urban Clap</Text>
+          <Text style={{ color: '#FFFFFF', fontSize: 44, lineHeight: 52, fontWeight: '600', letterSpacing: -1 }}>Urban Clap</Text>
           <Text style={{ color: 'rgba(255,255,255,0.76)', fontSize: 18, lineHeight: 25, fontWeight: '400', letterSpacing: 0.1 }}>
             Trusted services at your doorstep
           </Text>

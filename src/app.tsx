@@ -21,7 +21,7 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>('loading');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [callingCode, setCallingCode] = useState('+91');
-  const [, setSession] = useState<AuthSession | null>(null);
+  const [session, setSession] = useState<AuthSession | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -73,6 +73,7 @@ export default function App() {
         )}
         {screen === 'dashboard' && (
           <DashboardScreen
+            authToken={session?.token}
             onLogout={async () => {
               await clearAuthSession();
               setSession(null);

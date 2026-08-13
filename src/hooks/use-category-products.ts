@@ -16,6 +16,8 @@ type ProductsState = {
   sections: ProductSection[];
 };
 
+const productsCache = new Map<string, ProductSection[]>();
+
 function formatDuration(minutes?: number): string {
   if (!minutes) return 'Duration on request';
   if (minutes < 60) return `${minutes} mins`;
@@ -31,9 +33,21 @@ function formatReviewCount(count?: number): string {
 
 export function useCategoryProducts(categoryId: string) {
   const [requestKey, setRequestKey] = useState(0);
-  const [state, setState] = useState<ProductsState>({ errorMessage: '', isLoading: true, sections: [] });
+  const [state, setState] = useState<ProductsState>(() => {
+    const cachedSections = productsCache.get(categoryId);
+    return cachedSections
+      ? { errorMessage: '', isLoading: false, sections: cachedSections }
+      : { errorMessage: '', isLoading: true, sections: [] };
+  });
 
   useEffect(() => {
+    const cachedSections = productsCache.get(categoryId);
+    if (requestKey === 0 && cachedSections) {
+      if (__DEV__) console.log(`[Products API] Using cached products for category ${categoryId}`);
+      setState({ errorMessage: '', isLoading: false, sections: cachedSections });
+      return;
+    }
+
     const controller = new AbortController();
     setState({ errorMessage: '', isLoading: true, sections: [] });
 
@@ -65,9 +79,11 @@ export function useCategoryProducts(categoryId: string) {
               ),
             ),
             maxQuantity: product.maxQuantity,
+            productId: product._id,
             slug: product.slug,
             status: product.status,
             variants: product.variants?.map((variant) => ({
+              hasImageField: Object.prototype.hasOwnProperty.call(variant, 'image'),
               key: variant.key,
               label: variant.label,
               price: variant.price,
@@ -77,6 +93,7 @@ export function useCategoryProducts(categoryId: string) {
           })),
         }));
 
+        productsCache.set(categoryId, sections);
         setState({ errorMessage: '', isLoading: false, sections });
       })
       .catch((error: unknown) => {
@@ -91,7 +108,10 @@ export function useCategoryProducts(categoryId: string) {
     return () => controller.abort();
   }, [categoryId, requestKey]);
 
-  const retry = useCallback(() => setRequestKey((current) => current + 1), []);
+  const retry = useCallback(() => {
+    productsCache.delete(categoryId);
+    setRequestKey((current) => current + 1);
+  }, [categoryId]);
 
   return { ...state, retry };
 }

@@ -61,7 +61,7 @@ export function BottomTabBar({ activeTab, cartCount, onChange }: BottomTabBarPro
                 borderColor: active ? '#5A31C5' : 'transparent',
               }}
             >
-              <Text style={{ fontSize: 25, lineHeight: 27, fontWeight: '800', color: active ? '#FFFFFF' : '#8A8795' }}>
+              <Text style={{ fontSize: 25, lineHeight: 27, fontWeight: '600', color: active ? '#FFFFFF' : '#8A8795' }}>
                 {tab.icon}
               </Text>
               {tab.id === 'cart' && cartCount > 0 && (
@@ -81,7 +81,7 @@ export function BottomTabBar({ activeTab, cartCount, onChange }: BottomTabBarPro
                     borderColor: '#FFFFFF',
                   }}
                 >
-                  <Text style={{ color: '#FFFFFF', fontSize: 9, lineHeight: 11, fontWeight: '800', fontVariant: ['tabular-nums'] }}>
+                  <Text style={{ color: '#FFFFFF', fontSize: 9, lineHeight: 11, fontWeight: '600', fontVariant: ['tabular-nums'] }}>
                     {cartCount}
                   </Text>
                 </View>

@@ -1,11 +1,13 @@
 import { Image } from 'expo-image';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, Linking, Pressable, ScrollView, Text, TextInput, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { OfferCarousel } from '../../components/offer-carousel';
+import { DEFAULT_OFFER_HEADER_COLOR, OfferCarousel } from '../../components/offer-carousel';
 import type { ServiceCategory } from '../../data/service-catalog';
 import { useCurrentLocation } from '../../hooks/use-current-location';
+
+const SEARCH_SUGGESTIONS = ['AC service', 'Facial', 'Kitchen cleaning'];
 
 type HomeScreenProps = {
   categories: ServiceCategory[];
@@ -17,12 +19,16 @@ type HomeScreenProps = {
   onRetry: () => void;
 };
 
-export function HomeScreen({ categories, errorMessage, isLoading, onCategoryPress, onSeeAllCategories, onLogout, onRetry }: HomeScreenProps) {
+export function HomeScreen({ categories, errorMessage, isLoading, onCategoryPress, onLogout, onRetry }: HomeScreenProps) {
   const insets = useSafeAreaInsets();
   const [search, setSearch] = useState('');
+  const [searchSuggestionIndex, setSearchSuggestionIndex] = useState(0);
+  const [displayedSuggestion, setDisplayedSuggestion] = useState('');
+  const [isDeletingSuggestion, setIsDeletingSuggestion] = useState(false);
+  const [headerColor, setHeaderColor] = useState(DEFAULT_OFFER_HEADER_COLOR);
   const currentLocation = useCurrentLocation();
   const { width } = useWindowDimensions();
-  const categoryWidth = Math.max(70, Math.floor((width - 40 - 30) / 4));
+  const categoryWidth = Math.max(92, Math.floor((width - 40 - 20) / 3));
   const normalizedSearch = search.trim().toLowerCase();
   const visibleCategories = useMemo(
     () =>
@@ -35,6 +41,39 @@ export function HomeScreen({ categories, errorMessage, isLoading, onCategoryPres
         : categories,
     [categories, normalizedSearch],
   );
+
+  useEffect(() => {
+    const suggestion = SEARCH_SUGGESTIONS[searchSuggestionIndex];
+    let delay = isDeletingSuggestion ? 40 : 70;
+
+    if (!isDeletingSuggestion && displayedSuggestion.length === suggestion.length) {
+      delay = 1_000;
+    } else if (isDeletingSuggestion && displayedSuggestion.length === 0) {
+      delay = 250;
+    }
+
+    const timer = setTimeout(() => {
+      if (!isDeletingSuggestion && displayedSuggestion.length < suggestion.length) {
+        setDisplayedSuggestion(suggestion.slice(0, displayedSuggestion.length + 1));
+        return;
+      }
+
+      if (!isDeletingSuggestion) {
+        setIsDeletingSuggestion(true);
+        return;
+      }
+
+      if (displayedSuggestion.length > 0) {
+        setDisplayedSuggestion((current) => current.slice(0, -1));
+        return;
+      }
+
+      setIsDeletingSuggestion(false);
+      setSearchSuggestionIndex((current) => (current + 1) % SEARCH_SUGGESTIONS.length);
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [displayedSuggestion, isDeletingSuggestion, searchSuggestionIndex]);
 
   const handleLocationPress = () => {
     if ((currentLocation.status === 'denied' && !currentLocation.canAskAgain) || currentLocation.status === 'approximate') {
@@ -60,18 +99,12 @@ export function HomeScreen({ categories, errorMessage, isLoading, onCategoryPres
         style={{
           paddingTop: process.env.EXPO_OS === 'ios' ? 56 : insets.top + 16,
           paddingHorizontal: 20,
-          paddingBottom: 24,
-          gap: 17,
+          paddingBottom: 0,
+          gap: 14,
           overflow: 'hidden',
-          backgroundColor: '#6E45E2',
-          borderBottomLeftRadius: 30,
-          borderBottomRightRadius: 30,
-          borderCurve: 'continuous',
+          backgroundColor: headerColor,
         }}
       >
-        <View style={{ position: 'absolute', width: 190, height: 190, right: -70, top: -55, borderRadius: 95, backgroundColor: '#8E70EB' }} />
-        <View style={{ position: 'absolute', width: 110, height: 110, right: 74, bottom: -62, borderRadius: 55, backgroundColor: '#5C35C8' }} />
-
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <Pressable
             accessibilityRole="button"
@@ -79,11 +112,11 @@ export function HomeScreen({ categories, errorMessage, isLoading, onCategoryPres
             onPress={handleLocationPress}
             style={({ pressed }) => ({ flex: 1, gap: 2, opacity: pressed ? 0.7 : 1 })}
           >
-            <Text style={{ fontSize: 15, lineHeight: 20, fontWeight: '600', letterSpacing: 1.2, color: 'rgba(255, 255, 255, 0.88)' }}>Your Location</Text>
+            <Text style={{ fontSize: 15, lineHeight: 20, fontWeight: '600', color: 'rgba(255, 255, 255, 0.90)' }}>Your location</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
               <Text style={{ width: 15, fontSize: 14, lineHeight: 19, fontWeight: '700', color: '#FFFFFF', transform: [{ rotate: '-45deg' }] }}>➤</Text>
               {currentLocation.status === 'loading' && <ActivityIndicator size="small" color="#FFFFFF" />}
-              <Text selectable numberOfLines={2} style={{ flex: 1, fontSize: 15, lineHeight: 20, fontWeight: '600', color: '#FFFFFF' }}>
+              <Text selectable numberOfLines={1} ellipsizeMode="tail" style={{ flex: 1, fontSize: 13, lineHeight: 18, fontWeight: '500', color: 'rgba(255, 255, 255, 0.90)' }}>
                 {currentLocation.label}
               </Text>
             </View>
@@ -103,49 +136,42 @@ export function HomeScreen({ categories, errorMessage, isLoading, onCategoryPres
           </Pressable>
         </View>
 
-        <View style={{ gap: 0 }}>
-          <Text selectable style={{ fontSize: 18, lineHeight: 22, fontWeight: '500', color: 'rgba(255, 255, 255, 0.90)' }}>Good afternoon</Text>
-          <Text selectable style={{ fontSize: 27, lineHeight: 33, fontWeight: '800', letterSpacing: -0.6, color: '#FFFFFF' }}>
-            What can we help with?
-          </Text>
+        <View style={{ height: 44, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, borderRadius: 12, borderCurve: 'continuous', backgroundColor: '#FFFFFF' }}>
+          <View style={{ width: 17, height: 17 }}>
+            <View style={{ position: 'absolute', left: 1, top: 1, width: 11, height: 11, borderRadius: 6, borderWidth: 1.7, borderColor: '#645C6C' }} />
+            <View style={{ position: 'absolute', width: 7, height: 1.7, right: 0, bottom: 2, borderRadius: 1, backgroundColor: '#645C6C', transform: [{ rotate: '45deg' }] }} />
+          </View>
+          <View style={{ flex: 1, height: 44, justifyContent: 'center' }}>
+            {!search ? (
+              <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, flexDirection: 'row', alignItems: 'center' }}>
+                <Text style={{ fontSize: 13, color: '#918A97' }}>Search for '</Text>
+                <View style={{ height: 20, flex: 1, overflow: 'hidden', justifyContent: 'center' }}>
+                  <Text numberOfLines={1} style={{ fontSize: 13, color: '#918A97' }}>
+                    {`${displayedSuggestion}'`}
+                  </Text>
+                </View>
+              </View>
+            ) : null}
+            <TextInput
+              value={search}
+              onChangeText={setSearch}
+              accessibilityLabel="Search for services"
+              returnKeyType="search"
+              style={{ flex: 1, minHeight: 44, paddingVertical: 8, fontSize: 13, color: '#241D2B' }}
+            />
+          </View>
         </View>
 
-        <View style={{ minHeight: 54, flexDirection: 'row', alignItems: 'center', gap: 11, paddingHorizontal: 16, borderRadius: 17, borderCurve: 'continuous', backgroundColor: '#FFFFFF', boxShadow: '0 8px 22px rgba(28, 14, 60, 0.16)' }}>
-          <Text style={{ fontSize: 21, color: '#645C6C' }}>⌕</Text>
-          <TextInput
-            value={search}
-            onChangeText={setSearch}
-            placeholder="Search cleaning, AC, salon..."
-            placeholderTextColor="#918A97"
-            returnKeyType="search"
-            style={{ flex: 1, minHeight: 54, paddingVertical: 12, fontSize: 14, color: '#241D2B' }}
-          />
-        </View>
+        {!normalizedSearch && <OfferCarousel embeddedOnPurple onHeaderColorChange={setHeaderColor} />}
       </View>
 
       <View style={{ paddingHorizontal: 20, paddingTop: 24, gap: 25 }}>
-        {!normalizedSearch && (
-          <OfferCarousel />
-        )}
-
         <View style={{ gap: 15 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Text selectable style={{ flex: 1, fontSize: 19, lineHeight: 25, fontWeight: '800', color: '#211A28' }}>
-              {normalizedSearch ? 'Search results' : 'Book a service'}
+          {normalizedSearch ? (
+            <Text selectable style={{ fontSize: 19, lineHeight: 25, fontWeight: '600', color: '#211A28' }}>
+              Search results
             </Text>
-            {!normalizedSearch && (
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="View all categories"
-                hitSlop={10}
-                onPress={onSeeAllCategories}
-                style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 6, opacity: pressed ? 0.6 : 1 })}
-              >
-                <Text style={{ fontSize: 11, fontWeight: '800', color: '#6E45E2' }}>All categories</Text>
-                <Text style={{ fontSize: 16, lineHeight: 16, fontWeight: '700', color: '#6E45E2' }}>›</Text>
-              </Pressable>
-            )}
-          </View>
+          ) : null}
           {isLoading ? (
             <View style={{ minHeight: 150, alignItems: 'center', justifyContent: 'center', gap: 10 }}>
               <ActivityIndicator color="#6E45E2" />
@@ -156,7 +182,7 @@ export function HomeScreen({ categories, errorMessage, isLoading, onCategoryPres
               <Text style={{ fontSize: 28 }}>⚠️</Text>
               <Text selectable style={{ textAlign: 'center', fontSize: 12, lineHeight: 17, color: '#77717D' }}>{errorMessage}</Text>
               <Pressable accessibilityRole="button" onPress={onRetry} style={{ paddingHorizontal: 18, paddingVertical: 9, borderRadius: 999, backgroundColor: '#6E45E2' }}>
-                <Text style={{ fontSize: 12, fontWeight: '800', color: '#FFFFFF' }}>Try again</Text>
+                <Text style={{ fontSize: 12, fontWeight: '600', color: '#FFFFFF' }}>Try again</Text>
               </Pressable>
             </View>
           ) : visibleCategories.length > 0 ? (
@@ -168,14 +194,14 @@ export function HomeScreen({ categories, errorMessage, isLoading, onCategoryPres
                   onPress={() => onCategoryPress(category)}
                   style={({ pressed }) => ({ width: categoryWidth, alignItems: 'center', gap: 8, opacity: pressed ? 0.62 : 1 })}
                 >
-                  <View style={{ width: categoryWidth, height: categoryWidth, maxHeight: 84, alignItems: 'center', justifyContent: 'center', borderRadius: 21, borderCurve: 'continuous', backgroundColor: category.tint }}>
+                  <View style={{ width: categoryWidth, height: 76, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderRadius: 12, borderCurve: 'continuous', backgroundColor: '#EEEEEE' }}>
                     <Text style={{ fontSize: 29 }}>{category.icon}</Text>
                     {category.imageUrl ? (
                       <Image
                         source={category.imageUrl}
-                        contentFit="cover"
+                        contentFit="contain"
                         transition={180}
-                        style={{ position: 'absolute', inset: 0, borderRadius: 21 }}
+                        style={{ position: 'absolute', inset: 8 }}
                       />
                     ) : null}
                   </View>
@@ -198,7 +224,7 @@ export function HomeScreen({ categories, errorMessage, isLoading, onCategoryPres
           <View style={{ padding: 18, flexDirection: 'row', gap: 14, alignItems: 'center', borderRadius: 22, borderCurve: 'continuous', backgroundColor: '#EAF7F1' }}>
             <View style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: '#FFFFFF' }}><Text style={{ fontSize: 23 }}>🛡️</Text></View>
             <View style={{ flex: 1, gap: 3 }}>
-              <Text selectable style={{ fontSize: 14, fontWeight: '800', color: '#244A3A' }}>Safe & verified professionals</Text>
+              <Text selectable style={{ fontSize: 14, fontWeight: '600', color: '#244A3A' }}>Safe & verified professionals</Text>
               <Text style={{ fontSize: 11, lineHeight: 16, color: '#567065' }}>Background checked experts with transparent pricing.</Text>
             </View>
           </View>

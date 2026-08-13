@@ -16,11 +16,15 @@ export type ServiceItem = {
   images?: string[];
   includes?: string[];
   maxQuantity?: number;
+  productId?: string;
   selectedVariantLabel?: string;
+  serverCartItemId?: string;
+  serverLineTotal?: number;
   slug?: string;
   status?: string;
   variantLabel?: string;
-  variants?: Array<{ imageUrl?: string; key?: string; label: string; price: number }>;
+  variantKey?: string;
+  variants?: Array<{ hasImageField?: boolean; imageUrl?: string; key?: string; label: string; price: number }>;
 };
 
 export type ServiceSubcategory = {

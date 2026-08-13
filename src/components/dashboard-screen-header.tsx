@@ -41,7 +41,7 @@ export function DashboardScreenHeader({ title, subtitle, onBack }: DashboardScre
         </Pressable>
       )}
       <View style={{ flex: 1, gap: 2 }}>
-        <Text selectable style={{ fontSize: 21, lineHeight: 27, fontWeight: '800', color: '#1E1725' }}>
+        <Text selectable style={{ fontSize: 21, lineHeight: 27, fontWeight: '600', color: '#1E1725' }}>
           {title}
         </Text>
         {subtitle && (

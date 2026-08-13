@@ -58,7 +58,7 @@ export function ServiceCard({ item, quantity = 0, onAdd, onPress, onRemove }: Se
       </View>
 
       <View style={{ flex: 1, gap: 5 }}>
-        <Text selectable numberOfLines={2} style={{ fontSize: 15, lineHeight: 20, fontWeight: '800', color: '#211A28' }}>
+        <Text selectable numberOfLines={2} style={{ fontSize: 15, lineHeight: 20, fontWeight: '600', color: '#211A28' }}>
           {item.title}
         </Text>
         <Text selectable numberOfLines={2} style={{ fontSize: 11, lineHeight: 16, color: '#77717D' }}>
@@ -87,7 +87,7 @@ export function ServiceCard({ item, quantity = 0, onAdd, onPress, onRemove }: Se
         ) : null}
         <View style={{ minHeight: 34, flexDirection: 'row', alignItems: 'flex-end', gap: 7 }}>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'baseline', gap: 5 }}>
-            <Text selectable style={{ fontSize: 16, fontWeight: '800', color: '#211A28', fontVariant: ['tabular-nums'] }}>
+            <Text selectable style={{ fontSize: 16, fontWeight: '600', color: '#211A28', fontVariant: ['tabular-nums'] }}>
               {item.variants?.length ? 'From ' : ''}₹{item.price}
             </Text>
             {item.originalPrice > item.price ? (
@@ -115,7 +115,7 @@ export function ServiceCard({ item, quantity = 0, onAdd, onPress, onRemove }: Se
                 backgroundColor: pressed ? '#EEE7FF' : '#FAF8FF',
               })}
             >
-              <Text style={{ fontSize: 12, fontWeight: '800', color: '#6E45E2' }}>{item.variants?.length && onPress ? 'OPTIONS' : 'ADD'}</Text>
+              <Text style={{ fontSize: 12, fontWeight: '600', color: '#6E45E2' }}>{item.variants?.length && onPress ? 'OPTIONS' : 'ADD'}</Text>
             </Pressable>
           ) : (
             <View style={{ height: 34, flexDirection: 'row', alignItems: 'center', borderRadius: 11, backgroundColor: '#6E45E2', overflow: 'hidden' }}>
@@ -130,7 +130,7 @@ export function ServiceCard({ item, quantity = 0, onAdd, onPress, onRemove }: Se
               >
                 <Text style={{ fontSize: 18, color: '#FFFFFF' }}>−</Text>
               </Pressable>
-              <Text style={{ minWidth: 22, textAlign: 'center', fontSize: 12, fontWeight: '800', color: '#FFFFFF', fontVariant: ['tabular-nums'] }}>
+              <Text style={{ minWidth: 22, textAlign: 'center', fontSize: 12, fontWeight: '600', color: '#FFFFFF', fontVariant: ['tabular-nums'] }}>
                 {quantity}
               </Text>
               <Pressable

@@ -19,7 +19,7 @@ export function BookingsScreen({ onExplore }: BookingsScreenProps) {
           <View style={{ width: 92, height: 92, alignItems: 'center', justifyContent: 'center', borderRadius: 30, borderCurve: 'continuous', backgroundColor: '#F0EBFF' }}>
             <Text style={{ fontSize: 42 }}>📅</Text>
           </View>
-          <Text selectable style={{ paddingTop: 5, fontSize: 19, lineHeight: 25, fontWeight: '800', color: '#211A28' }}>No bookings yet</Text>
+          <Text selectable style={{ paddingTop: 5, fontSize: 19, lineHeight: 25, fontWeight: '600', color: '#211A28' }}>No bookings yet</Text>
           <Text selectable style={{ maxWidth: 280, textAlign: 'center', fontSize: 12, lineHeight: 18, color: '#77717D' }}>
             Your upcoming and completed services will appear here.
           </Text>
@@ -28,7 +28,7 @@ export function BookingsScreen({ onExplore }: BookingsScreenProps) {
             onPress={onExplore}
             style={({ pressed }) => ({ minWidth: 170, height: 46, marginTop: 10, alignItems: 'center', justifyContent: 'center', borderRadius: 14, backgroundColor: pressed ? '#5933C4' : '#6E45E2' })}
           >
-            <Text style={{ fontSize: 13, fontWeight: '800', color: '#FFFFFF' }}>Explore services</Text>
+            <Text style={{ fontSize: 13, fontWeight: '600', color: '#FFFFFF' }}>Explore services</Text>
           </Pressable>
         </View>
       </ScrollView>

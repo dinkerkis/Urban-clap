@@ -1,179 +1,201 @@
 import { Image } from 'expo-image';
-import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { DashboardScreenHeader } from '../../components/dashboard-screen-header';
 import type { ServiceItem } from '../../data/service-catalog';
 
 type ProductDetailScreenProps = {
   cart: Record<string, number>;
+  cartItemsById: Record<string, ServiceItem>;
   categoryTitle: string;
   item: ServiceItem;
-  onAdd: (item: ServiceItem) => void;
+  onAdd: (item: ServiceItem) => Promise<void> | void;
   onBack: () => void;
   onRemove: (item: ServiceItem) => void;
+  onViewCart: () => void;
   subcategoryTitle: string;
+  totalCartItems: number;
 };
 
-export function ProductDetailScreen({ cart, categoryTitle, item, onAdd, onBack, onRemove, subcategoryTitle }: ProductDetailScreenProps) {
+export function ProductDetailScreen({ cart, cartItemsById, categoryTitle, item, onAdd, onBack, onViewCart, totalCartItems }: ProductDetailScreenProps) {
   const insets = useSafeAreaInsets();
-  const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
+  const { width } = useWindowDimensions();
+  const [selectedVariantIndex, setSelectedVariantIndex] = useState(() => {
+    const selectedIndex = item.variants?.findIndex((variant) => variant.key === item.variantKey || variant.label === item.selectedVariantLabel) ?? -1;
+    return selectedIndex;
+  });
+  const [variantsExpanded, setVariantsExpanded] = useState(true);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+
   const selectedVariant = item.variants?.[selectedVariantIndex];
-  const galleryImages = useMemo(
-    () => Array.from(new Set([selectedVariant?.imageUrl, item.imageUrl, ...(item.images ?? [])].filter((image): image is string => Boolean(image)))),
-    [item.imageUrl, item.images, selectedVariant?.imageUrl],
-  );
-  const [selectedImage, setSelectedImage] = useState(galleryImages[0]);
   const price = selectedVariant?.price ?? item.price;
-  const maxQuantity = item.maxQuantity ?? 99;
   const isAvailable = !item.status || item.status.toLowerCase() === 'active';
   const selectedItem: ServiceItem = {
     ...item,
     id: selectedVariant ? `${item.id}::${selectedVariant.key || selectedVariantIndex}` : item.id,
-    imageUrl: selectedVariant?.imageUrl || item.imageUrl,
+    imageUrl: selectedVariant?.imageUrl || item.imageUrl || item.images?.[0],
     price,
     originalPrice: price,
     selectedVariantLabel: selectedVariant?.label,
+    variantKey: selectedVariant?.key,
   };
-  const quantity = cart[selectedItem.id] ?? 0;
+  const selectedCartEntry = Object.entries(cartItemsById).find(([cartKey, cartItem]) => {
+    const sameProduct = (cartItem.productId || cartKey.split('::')[0]) === (item.productId || item.id.split('::')[0]);
+    if (!sameProduct) return false;
+    if (!selectedVariant) return cartKey === selectedItem.id;
+    return selectedVariant.key ? cartItem.variantKey === selectedVariant.key : cartItem.selectedVariantLabel === selectedVariant.label;
+  });
+  const selectedCartKey = selectedCartEntry?.[0] ?? selectedItem.id;
+  const quantity = cart[selectedCartKey] ?? 0;
+  const cardWidth = Math.min(176, Math.max(142, width * 0.43));
+  const hasVariants = Boolean(item.variants?.length);
+  const hasRequiredSelection = !hasVariants || Boolean(selectedVariant);
+  const canContinue = isAvailable && hasRequiredSelection;
 
-  const chooseVariant = (index: number) => {
-    setSelectedVariantIndex(index);
-    const variantImage = item.variants?.[index]?.imageUrl;
-    if (variantImage) setSelectedImage(variantImage);
+  const handleConsultation = async () => {
+    if (!canContinue || isAddingToCart) return;
+    if (quantity > 0) onViewCart();
+    else {
+      setIsAddingToCart(true);
+      try {
+        await onAdd(selectedItem);
+      } finally {
+        setIsAddingToCart(false);
+      }
+    }
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#FAF9FB' }}>
-      <DashboardScreenHeader title="Product details" subtitle={`${categoryTitle} › ${subcategoryTitle}`} onBack={onBack} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ padding: 20, paddingBottom: 128 + insets.bottom, gap: 22 }}
-      >
-        <View style={{ gap: 10 }}>
-          <View style={{ height: 244, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderRadius: 26, borderCurve: 'continuous', backgroundColor: item.tint }}>
-            {selectedImage ? (
-              <Image source={selectedImage} contentFit="cover" transition={180} style={{ width: '100%', height: '100%' }} />
-            ) : <Text style={{ fontSize: 12, color: '#8A8490' }}>No image available</Text>}
+    <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.80)' }}>
+      <View style={{ height: insets.top + 78, paddingTop: insets.top, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+        <Text numberOfLines={1} style={{ flex: 1, fontSize: 16, fontWeight: '600', color: 'rgba(255,255,255,0.58)' }}>{categoryTitle}</Text>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Close estimate"
+          onPress={onBack}
+          style={({ pressed }) => ({ width: 50, height: 50, alignItems: 'center', justifyContent: 'center', borderRadius: 25, backgroundColor: '#FFFFFF', opacity: pressed ? 0.72 : 1 })}
+        >
+          <Text style={{ fontSize: 33, lineHeight: 35, fontWeight: '300', color: '#171419' }}>×</Text>
+        </Pressable>
+      </View>
+
+      <View style={{ flex: 1, overflow: 'hidden', borderTopLeftRadius: 24, borderTopRightRadius: 24, borderCurve: 'continuous', backgroundColor: '#FFFFFF' }}>
+        <ScrollView
+          contentInsetAdjustmentBehavior="never"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 142 + insets.bottom }}
+        >
+          <View style={{ paddingHorizontal: 20, paddingTop: 36, paddingBottom: 34, gap: 12 }}>
+            <Text selectable style={{ fontSize: 24, lineHeight: 32, fontWeight: '600', color: '#171419' }}>{item.title} estimate</Text>
+            <Text selectable style={{ fontSize: 13, lineHeight: 19, color: '#4C474E' }}>
+              <Text style={{ fontWeight: '600', color: '#171419' }}>Starts at ₹{item.price.toLocaleString('en-IN')}</Text>
+              {item.duration ? `  •  ${item.duration}` : ''}
+            </Text>
           </View>
-          {galleryImages.length > 1 ? (
-            <ScrollView horizontal contentInsetAdjustmentBehavior="automatic" showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
-              {galleryImages.map((image) => {
-                const selected = image === selectedImage;
-                return (
-                  <Pressable
-                    key={image}
-                    accessibilityRole="button"
-                    accessibilityLabel="View product image"
-                    onPress={() => setSelectedImage(image)}
-                    style={{ width: 62, height: 52, overflow: 'hidden', borderRadius: 12, borderWidth: selected ? 2 : 1, borderColor: selected ? '#6E45E2' : '#E2DEE7' }}
-                  >
-                    <Image source={image} contentFit="cover" style={{ width: '100%', height: '100%' }} />
-                  </Pressable>
-                );
-              })}
-            </ScrollView>
-          ) : null}
+
+          <View style={{ height: 1, backgroundColor: '#E4E1E5' }} />
+
+          <View style={{ paddingTop: 28, gap: 24 }}>
+            <Text selectable style={{ paddingHorizontal: 20, fontSize: 23, lineHeight: 30, fontWeight: '600', color: '#171419' }}>Get an estimate</Text>
+
+            {hasVariants ? (
+              <View style={{ gap: 17 }}>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={`${variantsExpanded ? 'Collapse' : 'Expand'} ${item.variantLabel || 'variant options'}`}
+                  accessibilityState={{ expanded: variantsExpanded }}
+                  onPress={() => setVariantsExpanded((current) => !current)}
+                  style={({ pressed }) => ({ paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', gap: 12, opacity: pressed ? 0.62 : 1 })}
+                >
+                  <View style={{ width: 31, height: 31, alignItems: 'center', justifyContent: 'center', borderRadius: 6, backgroundColor: '#F5F4F5' }}>
+                    <Text style={{ fontSize: 14, color: '#3F3A42' }}>1</Text>
+                  </View>
+                  <Text selectable style={{ flex: 1, fontSize: 16, lineHeight: 22, fontWeight: '600', color: '#3F3A42' }}>{item.variantLabel || 'Select an option'}</Text>
+                  <View style={{ width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}>
+                    <View
+                      style={{
+                        width: 9,
+                        height: 9,
+                        borderRightWidth: 1.8,
+                        borderBottomWidth: 1.8,
+                        borderColor: '#171419',
+                        transform: [{ rotate: variantsExpanded ? '-135deg' : '45deg' }],
+                      }}
+                    />
+                  </View>
+                </Pressable>
+
+                {variantsExpanded ? <ScrollView horizontal contentInsetAdjustmentBehavior="never" showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 10 }}>
+                  {item.variants?.map((variant, index) => {
+                    const selected = selectedVariantIndex === index;
+                    const showImageArea = variant.hasImageField === true;
+                    const variantImageUrl = variant.imageUrl || item.imageUrl || item.images?.[0];
+                    return (
+                      <Pressable
+                        key={variant.key || variant.label}
+                        accessibilityRole="radio"
+                        accessibilityState={{ checked: selected }}
+                        onPress={() => setSelectedVariantIndex(index)}
+                        style={({ pressed }) => ({
+                          width: cardWidth,
+                          minHeight: showImageArea ? 258 : 108,
+                          overflow: 'hidden',
+                          borderRadius: 11,
+                          borderCurve: 'continuous',
+                          borderWidth: selected ? 1.5 : 1,
+                          borderColor: selected ? '#6E45E2' : '#DEDADF',
+                          backgroundColor: selected ? '#F7F3FF' : '#FFFFFF',
+                          opacity: pressed ? 0.72 : 1,
+                        })}
+                      >
+                        {showImageArea ? (
+                          <View style={{ height: 148, backgroundColor: '#F0EFF0' }}>
+                            {variantImageUrl ? <Image source={variantImageUrl} contentFit="cover" contentPosition="center" transition={180} style={{ position: 'absolute', inset: 0 }} /> : null}
+                          </View>
+                        ) : null}
+                        <View style={{ flex: 1, justifyContent: 'center', gap: 10, paddingHorizontal: 12, paddingVertical: 15 }}>
+                          <Text selectable numberOfLines={3} style={{ fontSize: 13, lineHeight: 19, color: '#171419' }}>{variant.label}</Text>
+                          <Text selectable style={{ fontSize: 14, lineHeight: 20, fontWeight: '600', color: '#171419', fontVariant: ['tabular-nums'] }}>₹{variant.price.toLocaleString('en-IN')}</Text>
+                        </View>
+                      </Pressable>
+                    );
+                  })}
+                </ScrollView> : null}
+              </View>
+            ) : (
+              <View style={{ marginHorizontal: 20, padding: 18, borderRadius: 12, backgroundColor: '#F7F6F8' }}>
+                <Text selectable style={{ fontSize: 13, lineHeight: 19, color: '#4C474E' }}>No additional options are required for this service.</Text>
+              </View>
+            )}
+
+            {item.includes?.length ? (
+              <View style={{ paddingHorizontal: 20, paddingTop: 14, gap: 14, borderTopWidth: 1, borderTopColor: '#E4E1E5' }}>
+                <Text selectable style={{ fontSize: 20, lineHeight: 26, fontWeight: '600', color: '#171419' }}>Your total price includes</Text>
+                {item.includes.map((include) => <View key={include} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 9 }}><Text style={{ fontWeight: '600', color: '#6E45E2' }}>✓</Text><Text selectable style={{ flex: 1, fontSize: 12, lineHeight: 18, color: '#625D64' }}>{include}</Text></View>)}
+              </View>
+            ) : null}
+          </View>
+        </ScrollView>
+
+        <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingBottom: Math.max(insets.bottom, 10), backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: '#E8E5E9', boxShadow: '0 -4px 16px rgba(25,20,30,0.06)' }}>
+          <View style={{ minHeight: 39, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: canContinue ? '#EAF8F1' : '#FFF8E7' }}>
+            <Text style={{ fontSize: 16, color: canContinue ? '#087A4B' : '#9A6C00' }}>▧</Text>
+            <Text selectable style={{ fontSize: 11, lineHeight: 16, fontWeight: '600', color: canContinue ? '#087A4B' : '#9A6C00' }}>
+              {!isAvailable ? 'This service is currently unavailable' : !hasRequiredSelection ? 'Please select an option to generate your estimate' : `Your estimate is ₹${price.toLocaleString('en-IN')}`}
+            </Text>
+          </View>
+          <View style={{ paddingHorizontal: 10, paddingTop: 10 }}>
+            <Pressable
+              disabled={!canContinue || isAddingToCart}
+              accessibilityRole="button"
+              onPress={handleConsultation}
+              style={({ pressed }) => ({ height: 55, alignItems: 'center', justifyContent: 'center', borderRadius: 10, borderCurve: 'continuous', backgroundColor: canContinue ? '#6E45E2' : '#EEEEEE', opacity: pressed || isAddingToCart ? 0.78 : 1 })}
+            >
+              {isAddingToCart ? <ActivityIndicator color="#FFFFFF" /> : <Text style={{ fontSize: 16, fontWeight: '600', color: canContinue ? '#FFFFFF' : '#B7B5B8' }}>{quantity > 0 ? 'View cart' : 'Book Consultation at ₹49'}</Text>}
+            </Pressable>
+          </View>
         </View>
-
-        <View style={{ gap: 8 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10 }}>
-            <Text selectable style={{ flex: 1, fontSize: 24, lineHeight: 30, fontWeight: '800', color: '#211A28' }}>{item.title}</Text>
-            <View style={{ paddingHorizontal: 9, paddingVertical: 5, borderRadius: 999, backgroundColor: isAvailable ? '#E7F7EF' : '#FCE8EA' }}>
-              <Text style={{ fontSize: 9, fontWeight: '800', color: isAvailable ? '#28704F' : '#A33D48' }}>{isAvailable ? 'AVAILABLE' : 'UNAVAILABLE'}</Text>
-            </View>
-          </View>
-          {item.rating > 0 || item.duration ? (
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              {item.rating > 0 ? <Text style={{ fontSize: 14, color: '#F19A2A' }}>★</Text> : null}
-              <Text selectable style={{ fontSize: 12, fontWeight: '700', color: '#514A58' }}>
-                {item.rating > 0 ? `${item.rating} (${item.reviews} reviews)` : ''}{item.rating > 0 && item.duration ? ' · ' : ''}{item.duration}
-              </Text>
-            </View>
-          ) : null}
-          <Text selectable style={{ fontSize: 13, lineHeight: 20, color: '#6B6470' }}>{item.fullDescription || item.description}</Text>
-        </View>
-
-        {item.includes?.length ? (
-          <View style={{ gap: 12 }}>
-            <Text selectable style={{ fontSize: 18, fontWeight: '800', color: '#211A28' }}>What’s included</Text>
-            <View style={{ gap: 9, padding: 16, borderRadius: 20, borderCurve: 'continuous', backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#ECE9EF' }}>
-              {item.includes.map((include) => (
-                <View key={include} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 9 }}>
-                  <Text style={{ color: '#6E45E2', fontWeight: '800' }}>✓</Text>
-                  <Text selectable style={{ flex: 1, fontSize: 12, lineHeight: 18, color: '#5F5765' }}>{include}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-        ) : null}
-
-        {item.variants?.length ? (
-          <View style={{ gap: 12 }}>
-            <View style={{ gap: 3 }}>
-              <Text selectable style={{ fontSize: 18, fontWeight: '800', color: '#211A28' }}>{item.variantLabel || 'Choose an option'}</Text>
-              <Text selectable style={{ fontSize: 11, color: '#77717D' }}>Select one option before adding this product.</Text>
-            </View>
-            <View style={{ gap: 9 }}>
-              {item.variants.map((variant, index) => {
-                const selected = selectedVariantIndex === index;
-                return (
-                  <Pressable
-                    key={variant.key || variant.label}
-                    accessibilityRole="radio"
-                    accessibilityState={{ checked: selected }}
-                    onPress={() => chooseVariant(index)}
-                    style={({ pressed }) => ({
-                      minHeight: 58,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 12,
-                      paddingHorizontal: 14,
-                      paddingVertical: 11,
-                      borderRadius: 16,
-                      borderCurve: 'continuous',
-                      borderWidth: selected ? 2 : 1,
-                      borderColor: selected ? '#6E45E2' : '#E2DEE7',
-                      backgroundColor: selected ? '#F6F2FF' : '#FFFFFF',
-                      opacity: pressed ? 0.7 : 1,
-                    })}
-                  >
-                    <View style={{ width: 20, height: 20, alignItems: 'center', justifyContent: 'center', borderRadius: 10, borderWidth: 2, borderColor: selected ? '#6E45E2' : '#A29BA7' }}>
-                      {selected ? <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: '#6E45E2' }} /> : null}
-                    </View>
-                    <Text selectable style={{ flex: 1, fontSize: 12, lineHeight: 17, fontWeight: selected ? '700' : '600', color: '#4F4755' }}>{variant.label}</Text>
-                    <Text selectable style={{ fontSize: 13, fontWeight: '800', color: '#211A28', fontVariant: ['tabular-nums'] }}>₹{variant.price}</Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-          </View>
-        ) : null}
-      </ScrollView>
-
-      <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 20, paddingTop: 12, paddingBottom: Math.max(insets.bottom, 14), backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: '#ECE9EF', boxShadow: '0 -6px 20px rgba(33, 22, 52, 0.06)' }}>
-        <View style={{ flex: 1, gap: 2 }}>
-          <Text style={{ fontSize: 10, color: '#77717D' }}>{selectedVariant ? 'Selected price' : 'Price'}</Text>
-          <Text selectable style={{ fontSize: 20, fontWeight: '800', color: '#211A28', fontVariant: ['tabular-nums'] }}>₹{price}</Text>
-        </View>
-        {quantity > 0 ? (
-          <View style={{ height: 46, flexDirection: 'row', alignItems: 'center', borderRadius: 14, overflow: 'hidden', backgroundColor: '#6E45E2' }}>
-            <Pressable accessibilityRole="button" onPress={() => onRemove(selectedItem)} style={{ width: 42, height: 46, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 21, color: '#FFFFFF' }}>−</Text></Pressable>
-            <Text style={{ minWidth: 28, textAlign: 'center', fontSize: 14, fontWeight: '800', color: '#FFFFFF', fontVariant: ['tabular-nums'] }}>{quantity}</Text>
-            <Pressable disabled={quantity >= maxQuantity} accessibilityRole="button" onPress={() => onAdd(selectedItem)} style={{ width: 42, height: 46, alignItems: 'center', justifyContent: 'center', opacity: quantity >= maxQuantity ? 0.4 : 1 }}><Text style={{ fontSize: 21, color: '#FFFFFF' }}>+</Text></Pressable>
-          </View>
-        ) : (
-          <Pressable
-            disabled={!isAvailable}
-            accessibilityRole="button"
-            onPress={() => onAdd(selectedItem)}
-            style={({ pressed }) => ({ minWidth: 142, height: 46, alignItems: 'center', justifyContent: 'center', borderRadius: 14, backgroundColor: '#6E45E2', opacity: !isAvailable ? 0.4 : pressed ? 0.75 : 1 })}
-          >
-            <Text style={{ fontSize: 13, fontWeight: '800', color: '#FFFFFF' }}>Add to cart</Text>
-          </Pressable>
-        )}
       </View>
     </View>
   );

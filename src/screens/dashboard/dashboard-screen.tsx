@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
-import { View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Alert, View } from 'react-native';
 
 import { BottomTabBar, type DashboardTab } from '../../components/bottom-tab-bar';
 import type { ServiceCategory, ServiceItem, ServiceSubcategory } from '../../data/service-catalog';
+import { useCart } from '../../hooks/use-cart';
 import { useServiceCategories } from '../../hooks/use-service-categories';
 import { BookingsScreen } from '../bookings';
 import { CartScreen } from '../cart';
@@ -16,39 +17,47 @@ type DashboardPage =
   | { type: 'root' }
   | { type: 'category'; category: ServiceCategory }
   | { type: 'services'; category: ServiceCategory; subcategory: ServiceSubcategory }
-  | { type: 'product'; category: ServiceCategory; subcategory: ServiceSubcategory; item: ServiceItem };
+  | { type: 'product'; category: ServiceCategory; subcategory: ServiceSubcategory; item: ServiceItem }
+  | { type: 'cart-product'; item: ServiceItem }
+  | { type: 'checkout-cart'; category?: ServiceCategory; subcategory?: ServiceSubcategory; categoryTitle?: string };
 
 type DashboardScreenProps = {
+  authToken?: string;
   onLogout: () => void;
 };
 
-export function DashboardScreen({ onLogout }: DashboardScreenProps) {
+export function DashboardScreen({ authToken, onLogout }: DashboardScreenProps) {
   const [activeTab, setActiveTab] = useState<DashboardTab>('home');
   const [page, setPage] = useState<DashboardPage>({ type: 'root' });
-  const [cart, setCart] = useState<Record<string, number>>({});
-  const [cartItemsById, setCartItemsById] = useState<Record<string, ServiceItem>>({});
+  const cartState = useCart(authToken);
   const { categories, errorMessage: categoriesError, isLoading: categoriesLoading, retry: retryCategories } = useServiceCategories();
+  const isCartScreenVisible = page.type === 'checkout-cart' || (page.type === 'root' && activeTab === 'cart');
 
-  const cartCount = useMemo(() => Object.values(cart).reduce((total, quantity) => total + quantity, 0), [cart]);
+  useEffect(() => {
+    if (!isCartScreenVisible || !authToken) return;
+    void cartState.refresh().catch(() => undefined);
+  }, [authToken, cartState.refresh, isCartScreenVisible]);
 
-  const addToCart = (item: ServiceItem) => {
-    setCartItemsById((current) => ({ ...current, [item.id]: item }));
-    setCart((current) => ({
-      ...current,
-      [item.id]: Math.min((current[item.id] ?? 0) + 1, item.maxQuantity ?? 99),
-    }));
+  const tryAddToCart = async (item: ServiceItem) => {
+    try {
+      await cartState.add(item);
+      return true;
+    } catch (error) {
+      Alert.alert('Could not add to cart', error instanceof Error ? error.message : 'Please try again.');
+      return false;
+    }
   };
 
-  const removeFromCart = (item: ServiceItem) => {
-    setCart((current) => {
-      const quantity = current[item.id] ?? 0;
-      if (quantity <= 1) {
-        const next = { ...current };
-        delete next[item.id];
-        return next;
-      }
-      return { ...current, [item.id]: quantity - 1 };
-    });
+  const addToCart = async (item: ServiceItem) => {
+    await tryAddToCart(item);
+  };
+
+  const removeFromCart = async (item: ServiceItem) => {
+    try {
+      await cartState.decrement(item);
+    } catch (error) {
+      Alert.alert('Could not update cart', error instanceof Error ? error.message : 'Please try again.');
+    }
   };
 
   const changeTab = (tab: DashboardTab) => {
@@ -62,22 +71,82 @@ export function DashboardScreen({ onLogout }: DashboardScreenProps) {
 
   let content;
 
-  if (page.type === 'product') {
+  if (page.type === 'checkout-cart') {
+    content = (
+      <CartScreen
+        cart={cartState.quantities}
+        categoryTitle={page.categoryTitle}
+        errorMessage={cartState.errorMessage}
+        isLoading={cartState.isLoading}
+        items={cartState.items}
+        totalItems={cartState.totalItems}
+        totalPrice={cartState.totalPrice}
+        onAdd={addToCart}
+        onBack={() => {
+          if (page.category && page.subcategory) {
+            setPage({ type: 'services', category: page.category, subcategory: page.subcategory });
+          } else {
+            changeTab('cart');
+          }
+        }}
+        onRemove={removeFromCart}
+        onProductPress={(item) => setPage({ type: 'cart-product', item })}
+        onExplore={() => changeTab('categories')}
+        onRetry={() => void cartState.refresh().catch(() => undefined)}
+      />
+    );
+  } else if (page.type === 'cart-product') {
     content = (
       <ProductDetailScreen
-        cart={cart}
+        cart={cartState.quantities}
+        cartItemsById={cartState.itemsById}
+        categoryTitle="Your cart"
+        item={page.item}
+        subcategoryTitle={page.item.selectedVariantLabel || 'Selected service'}
+        onAdd={async (item) => {
+          if (await tryAddToCart(item)) {
+            setPage({ type: 'checkout-cart', categoryTitle: 'Selected services' });
+          }
+        }}
+        onRemove={removeFromCart}
+        onViewCart={() => setPage({ type: 'checkout-cart', categoryTitle: 'Selected services' })}
+        onBack={() => changeTab('cart')}
+        totalCartItems={cartState.totalItems}
+      />
+    );
+  } else if (page.type === 'product') {
+    content = (
+      <ProductDetailScreen
+        cart={cartState.quantities}
+        cartItemsById={cartState.itemsById}
         categoryTitle={page.category.title}
         item={page.item}
         subcategoryTitle={page.subcategory.title}
-        onAdd={addToCart}
+        onAdd={async (item) => {
+          if (await tryAddToCart(item)) {
+            setPage({
+              type: 'checkout-cart',
+              category: page.category,
+              subcategory: page.subcategory,
+              categoryTitle: page.category.title,
+            });
+          }
+        }}
         onRemove={removeFromCart}
+        onViewCart={() => setPage({
+          type: 'checkout-cart',
+          category: page.category,
+          subcategory: page.subcategory,
+          categoryTitle: page.category.title,
+        })}
         onBack={() => setPage({ type: 'services', category: page.category, subcategory: page.subcategory })}
+        totalCartItems={cartState.totalItems}
       />
     );
   } else if (page.type === 'services') {
     content = (
       <ServiceListScreen
-        cart={cart}
+        cart={cartState.quantities}
         categoryTitle={page.category.title}
         subcategory={page.subcategory}
         onAdd={addToCart}
@@ -109,11 +178,18 @@ export function DashboardScreen({ onLogout }: DashboardScreenProps) {
   } else if (activeTab === 'cart') {
     content = (
       <CartScreen
-        cart={cart}
-        items={Object.values(cartItemsById)}
+        cart={cartState.quantities}
+        errorMessage={cartState.errorMessage}
+        isLoading={cartState.isLoading}
+        items={cartState.items}
+        totalItems={cartState.totalItems}
+        totalPrice={cartState.totalPrice}
         onAdd={addToCart}
         onRemove={removeFromCart}
+        onProductPress={(item) => setPage({ type: 'cart-product', item })}
         onExplore={() => changeTab('categories')}
+        onRetry={() => void cartState.refresh().catch(() => undefined)}
+        showBottomTab
       />
     );
   } else {
@@ -133,7 +209,7 @@ export function DashboardScreen({ onLogout }: DashboardScreenProps) {
   return (
     <View style={{ flex: 1, backgroundColor: '#FAF9FB' }}>
       {content}
-      {page.type === 'root' ? <BottomTabBar activeTab={activeTab} cartCount={cartCount} onChange={changeTab} /> : null}
+      {page.type === 'root' ? <BottomTabBar activeTab={activeTab} cartCount={cartState.totalItems} onChange={changeTab} /> : null}
     </View>
   );
 }
