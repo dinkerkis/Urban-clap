@@ -75,7 +75,7 @@ function AddressIcon({ label }: { label?: string | null }) {
 
 function GoogleMark() {
   return (
-    <Text style={{ fontSize: 13, fontWeight: '700', letterSpacing: -0.3, marginLeft:-2 }}>
+    <Text style={{ fontSize: 12, fontWeight: '700', letterSpacing: -0.3, marginLeft:-2 }}>
       <Text style={{ color: '#4285F4' }}>G</Text>
       <Text style={{ color: '#EA4335' }}>o</Text>
       <Text style={{ color: '#FBBC05' }}>o</Text>

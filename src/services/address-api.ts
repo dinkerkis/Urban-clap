@@ -12,8 +12,12 @@ export type UserAddress = {
   houseNo?: string;
   isActive?: boolean;
   isDefault?: boolean;
-  label: AddressLabel | string;
+  label: AddressLabel | string | null;
   landmark?: string;
+  location?: {
+    coordinates?: [number, number];
+    type?: string;
+  };
   pincode: string;
   state: string;
 };
@@ -73,6 +77,34 @@ export function formatAddressLabel(label?: string | null): string {
 
 function text(value?: string | null): string {
   return value?.trim() || '';
+}
+
+function distanceMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const toRad = (value: number) => (value * Math.PI) / 180;
+  const earthRadius = 6_371_000;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const area =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return 2 * earthRadius * Math.asin(Math.sqrt(area));
+}
+
+export function isSameSavedLocation(
+  address: UserAddress,
+  payload: Pick<AddAddressPayload, 'addressLine1' | 'city' | 'latitude' | 'longitude' | 'pincode'>,
+): boolean {
+  const longitude = address.location?.coordinates?.[0];
+  const latitude = address.location?.coordinates?.[1];
+  if (typeof latitude === 'number' && typeof longitude === 'number') {
+    return distanceMeters(latitude, longitude, payload.latitude, payload.longitude) < 80;
+  }
+
+  return (
+    text(address.addressLine1) === text(payload.addressLine1) &&
+    text(address.city) === text(payload.city) &&
+    text(address.pincode) === text(payload.pincode)
+  );
 }
 
 export function buildAddressFromCurrentLocation(
