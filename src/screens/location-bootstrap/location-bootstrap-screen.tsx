@@ -1,0 +1,281 @@
+import { useEffect, useRef, useState } from 'react';
+import { Text, View } from 'react-native';
+import Animated, {
+  Easing,
+  FadeIn,
+  FadeOut,
+  type SharedValue,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
+
+import { fetchCurrentLocation, formatLocationDisplay, type LocationDisplay } from '../../hooks/use-current-location';
+import { saveCurrentLocationAddress } from '../../hooks/use-save-current-location-address';
+
+const FETCH_PIN = '#1A4FBF';
+const CONFIRM_GREEN = '#1AA05A';
+const MIN_FETCH_MS = 1_400;
+const DOTS_MS = 800;
+const CONFIRM_MS = 1_800;
+
+type Phase = 'dots' | 'fetching' | 'confirming';
+
+type LocationBootstrapScreenProps = {
+  authToken?: string;
+  onComplete: () => void;
+};
+
+function wait(ms: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, ms));
+}
+
+function PulseRing({ delay, progress }: { delay: number; progress: SharedValue<number> }) {
+  const style = useAnimatedStyle(() => ({
+    opacity: 0.26 * (1 - progress.value),
+    transform: [{ scale: 0.22 + progress.value * 1.15 }],
+  }));
+
+  useEffect(() => {
+    progress.value = withDelay(
+      delay,
+      withRepeat(
+        withSequence(withTiming(1, { duration: 1_800, easing: Easing.out(Easing.quad) }), withTiming(0, { duration: 0 })),
+        -1,
+        false,
+      ),
+    );
+  }, [delay, progress]);
+
+  return (
+    <Animated.View
+      pointerEvents="none"
+      style={[
+        {
+          position: 'absolute',
+          width: 120,
+          height: 120,
+          borderRadius: 60,
+          backgroundColor: 'rgba(26, 79, 191, 0.12)',
+        },
+        style,
+      ]}
+    />
+  );
+}
+
+function FetchingPin() {
+  const ring1 = useSharedValue(0);
+  const ring2 = useSharedValue(0);
+  const ring3 = useSharedValue(0);
+
+  return (
+    <View style={{ width: 140, height: 140, alignItems: 'center', justifyContent: 'center' }}>
+      <PulseRing delay={0} progress={ring1} />
+      <PulseRing delay={600} progress={ring2} />
+      <PulseRing delay={1_200} progress={ring3} />
+      <View style={{ alignItems: 'center' }}>
+        <View
+          style={{
+            width: 22,
+            height: 22,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 11,
+            backgroundColor: FETCH_PIN,
+          }}
+        >
+          <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#FFFFFF' }} />
+        </View>
+        <View style={{ width: 2.5, height: 11, marginTop: 1, borderRadius: 1, backgroundColor: FETCH_PIN }} />
+      </View>
+    </View>
+  );
+}
+
+function ConfirmPin() {
+  return (
+    <View style={{ alignItems: 'center' }}>
+      <View
+        style={{
+          width: 22,
+          height: 22,
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: 11,
+          backgroundColor: CONFIRM_GREEN,
+        }}
+      >
+        <View
+          style={{
+            width: 8,
+            height: 4.5,
+            marginTop: -1,
+            borderLeftWidth: 1.8,
+            borderBottomWidth: 1.8,
+            borderColor: '#FFFFFF',
+            transform: [{ rotate: '-45deg' }],
+          }}
+        />
+      </View>
+      <View style={{ width: 2, height: 10, marginTop: 2, borderRadius: 1, backgroundColor: CONFIRM_GREEN }} />
+    </View>
+  );
+}
+
+function LoadingDots() {
+  const d1 = useSharedValue(0.25);
+  const d2 = useSharedValue(0.25);
+  const d3 = useSharedValue(0.25);
+
+  useEffect(() => {
+    const pulse = (value: SharedValue<number>, delay: number) => {
+      value.value = withDelay(
+        delay,
+        withRepeat(
+          withSequence(
+            withTiming(1, { duration: 280, easing: Easing.out(Easing.quad) }),
+            withTiming(0.22, { duration: 280, easing: Easing.in(Easing.quad) }),
+          ),
+          -1,
+          false,
+        ),
+      );
+    };
+
+    pulse(d1, 0);
+    pulse(d2, 140);
+    pulse(d3, 280);
+  }, [d1, d2, d3]);
+
+  const s1 = useAnimatedStyle(() => ({ opacity: d1.value, transform: [{ scale: 0.82 + d1.value * 0.18 }] }));
+  const s2 = useAnimatedStyle(() => ({ opacity: d2.value, transform: [{ scale: 0.82 + d2.value * 0.18 }] }));
+  const s3 = useAnimatedStyle(() => ({ opacity: d3.value, transform: [{ scale: 0.82 + d3.value * 0.18 }] }));
+
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 9 }}>
+      <Animated.View style={[{ width: 7, height: 7, borderRadius: 3.5, backgroundColor: '#1A1A1A' }, s1]} />
+      <Animated.View style={[{ width: 7, height: 7, borderRadius: 3.5, backgroundColor: '#1A1A1A' }, s2]} />
+      <Animated.View style={[{ width: 7, height: 7, borderRadius: 3.5, backgroundColor: '#1A1A1A' }, s3]} />
+    </View>
+  );
+}
+
+export function LocationBootstrapScreen({ authToken, onComplete }: LocationBootstrapScreenProps) {
+  const [phase, setPhase] = useState<Phase>('dots');
+  const [display, setDisplay] = useState<LocationDisplay | null>(null);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void (async () => {
+      const locationPromise = fetchCurrentLocation();
+
+      await wait(DOTS_MS);
+      if (cancelled) return;
+
+      setPhase('fetching');
+      const fetchStartedAt = Date.now();
+      const snapshot = await locationPromise;
+      const remaining = Math.max(0, MIN_FETCH_MS - (Date.now() - fetchStartedAt));
+      await wait(remaining);
+      if (cancelled) return;
+
+      const savePromise = saveCurrentLocationAddress(authToken, snapshot);
+
+      if (snapshot.status === 'ready') {
+        setDisplay(formatLocationDisplay(snapshot.geocodedAddress, snapshot.label));
+        setPhase('confirming');
+        await Promise.all([wait(CONFIRM_MS), savePromise]);
+      } else {
+        await savePromise;
+      }
+
+      if (!cancelled) onCompleteRef.current();
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authToken]);
+
+  return (
+    <View
+      accessibilityLabel={
+        phase === 'dots'
+          ? 'Loading'
+          : phase === 'fetching'
+            ? 'Fetching your location'
+            : `Delivering service at ${display?.title ?? 'your area'}`
+      }
+      accessibilityRole="progressbar"
+      style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF' }}
+    >
+      {phase === 'fetching' ? (
+        <Animated.View
+          key="fetching"
+          entering={FadeIn.duration(280)}
+          exiting={FadeOut.duration(160)}
+          style={{ alignItems: 'center', transform: [{ translateY: -36 }] }}
+        >
+          <FetchingPin />
+          <Text style={{ marginTop: 2, fontSize: 15, lineHeight: 21, fontWeight: '400', color: '#2F2F2F' }}>
+            Fetching your location...
+          </Text>
+        </Animated.View>
+      ) : null}
+
+      {phase === 'dots' ? (
+        <Animated.View
+          key="dots"
+          entering={FadeIn.duration(220)}
+          exiting={FadeOut.duration(140)}
+          style={{ alignItems: 'center', justifyContent: 'center' }}
+        >
+          <LoadingDots />
+        </Animated.View>
+      ) : null}
+
+      {phase === 'confirming' && display ? (
+        <Animated.View
+          key="confirming"
+          entering={FadeIn.duration(320)}
+          exiting={FadeOut.duration(180)}
+          style={{ alignItems: 'center', paddingHorizontal: 36, transform: [{ translateY: -20 }] }}
+        >
+          <ConfirmPin />
+          <Text style={{ marginTop: 14, fontSize: 13, lineHeight: 18, fontWeight: '400', color: CONFIRM_GREEN }}>
+            Delivering service at
+          </Text>
+          <Text
+            selectable
+            style={{ marginTop: 6, fontSize: 22, lineHeight: 28, fontWeight: '700', color: '#111111', textAlign: 'center' }}
+          >
+            {display.title}
+          </Text>
+          {display.subtitle ? (
+            <Text
+              selectable
+              style={{
+                marginTop: 8,
+                maxWidth: 300,
+                fontSize: 14,
+                lineHeight: 20,
+                fontWeight: '400',
+                color: '#2A2A2A',
+                textAlign: 'center',
+              }}
+            >
+              {display.subtitle}
+            </Text>
+          ) : null}
+        </Animated.View>
+      ) : null}
+    </View>
+  );
+}

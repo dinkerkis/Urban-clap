@@ -32,7 +32,7 @@ export function AuthHeader({ onPress }: Props) {
           opacity: pressed ? 0.55 : 1,
         })}
       >
-        <Text style={{ fontSize: 30, lineHeight: 34, color: colors.text }}>‹</Text>
+        <Text style={{ fontSize: 23, lineHeight: 25, fontWeight: '400', color: colors.text }}>←</Text>
       </Pressable>
     </View>
   );

@@ -213,7 +213,6 @@ export function DashboardScreen({ authToken, onLogout }: DashboardScreenProps) {
   } else {
     content = (
       <HomeScreen
-        authToken={authToken}
         categories={categories}
         errorMessage={categoriesError}
         isLoading={categoriesLoading}

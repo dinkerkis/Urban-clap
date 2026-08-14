@@ -6,7 +6,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DEFAULT_OFFER_HEADER_COLOR, OfferCarousel } from '../../components/offer-carousel';
 import type { ServiceCategory } from '../../data/service-catalog';
 import { useCurrentLocation } from '../../hooks/use-current-location';
-import { useSaveCurrentLocationAddress } from '../../hooks/use-save-current-location-address';
 
 const SEARCH_SUGGESTIONS = ['AC service', 'Facial', 'Kitchen cleaning'];
 
@@ -63,7 +62,6 @@ function SearchIcon() {
 }
 
 type HomeScreenProps = {
-  authToken?: string;
   categories: ServiceCategory[];
   errorMessage: string;
   isLoading: boolean;
@@ -76,7 +74,7 @@ type HomeScreenProps = {
   onRetry: () => void;
 };
 
-export function HomeScreen({ authToken, categories, errorMessage, isLoading, locationSubtitle, locationTitle, onCategoryPress, onLocationPress, onLogout, onRetry }: HomeScreenProps) {
+export function HomeScreen({ categories, errorMessage, isLoading, locationSubtitle, locationTitle, onCategoryPress, onLocationPress, onLogout, onRetry }: HomeScreenProps) {
   const insets = useSafeAreaInsets();
   const [search, setSearch] = useState('');
   const [searchSuggestionIndex, setSearchSuggestionIndex] = useState(0);
@@ -84,7 +82,6 @@ export function HomeScreen({ authToken, categories, errorMessage, isLoading, loc
   const [isDeletingSuggestion, setIsDeletingSuggestion] = useState(false);
   const [headerColor, setHeaderColor] = useState(DEFAULT_OFFER_HEADER_COLOR);
   const currentLocation = useCurrentLocation();
-  useSaveCurrentLocationAddress(authToken, currentLocation);
   const { width } = useWindowDimensions();
   const categoryWidth = Math.max(92, Math.floor((width - 32 - 24) / 3));
   const normalizedSearch = search.trim().toLowerCase();

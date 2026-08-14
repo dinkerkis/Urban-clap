@@ -17,6 +17,11 @@ export type CurrentLocation = {
   status: LocationStatus;
 };
 
+export type LocationDisplay = {
+  subtitle: string;
+  title: string;
+};
+
 type LocationSnapshot = Omit<CurrentLocation, 'refresh'>;
 
 const loadingSnapshot: LocationSnapshot = {
@@ -55,7 +60,44 @@ function formatAddress(address: Location.LocationGeocodedAddress | undefined): s
   return uniqueParts.slice(0, 4).join(', ') || null;
 }
 
-async function fetchCurrentLocation(): Promise<LocationSnapshot> {
+function stripLeadingTitle(full: string, title: string): string {
+  const escaped = title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return full.replace(new RegExp(`^${escaped}\\s*,\\s*`, 'i'), '').trim();
+}
+
+export function formatLocationDisplay(
+  address: Location.LocationGeocodedAddress | null | undefined,
+  fallbackLabel?: string,
+): LocationDisplay {
+  if (!address) {
+    return {
+      title: 'your area',
+      subtitle: fallbackLabel || 'Enable location to see services near you.',
+    };
+  }
+
+  const candidates = [address.name, address.district, address.city, address.subregion].filter(
+    (part): part is string => Boolean(part?.trim()),
+  );
+  const title = candidates.find((part) => part.length <= 28 && !part.includes(',')) || candidates[0] || 'your area';
+  const streetAddress = [address.streetNumber, address.street].filter(Boolean).join(' ');
+  const regionLine = [address.region, address.postalCode].filter((part): part is string => Boolean(part?.trim())).join(' ');
+  const restParts = [
+    streetAddress !== title ? streetAddress : '',
+    address.district && address.district !== title ? address.district : '',
+    address.city && address.city !== title ? address.city : '',
+    address.subregion && address.subregion !== title && address.subregion !== address.city ? address.subregion : '',
+    regionLine,
+    address.country,
+  ].filter((part): part is string => Boolean(part?.trim()));
+  const assembled = restParts.join(', ');
+  const fromFormatted = address.formattedAddress ? stripLeadingTitle(address.formattedAddress, title) : '';
+  const subtitle = fromFormatted || assembled || fallbackLabel || '';
+
+  return { title, subtitle };
+}
+
+export async function fetchCurrentLocation(): Promise<LocationSnapshot> {
   if (cachedSnapshot?.status === 'ready') return cachedSnapshot;
   if (inFlight) return inFlight;
 
@@ -103,6 +145,10 @@ async function fetchCurrentLocation(): Promise<LocationSnapshot> {
   })();
 
   return inFlight;
+}
+
+export function getCachedLocation(): LocationSnapshot | null {
+  return cachedSnapshot;
 }
 
 export function useCurrentLocation(): CurrentLocation {

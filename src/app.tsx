@@ -5,6 +5,7 @@ import { View } from 'react-native';
 import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { DashboardScreen } from './screens/dashboard';
+import { LocationBootstrapScreen } from './screens/location-bootstrap';
 import { OtpVerificationScreen } from './screens/otp-verification';
 import { PhoneLoginScreen } from './screens/phone-login';
 import { CustomSplashScreen } from './screens/splash';
@@ -12,7 +13,7 @@ import type { AuthSession } from './services/auth-api';
 import { clearAuthSession, getStoredAuthSession, saveAuthSession } from './services/auth-session-storage';
 import { colors } from './theme/colors';
 
-type Screen = 'loading' | 'phone' | 'otp' | 'dashboard';
+type Screen = 'loading' | 'location-bootstrap' | 'phone' | 'otp' | 'dashboard';
 
 void SplashScreen.preventAutoHideAsync();
 SplashScreen.setOptions({ duration: 0, fade: false });
@@ -34,7 +35,7 @@ export default function App() {
     ]).then(([storedSession]) => {
         if (!active) return;
         setSession(storedSession);
-        setScreen(storedSession ? 'dashboard' : 'phone');
+        setScreen(storedSession ? 'location-bootstrap' : 'phone');
       });
 
     return () => {
@@ -47,6 +48,12 @@ export default function App() {
       <View style={{ flex: 1, backgroundColor: screen === 'loading' || screen === 'dashboard' ? '#6E45E2' : colors.background }}>
         <StatusBar style={screen === 'loading' || screen === 'dashboard' ? 'light' : 'dark'} />
         {screen === 'loading' && <CustomSplashScreen />}
+        {screen === 'location-bootstrap' && (
+          <LocationBootstrapScreen
+            authToken={session?.token}
+            onComplete={() => setScreen('dashboard')}
+          />
+        )}
         {screen === 'phone' && (
           <PhoneLoginScreen
             onContinue={({ callingCode: nextCallingCode, phoneNumber: phone }) => {
@@ -66,7 +73,7 @@ export default function App() {
                 await saveAuthSession(session);
               } finally {
                 setSession(session);
-                setScreen('dashboard');
+                setScreen('location-bootstrap');
               }
             }}
           />
