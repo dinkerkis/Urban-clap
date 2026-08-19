@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, ScrollView, Text, TextInput, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { DEFAULT_OFFER_HEADER_COLOR, OfferCarousel } from '../../components/offer-carousel';
@@ -55,7 +55,7 @@ function SearchIcon() {
     <Image
       source={require('../../../assets/search.png')}
       contentFit="contain"
-      tintColor="#8B8590"
+      tintColor="#6B6572"
       style={{ width: 18, height: 18 }}
     />
   );
@@ -70,11 +70,11 @@ type HomeScreenProps = {
   onCategoryPress: (category: ServiceCategory) => void;
   onLocationPress: () => void;
   onSeeAllCategories: () => void;
-  onLogout: () => void;
+  onProfilePress: () => void;
   onRetry: () => void;
 };
 
-export function HomeScreen({ categories, errorMessage, isLoading, locationSubtitle, locationTitle, onCategoryPress, onLocationPress, onLogout, onRetry }: HomeScreenProps) {
+export function HomeScreen({ categories, errorMessage, isLoading, locationSubtitle, locationTitle, onCategoryPress, onLocationPress, onProfilePress, onRetry }: HomeScreenProps) {
   const insets = useSafeAreaInsets();
   const [search, setSearch] = useState('');
   const [searchSuggestionIndex, setSearchSuggestionIndex] = useState(0);
@@ -173,15 +173,10 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Open account options"
-            onPress={() =>
-              Alert.alert('Account', 'You are currently signed in.', [
-                { text: 'Cancel', style: 'cancel' },
-                { text: 'Log out', style: 'destructive', onPress: onLogout },
-              ])
-            }
+            onPress={onProfilePress}
             style={({ pressed }) => ({ width: 35, height: 35, alignItems: 'center', justifyContent: 'center', borderRadius: 6, backgroundColor: '#FFFFFF', opacity: pressed ? 0.7 : 1 })}
           >
-            <Text style={{ fontSize: 16, lineHeight: 18, textAlign: 'center', includeFontPadding: false }}>👤</Text>
+            <Image source={require('../../../assets/profile.png')} contentFit="contain" style={{ width: 16, height: 16 }} />
           </Pressable>
         </View>
 

@@ -3,6 +3,7 @@ import { Image } from 'expo-image';
 import { ActivityIndicator, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { BackIcon } from '../../components/back-icon';
 import type { ServiceItem } from '../../data/service-catalog';
 
 type CartScreenProps = {
@@ -69,7 +70,7 @@ export function CartScreen({
             onPress={onBack}
             style={({ pressed }) => ({ width: 30, height: 36, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.55 : 1 })}
           >
-            <Text style={{ fontSize: 31, lineHeight: 34, fontWeight: '400', color: '#171319' }}>‹</Text>
+            <BackIcon color="#171319" />
           </Pressable>
         ) : null}
         <Text selectable style={{ fontSize: 22, lineHeight: 28, fontWeight: '600', color: '#171319' }}>Your cart</Text>

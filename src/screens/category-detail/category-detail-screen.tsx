@@ -2,6 +2,7 @@ import { Image } from 'expo-image';
 import { Pressable, ScrollView, Share, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { BackIcon } from '../../components/back-icon';
 import type { ServiceCategory, ServiceSubcategory } from '../../data/service-catalog';
 
 type CategoryDetailScreenProps = {
@@ -30,11 +31,11 @@ export function CategoryDetailScreen({ category, onBack, onSubcategoryPress }: C
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Go back"
-            hitSlop={8}
+            hitSlop={{ top: 8, bottom: 8, right: 8, left: 0 }}
             onPress={onBack}
-            style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, opacity: pressed ? 0.58 : 1 })}
+            style={({ pressed }) => ({ height: 40, justifyContent: 'center', opacity: pressed ? 0.58 : 1 })}
           >
-            <Text style={{ fontSize: 23, lineHeight: 25, fontWeight: '400', color: '#171419' }}>←</Text>
+            <BackIcon />
           </Pressable>
 
           <Text selectable numberOfLines={2} style={{ flex: 1, fontSize: 20, lineHeight: 26, fontWeight: '600', color: '#171419' }}>
@@ -48,13 +49,12 @@ export function CategoryDetailScreen({ category, onBack, onSubcategoryPress }: C
             onPress={shareCategory}
             style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, opacity: pressed ? 0.58 : 1 })}
           >
-            <View style={{ width: 19, height: 19 }}>
-              <View style={{ position: 'absolute', left: 4.5, top: 6, width: 10, height: 1.7, borderRadius: 2, backgroundColor: '#171419', transform: [{ rotate: '-29deg' }] }} />
-              <View style={{ position: 'absolute', left: 4.5, top: 11.5, width: 10, height: 1.7, borderRadius: 2, backgroundColor: '#171419', transform: [{ rotate: '29deg' }] }} />
-              <View style={{ position: 'absolute', left: 1, top: 7, width: 5, height: 5, borderRadius: 2.5, backgroundColor: '#171419' }} />
-              <View style={{ position: 'absolute', right: 1, top: 1.5, width: 5, height: 5, borderRadius: 2.5, backgroundColor: '#171419' }} />
-              <View style={{ position: 'absolute', right: 1, bottom: 1.5, width: 5, height: 5, borderRadius: 2.5, backgroundColor: '#171419' }} />
-            </View>
+            <Image
+              source={require('../../../assets/share.png')}
+              contentFit="contain"
+              tintColor="#171419"
+              style={{ width: 18, height: 18 }}
+            />
           </Pressable>
         </View>
       </View>

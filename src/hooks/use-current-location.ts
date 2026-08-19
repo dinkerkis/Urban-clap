@@ -35,6 +35,35 @@ const loadingSnapshot: LocationSnapshot = {
 let cachedSnapshot: LocationSnapshot | null = null;
 let inFlight: Promise<LocationSnapshot> | null = null;
 
+const LAST_KNOWN_MAX_AGE_MS = 5 * 60 * 1000;
+const LAST_KNOWN_ACCURACY_M = 150;
+const CURRENT_POSITION_TIMEOUT_MS = 6_000;
+
+function wait(ms: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, ms));
+}
+
+async function getDevicePosition(): Promise<Location.LocationObject> {
+  const lastKnown = await Location.getLastKnownPositionAsync({
+    maxAge: LAST_KNOWN_MAX_AGE_MS,
+    requiredAccuracy: LAST_KNOWN_ACCURACY_M,
+  });
+  if (lastKnown) return lastKnown;
+
+  try {
+    return await Promise.race([
+      Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }),
+      wait(CURRENT_POSITION_TIMEOUT_MS).then(() => {
+        throw new Error('location-timeout');
+      }),
+    ]);
+  } catch {
+    const stale = await Location.getLastKnownPositionAsync();
+    if (stale) return stale;
+    throw new Error('location-unavailable');
+  }
+}
+
 function formatAddress(address: Location.LocationGeocodedAddress | undefined): string | null {
   if (!address) return null;
 
@@ -121,7 +150,7 @@ export async function fetchCurrentLocation(): Promise<LocationSnapshot> {
         return { ...loadingSnapshot, canAskAgain: permission.canAskAgain, status: 'disabled', label: 'Turn on location services' };
       }
 
-      const position = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Highest });
+      const position = await getDevicePosition();
       const coords = {
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,

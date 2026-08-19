@@ -1,5 +1,7 @@
 import { Pressable, Text, View } from 'react-native';
 
+import { BackIcon } from './back-icon';
+
 type DashboardScreenHeaderProps = {
   title: string;
   subtitle?: string;
@@ -37,7 +39,7 @@ export function DashboardScreenHeader({ title, subtitle, onBack }: DashboardScre
             opacity: pressed ? 0.65 : 1,
           })}
         >
-          <Text style={{ fontSize: 25, lineHeight: 27, color: '#241A30' }}>‹</Text>
+          <BackIcon color="#241A30" />
         </Pressable>
       )}
       <View style={{ flex: 1, gap: 2 }}>

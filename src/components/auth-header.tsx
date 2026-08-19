@@ -1,5 +1,6 @@
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
+import { BackIcon } from './back-icon';
 import { colors } from '../theme/colors';
 
 type Props = { onPress: () => void };
@@ -32,7 +33,7 @@ export function AuthHeader({ onPress }: Props) {
           opacity: pressed ? 0.55 : 1,
         })}
       >
-        <Text style={{ fontSize: 23, lineHeight: 25, fontWeight: '400', color: colors.text }}>←</Text>
+        <BackIcon color={colors.text} />
       </Pressable>
     </View>
   );

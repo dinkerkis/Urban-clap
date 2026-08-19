@@ -8,6 +8,7 @@ export type OtpRequestData = {
 export type AuthSession = {
   email: string;
   name: string;
+  phone?: string;
   profilePicture: string;
   role: string;
   status: number;

@@ -4,12 +4,14 @@ import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { fetchCurrentLocation } from './hooks/use-current-location';
 import { DashboardScreen } from './screens/dashboard';
 import { LocationBootstrapScreen } from './screens/location-bootstrap';
 import { OtpVerificationScreen } from './screens/otp-verification';
 import { PhoneLoginScreen } from './screens/phone-login';
 import { CustomSplashScreen } from './screens/splash';
 import type { AuthSession } from './services/auth-api';
+import type { CompletedProfile } from './screens/profile';
 import { clearAuthSession, getStoredAuthSession, saveAuthSession } from './services/auth-session-storage';
 import { colors } from './theme/colors';
 
@@ -29,8 +31,13 @@ export default function App() {
 
     void SplashScreen.hide();
 
+    const sessionPromise = getStoredAuthSession().catch(() => null);
+    void sessionPromise.then((storedSession) => {
+      if (storedSession) void fetchCurrentLocation();
+    });
+
     Promise.all([
-      getStoredAuthSession().catch(() => null),
+      sessionPromise,
       new Promise<void>((resolve) => setTimeout(resolve, 1600)),
     ]).then(([storedSession]) => {
         if (!active) return;
@@ -68,11 +75,15 @@ export default function App() {
             phoneNumber={phoneNumber}
             callingCode={callingCode}
             onBack={() => setScreen('phone')}
-            onVerified={async (session) => {
+            onVerified={async (verifiedSession) => {
+              const sessionWithPhone: AuthSession = {
+                ...verifiedSession,
+                phone: verifiedSession.phone || `${callingCode} ${phoneNumber}`,
+              };
               try {
-                await saveAuthSession(session);
+                await saveAuthSession(sessionWithPhone);
               } finally {
-                setSession(session);
+                setSession(sessionWithPhone);
                 setScreen('location-bootstrap');
               }
             }}
@@ -81,6 +92,16 @@ export default function App() {
         {screen === 'dashboard' && (
           <DashboardScreen
             authToken={session?.token}
+            email={session?.email}
+            name={session?.name}
+            phone={session?.phone || (phoneNumber ? `${callingCode} ${phoneNumber}` : undefined)}
+            profilePicture={session?.profilePicture}
+            onProfileUpdated={(profile: CompletedProfile) => {
+              if (!session) return;
+              const updatedSession = { ...session, ...profile };
+              setSession(updatedSession);
+              void saveAuthSession(updatedSession);
+            }}
             onLogout={async () => {
               await clearAuthSession();
               setSession(null);

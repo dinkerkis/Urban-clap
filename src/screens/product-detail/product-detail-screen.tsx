@@ -1,9 +1,21 @@
 import { Image } from 'expo-image';
-import { useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, PanResponder, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import Animated, {
+  Easing,
+  FadeIn,
+  FadeOut,
+  interpolate,
+  runOnJS,
+  Extrapolation,
+  SlideInDown,
+  SlideOutDown,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { DottedUnderline } from '../../components/dotted-underline';
 import { EstimateNoteIcon } from '../../components/estimate-note-icon';
 import type { ServiceItem } from '../../data/service-catalog';
 
@@ -20,9 +32,18 @@ type ProductDetailScreenProps = {
   totalCartItems: number;
 };
 
-export function ProductDetailScreen({ cart, cartItemsById, categoryTitle, item, onAdd, onBack, onViewCart, totalCartItems }: ProductDetailScreenProps) {
+const BACKDROP_IN = FadeIn.duration(220);
+const BACKDROP_OUT = FadeOut.duration(200);
+const SHEET_IN = SlideInDown.duration(380).easing(Easing.out(Easing.cubic));
+const SHEET_OUT = SlideOutDown.duration(300).easing(Easing.in(Easing.cubic));
+
+export function ProductDetailScreen({ cart, cartItemsById, item, onAdd, onBack, onViewCart, totalCartItems }: ProductDetailScreenProps) {
   const insets = useSafeAreaInsets();
-  const { width } = useWindowDimensions();
+  const { height: windowHeight, width } = useWindowDimensions();
+  const dragY = useSharedValue(0);
+  const onBackRef = useRef(onBack);
+  onBackRef.current = onBack;
+  const scrollOffset = useRef(0);
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(() => {
     const selectedIndex = item.variants?.findIndex((variant) => variant.key === item.variantKey || variant.label === item.selectedVariantLabel) ?? -1;
     return selectedIndex;
@@ -55,6 +76,41 @@ export function ProductDetailScreen({ cart, cartItemsById, categoryTitle, item, 
   const hasRequiredSelection = !hasVariants || Boolean(selectedVariant);
   const canContinue = isAvailable && hasRequiredSelection;
 
+  const closeAfterSwipe = () => {
+    onBackRef.current();
+  };
+
+  const panResponder = useMemo(
+    () =>
+      PanResponder.create({
+        onMoveShouldSetPanResponder: (_, gesture) =>
+          scrollOffset.current <= 2 && gesture.dy > 8 && Math.abs(gesture.dy) > Math.abs(gesture.dx),
+        onMoveShouldSetPanResponderCapture: (_, gesture) =>
+          scrollOffset.current <= 2 && gesture.dy > 8 && Math.abs(gesture.dy) > Math.abs(gesture.dx),
+        onPanResponderMove: (_, gesture) => {
+          dragY.value = Math.max(0, gesture.dy);
+        },
+        onPanResponderRelease: (_, gesture) => {
+          if (gesture.dy > 90 || gesture.vy > 1.1) {
+            dragY.value = withTiming(windowHeight, { duration: 280, easing: Easing.in(Easing.cubic) }, (finished) => {
+              if (finished) runOnJS(closeAfterSwipe)();
+            });
+            return;
+          }
+          dragY.value = withTiming(0, { duration: 220, easing: Easing.out(Easing.cubic) });
+        },
+      }),
+    [dragY, windowHeight],
+  );
+
+  const dragStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: dragY.value }],
+  }));
+
+  const backdropStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(dragY.value, [0, windowHeight * 0.45], [1, 0], Extrapolation.CLAMP),
+  }));
+
   const handleConsultation = async () => {
     if (!canContinue || isAddingToCart) return;
     if (quantity > 0) onViewCart();
@@ -69,36 +125,54 @@ export function ProductDetailScreen({ cart, cartItemsById, categoryTitle, item, 
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.80)' }}>
-      <View style={{ height: insets.top + 78, paddingTop: insets.top, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-        <Text numberOfLines={1} style={{ flex: 1, fontSize: 16, fontWeight: '600', color: 'rgba(255,255,255,0.58)' }}>{categoryTitle}</Text>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Close estimate"
-          onPress={onBack}
-          style={({ pressed }) => ({ width: 50, height: 50, alignItems: 'center', justifyContent: 'center', borderRadius: 25, backgroundColor: '#FFFFFF', opacity: pressed ? 0.72 : 1 })}
+    <View style={{ flex: 1 }}>
+      <Animated.View
+        entering={BACKDROP_IN}
+        exiting={BACKDROP_OUT}
+        style={[{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.80)' }, backdropStyle]}
+      />
+      <Animated.View style={[{ flex: 1 }, dragStyle]}>
+        <Animated.View
+          entering={FadeIn.delay(90).duration(180)}
+          exiting={FadeOut.duration(120)}
+          {...panResponder.panHandlers}
+          style={{ height: insets.top + 50, paddingTop: insets.top, paddingHorizontal: 16, paddingBottom: 10, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'flex-end' }}
         >
-          <Text style={{ fontSize: 33, lineHeight: 35, fontWeight: '300', color: '#171419' }}>×</Text>
-        </Pressable>
-      </View>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Close estimate"
+            onPress={onBack}
+            style={({ pressed }) => ({ width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 17, backgroundColor: '#FFFFFF', opacity: pressed ? 0.72 : 1 })}
+          >
+            <Text style={{ fontSize: 26, lineHeight: 28, fontWeight: '400', color: '#171419', marginTop: -1 }}>×</Text>
+          </Pressable>
+        </Animated.View>
 
-      <View style={{ flex: 1, overflow: 'hidden', borderTopLeftRadius: 24, borderTopRightRadius: 24, borderCurve: 'continuous', backgroundColor: '#FFFFFF' }}>
-        <ScrollView
-          contentInsetAdjustmentBehavior="never"
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 142 + insets.bottom }}
+        <Animated.View
+          entering={SHEET_IN}
+          exiting={SHEET_OUT}
+          {...panResponder.panHandlers}
+          style={{ flex: 1, overflow: 'hidden', borderTopLeftRadius: 16, borderTopRightRadius: 16, borderCurve: 'continuous', backgroundColor: '#FFFFFF' }}
         >
-          <View style={{ paddingHorizontal: 20, paddingTop: 36, paddingBottom: 34, gap: 12 }}>
-            <Text selectable style={{ fontSize: 24, lineHeight: 32, fontWeight: '600', color: '#171419' }}>{item.title} estimate</Text>
-            <DottedUnderline fullWidth lineMarginTop={10} dotColor="#DDD9DE">
+          <ScrollView
+            contentInsetAdjustmentBehavior="never"
+            showsVerticalScrollIndicator={false}
+            scrollEventThrottle={16}
+            bounces
+            onScroll={(event) => {
+              scrollOffset.current = event.nativeEvent.contentOffset.y;
+            }}
+            contentContainerStyle={{ paddingBottom: 142 + insets.bottom }}
+          >
+            <View style={{ paddingHorizontal: 20, paddingTop: 36, paddingBottom: 34, gap: 12 }}>
+              <Text selectable style={{ fontSize: 24, lineHeight: 32, fontWeight: '600', color: '#171419' }}>{item.title} estimate</Text>
               <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 7 }}>
                 <Text selectable style={{ fontSize: 13, lineHeight: 19, fontWeight: '600', color: '#171419' }}>Starts at ₹{item.price.toLocaleString('en-IN')}</Text>
                 {item.duration ? <Text selectable style={{ fontSize: 13, lineHeight: 19, color: '#4C474E' }}>•  {item.duration}</Text> : null}
               </View>
-            </DottedUnderline>
-          </View>
+            </View>
 
-          <View style={{ height: 1, backgroundColor: '#E4E1E5' }} />
+            <View style={{ height: 1, backgroundColor: '#E4E1E5' }} />
 
           <View style={{ paddingTop: 28, gap: 24 }}>
             <Text selectable style={{ paddingHorizontal: 20, fontSize: 23, lineHeight: 30, fontWeight: '600', color: '#171419' }}>Get an estimate</Text>
@@ -200,7 +274,8 @@ export function ProductDetailScreen({ cart, cartItemsById, categoryTitle, item, 
             </Pressable>
           </View>
         </View>
-      </View>
+      </Animated.View>
+      </Animated.View>
     </View>
   );
 }

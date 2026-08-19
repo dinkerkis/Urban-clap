@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { BackIcon } from '../../components/back-icon';
 import { useAddresses } from '../../hooks/use-addresses';
 import { formatAddressLabel, formatSavedAddress, setDefaultAddress, type UserAddress } from '../../services/address-api';
 
@@ -132,13 +133,13 @@ export function LocationPickerScreen({ authToken, onBack, onSelectAddress, onUse
             onPress={onBack}
             style={({ pressed }) => ({ width: 40, height: 44, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.55 : 1 })}
           >
-            <Text style={{ fontSize: 23, lineHeight: 25, fontWeight: '400', color: '#171419' }}>←</Text>
+            <BackIcon />
           </Pressable>
           <TextInput
             value={search}
             onChangeText={setSearch}
             placeholder="Search for your location/society/apartment"
-            placeholderTextColor="#9A959C"
+            placeholderTextColor="#C9C4CB"
             style={{ flex: 1, minWidth: 0, height: '100%', fontSize: 14, color: '#171419' }}
           />
         </View>

@@ -1,9 +1,10 @@
 import { Image } from 'expo-image';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Modal, Pressable, ScrollView, Share, Text, TextInput, View, useWindowDimensions } from 'react-native';
-import Animated, { Easing, FadeIn, interpolate, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { Modal, Pressable, ScrollView, Share, Text, TextInput, View, useWindowDimensions } from 'react-native';
+import Animated, { Easing, FadeIn, interpolate, runOnJS, useAnimatedStyle, useSharedValue, withDelay, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { BackIcon } from '../../components/back-icon';
 import { DottedUnderline } from '../../components/dotted-underline';
 import { EstimateNoteIcon } from '../../components/estimate-note-icon';
 import type { ServiceItem, ServiceSubcategory } from '../../data/service-catalog';
@@ -24,15 +25,63 @@ const NAV_HEIGHT = 66;
 const SECTION_HEADER_HEIGHT = 46;
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
+function LoadingDot({ delay }: { delay: number }) {
+  const progress = useSharedValue(0);
+
+  useEffect(() => {
+    progress.value = withDelay(
+      delay,
+      withRepeat(
+        withSequence(
+          withTiming(1, { duration: 260, easing: Easing.out(Easing.quad) }),
+          withTiming(0, { duration: 260, easing: Easing.in(Easing.quad) }),
+          withTiming(0, { duration: 180 }),
+        ),
+        -1,
+      ),
+    );
+  }, [delay, progress]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(progress.value, [0, 1], [0.42, 1]),
+    transform: [
+      { translateY: interpolate(progress.value, [0, 1], [0, -5]) },
+      { scale: interpolate(progress.value, [0, 1], [0.86, 1]) },
+    ],
+  }));
+
+  return <Animated.View style={[{ width: 7, height: 7, borderRadius: 999, backgroundColor: '#6E45E2' }, animatedStyle]} />;
+}
+
+function ThreeDotLoader() {
+  return (
+    <View accessibilityLabel="Loading services" accessibilityRole="progressbar" style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+      <LoadingDot delay={0} />
+      <LoadingDot delay={130} />
+      <LoadingDot delay={260} />
+    </View>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <Image
+      source={require('../../../assets/search.png')}
+      contentFit="contain"
+      tintColor="#171419"
+      style={{ width: 18, height: 18 }}
+    />
+  );
+}
+
 function ShareIcon() {
   return (
-    <View style={{ width: 19, height: 19 }}>
-      <View style={{ position: 'absolute', left: 4.5, top: 6, width: 10, height: 1.7, borderRadius: 2, backgroundColor: '#171419', transform: [{ rotate: '-29deg' }] }} />
-      <View style={{ position: 'absolute', left: 4.5, top: 11.5, width: 10, height: 1.7, borderRadius: 2, backgroundColor: '#171419', transform: [{ rotate: '29deg' }] }} />
-      <View style={{ position: 'absolute', left: 1, top: 7, width: 5, height: 5, borderRadius: 2.5, backgroundColor: '#171419' }} />
-      <View style={{ position: 'absolute', right: 1, top: 1.5, width: 5, height: 5, borderRadius: 2.5, backgroundColor: '#171419' }} />
-      <View style={{ position: 'absolute', right: 1, bottom: 1.5, width: 5, height: 5, borderRadius: 2.5, backgroundColor: '#171419' }} />
-    </View>
+    <Image
+      source={require('../../../assets/share.png')}
+      contentFit="contain"
+      tintColor="#171419"
+      style={{ width: 18, height: 18 }}
+    />
   );
 }
 
@@ -176,7 +225,7 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
   const share = () => void Share.share({ message: `Explore ${categoryTitle} services on Urban Clap.` });
 
   if (isLoading) {
-    return <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10, backgroundColor: '#FFFFFF' }}><ActivityIndicator color="#6E45E2" /><Text style={{ fontSize: 13, color: '#625D64' }}>Loading services...</Text></View>;
+    return <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF' }}><ThreeDotLoader /></View>;
   }
 
   if (errorMessage) {
@@ -280,7 +329,7 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
               onPress={onBack}
               style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, borderWidth: 0, backgroundColor: stickyHeaderVisible ? 'transparent' : '#FFFFFF', opacity: pressed ? 0.58 : 1 })}
             >
-              <Text style={{ fontSize: 23, lineHeight: 25, fontWeight: '400', color: '#171419' }}>←</Text>
+              <BackIcon />
             </Pressable>
 
             {searchVisible ? (
@@ -310,7 +359,7 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
               {searchVisible ? (
                 <Text style={{ fontSize: 25, lineHeight: 27, fontWeight: '300', color: '#171419' }}>×</Text>
               ) : (
-                <View style={{ width: 17, height: 17 }}><View style={{ position: 'absolute', left: 1, top: 1, width: 11, height: 11, borderRadius: 6, borderWidth: 1.7, borderColor: '#171419' }} /><View style={{ position: 'absolute', right: 0, bottom: 2, width: 6.5, height: 1.7, backgroundColor: '#171419', transform: [{ rotate: '45deg' }] }} /></View>
+                <SearchIcon />
               )}
             </Pressable>
 
@@ -328,7 +377,7 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
           </View>
           {stickySection ? (
             <View style={{ height: SECTION_HEADER_HEIGHT, paddingHorizontal: 20, justifyContent: 'center', backgroundColor: '#FFFFFF', borderBottomWidth: 1, borderBottomColor: '#E7E5E8' }}>
-              <Text selectable numberOfLines={1} ellipsizeMode="tail" style={{ fontSize: 18, lineHeight: 24, fontWeight: '600', color: '#171419' }}>
+              <Text selectable numberOfLines={1} ellipsizeMode="tail" style={{ fontSize: 14, lineHeight: 20, fontWeight: '700', color: '#171419' }}>
                 {stickySection.title}
               </Text>
             </View>
