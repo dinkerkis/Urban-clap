@@ -5,8 +5,11 @@ export type AddressType = 'apartment' | 'independent_house' | 'office' | 'other'
 
 export type UserAddress = {
   _id: string;
+  contactName?: string;
+  contactPhone?: string;
   addressLine1: string;
   addressLine2?: string;
+  addressType?: AddressType;
   city: string;
   country: string;
   houseNo?: string;
@@ -14,6 +17,7 @@ export type UserAddress = {
   isDefault?: boolean;
   label: AddressLabel | string | null;
   landmark?: string;
+  instructions?: string;
   location?: {
     coordinates?: [number, number];
     type?: string;
@@ -44,7 +48,7 @@ export type AddAddressPayload = {
   country: string;
   houseNo?: string;
   instructions?: string;
-  label?: AddressLabel | null;
+  label?: Lowercase<AddressLabel> | null;
   landmark?: string;
   latitude: number;
   longitude: number;
@@ -60,6 +64,12 @@ type AddressListResponse = {
 
 type AddressResponse = {
   data: UserAddress;
+  message?: string;
+  success: boolean;
+};
+
+type DeleteAddressResponse = {
+  data: { _id: string };
   message?: string;
   success: boolean;
 };
@@ -156,12 +166,33 @@ export async function addAddress(token: string, body: AddAddressPayload): Promis
   return requireApiData(payload, 'The address could not be saved. Please try again.');
 }
 
+export async function updateAddress(token: string, addressId: string, body: AddAddressPayload): Promise<UserAddress> {
+  const payload = await apiRequest<AddressResponse>(`/address/${encodeURIComponent(addressId)}`, {
+    method: 'PUT',
+    json: body,
+    logScope: 'Address API',
+    token,
+    defaultErrorMessage: 'Unable to update this address. Please try again.',
+  });
+  return requireApiData(payload, 'The address could not be updated. Please try again.');
+}
+
 export async function setDefaultAddress(token: string, addressId: string): Promise<UserAddress> {
-  const payload = await apiRequest<AddressResponse>(`/address/${addressId}/default`, {
+  const payload = await apiRequest<AddressResponse>(`/address/${encodeURIComponent(addressId)}/default`, {
     method: 'PATCH',
     logScope: 'Address API',
     token,
     defaultErrorMessage: 'Unable to set this address. Please try again.',
   });
   return requireApiData(payload, 'The address could not be updated. Please try again.');
+}
+
+export async function deleteAddress(token: string, addressId: string): Promise<string> {
+  const payload = await apiRequest<DeleteAddressResponse>(`/address/${encodeURIComponent(addressId)}`, {
+    method: 'DELETE',
+    logScope: 'Address API',
+    token,
+    defaultErrorMessage: 'Unable to delete this address. Please try again.',
+  });
+  return requireApiData(payload, 'The address could not be deleted. Please try again.')._id;
 }

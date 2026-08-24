@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { ServiceItem } from '../data/service-catalog';
 import { addCartItem, decrementCartItem, getCart, type CartItem } from '../services/cart-api';
@@ -54,9 +54,11 @@ function mapCartItem(cartItem: CartItem, knownItem?: ServiceItem): ServiceItem {
 
 export function useCart(authToken?: string) {
   const [state, setState] = useState<CartState>({ ...emptyState, isLoading: Boolean(authToken) });
+  const mutationVersionRef = useRef(0);
 
   const refresh = useCallback(async () => {
     if (!authToken) return;
+    const refreshVersion = mutationVersionRef.current;
     setState((current) => ({ ...current, errorMessage: '', isLoading: true }));
 
     try {
@@ -64,6 +66,7 @@ export function useCart(authToken?: string) {
       if (__DEV__) {
         console.log(`[Get Cart API] Cart data used by UI\n${JSON.stringify(data, null, 2)}`);
       }
+      if (refreshVersion !== mutationVersionRef.current) return;
       setState((current) => {
         const itemsById: Record<string, ServiceItem> = {};
         const quantities: Record<string, number> = {};
@@ -83,6 +86,7 @@ export function useCart(authToken?: string) {
         };
       });
     } catch (error) {
+      if (refreshVersion !== mutationVersionRef.current) return;
       setState((current) => ({
         ...current,
         errorMessage: error instanceof Error ? error.message : 'Unable to load your cart.',
@@ -109,9 +113,11 @@ export function useCart(authToken?: string) {
     );
     const key = cartKey(data.addedItem.product_id, data.addedItem.variant?.key || item.variantKey);
 
+    mutationVersionRef.current += 1;
     setState((current) => ({
       ...current,
       errorMessage: '',
+      isLoading: false,
       itemsById: { ...current.itemsById, [key]: mapCartItem(data.addedItem, { ...item, id: key }) },
       quantities: { ...current.quantities, [key]: data.addedItem.quantity },
       totalItems: data.cartSummary.totalItems,
@@ -125,6 +131,7 @@ export function useCart(authToken?: string) {
     }
 
     const data = await decrementCartItem(item.serverCartItemId, authToken);
+    mutationVersionRef.current += 1;
     setState((current) => {
       const itemsById = { ...current.itemsById };
       const quantities = { ...current.quantities };
@@ -141,6 +148,7 @@ export function useCart(authToken?: string) {
       return {
         ...current,
         errorMessage: '',
+        isLoading: false,
         itemsById,
         quantities,
         totalItems: data.cartSummary.totalItems,

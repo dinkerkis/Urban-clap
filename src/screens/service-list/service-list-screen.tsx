@@ -50,7 +50,7 @@ function LoadingDot({ delay }: { delay: number }) {
     ],
   }));
 
-  return <Animated.View style={[{ width: 7, height: 7, borderRadius: 999, backgroundColor: '#6E45E2' }, animatedStyle]} />;
+    return <Animated.View style={[{ width: 7, height: 7, borderRadius: 999, backgroundColor: '#6E45E2' }, animatedStyle]} />;
 }
 
 function ThreeDotLoader() {
@@ -327,7 +327,7 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
               accessibilityLabel="Go back"
               hitSlop={8}
               onPress={onBack}
-              style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, borderWidth: 0, backgroundColor: stickyHeaderVisible ? 'transparent' : '#FFFFFF', opacity: pressed ? 0.58 : 1 })}
+              style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, borderCurve: 'continuous', backgroundColor: '#FFFFFF', opacity: pressed ? 0.58 : 1 })}
             >
               <BackIcon />
             </Pressable>

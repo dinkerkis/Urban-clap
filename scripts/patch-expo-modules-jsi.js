@@ -26,15 +26,24 @@ const replacements = {
   'apple/Sources/ExpoModulesJSI/Runtime/JavaScriptPropNameID.swift': [
     ['public final class JavaScriptPropNameID: JavaScriptType {', 'public final class JavaScriptPropNameID: JavaScriptType, @unchecked Sendable {'],
   ],
+  'apple/Sources/ExpoModulesJSI-Cxx/include/RuntimeScheduler.h': [
+    [
+      'SWIFT_RETURNS_RETAINED RuntimeScheduler(void *scheduler, ScheduleFn fn) noexcept',
+      'RuntimeScheduler(void *scheduler, ScheduleFn fn) noexcept',
+    ],
+    ['SWIFT_RETURNS_RETAINED RuntimeScheduler() {}', 'RuntimeScheduler() {}'],
+  ],
 };
 
 for (const [relative, changes] of Object.entries(replacements)) {
   const file = path.join(root, relative);
   let source = fs.readFileSync(file, 'utf8');
   for (const [before, after] of changes) {
-    if (source.includes(after)) continue;
-    if (!source.includes(before)) throw new Error(`Patch no longer applies: ${relative}`);
-    source = source.replace(before, after);
+    if (source.includes(before)) {
+      source = source.replace(before, after);
+      continue;
+    }
+    if (!source.includes(after)) throw new Error(`Patch no longer applies: ${relative}`);
   }
   fs.writeFileSync(file, source);
 }
@@ -65,3 +74,90 @@ while (pending.length > 0) {
 }
 
 console.log('Applied temporary ExpoModulesJSI compatibility patch for Xcode 26.0.');
+
+// ExpoModulesCore also captures EventEmitter with `weak let`. Xcode 26's Swift
+// compiler requires every weak reference to be mutable, even when the reference
+// is used only as a safe nonisolated bridge into the JavaScript actor.
+const expoModulesCoreRoot = path.dirname(require.resolve('expo-modules-core/package.json'));
+const eventEmitterFile = path.join(expoModulesCoreRoot, 'ios/Core/Events/EventEmitter.swift');
+const eventEmitterSource = fs.readFileSync(eventEmitterFile, 'utf8');
+let patchedEventEmitterSource = eventEmitterSource.replaceAll(
+  'nonisolated(unsafe) weak let emitter = self',
+  'nonisolated(unsafe) weak var emitter = self'
+);
+patchedEventEmitterSource = patchedEventEmitterSource.replaceAll(
+  'nonisolated(unsafe) weak var emitter = self',
+  'let emitterReference = WeakEventEmitterReference(self)'
+);
+patchedEventEmitterSource = patchedEventEmitterSource.replaceAll(
+  'guard let emitter else {',
+  'guard let emitter = emitterReference.value else {'
+);
+patchedEventEmitterSource = patchedEventEmitterSource.replaceAll(
+  'guard let emitter, let appContext else {',
+  'guard let emitter = emitterReference.value, let appContext else {'
+);
+if (!patchedEventEmitterSource.includes('private final class WeakEventEmitterReference')) {
+  patchedEventEmitterSource = patchedEventEmitterSource.replace(
+    'public extension EventEmitter {',
+    `private final class WeakEventEmitterReference: @unchecked Sendable {
+  weak var value: (any EventEmitter)?
+
+  init(_ value: any EventEmitter) {
+    self.value = value
+  }
+}
+
+public extension EventEmitter {`
+  );
+}
+if (patchedEventEmitterSource !== eventEmitterSource) {
+  fs.writeFileSync(eventEmitterFile, patchedEventEmitterSource);
+}
+
+const sharedObjectRegistryFile = path.join(
+  expoModulesCoreRoot,
+  'ios/Core/SharedObjects/SharedObjectRegistry.swift'
+);
+const sharedObjectRegistrySource = fs.readFileSync(sharedObjectRegistryFile, 'utf8');
+let patchedSharedObjectRegistrySource = sharedObjectRegistrySource.replace(
+  'private weak let appContext: AppContext?',
+  'private weak var appContext: AppContext?'
+);
+patchedSharedObjectRegistrySource = patchedSharedObjectRegistrySource.replace(
+  'public final class SharedObjectRegistry: Sendable {',
+  'public final class SharedObjectRegistry: @unchecked Sendable {'
+);
+if (patchedSharedObjectRegistrySource !== sharedObjectRegistrySource) {
+  fs.writeFileSync(sharedObjectRegistryFile, patchedSharedObjectRegistrySource);
+}
+
+console.log('Applied temporary ExpoModulesCore compatibility patch for Xcode 26.0.');
+
+// expo@57.0.4 still passes a raw facebook::react::RuntimeScheduler* into
+// AppContext.setRuntime, but expo-modules-core@57.0.6+ treats that pointer as a
+// SchedulerHandle created by createReactSchedulerHandle. The mismatch crashes
+// in RuntimeScheduler.cpp on first JS dispatch (app install / reload).
+const expoRoot = path.dirname(require.resolve('expo/package.json'));
+const factoryFile = path.join(expoRoot, 'ios/AppDelegates/ExpoReactNativeFactory.mm');
+const factorySource = fs.readFileSync(factoryFile, 'utf8');
+const factoryBefore = `  auto binding = facebook::react::RuntimeSchedulerBinding::getBinding(runtime);
+  auto scheduler = binding ? binding->getRuntimeScheduler() : nullptr;
+
+  [_appContext setRuntime:&runtime
+                scheduler:scheduler.get()
+                 dispatch:scheduler ? reinterpret_cast<const void *>(&expo::dispatchOnReactScheduler) : nullptr];`;
+const factoryAfter = `  auto binding = facebook::react::RuntimeSchedulerBinding::getBinding(runtime);
+  auto scheduler = binding ? binding->getRuntimeScheduler() : nullptr;
+  void *schedulerHandle = expo::createReactSchedulerHandle(scheduler);
+
+  [_appContext setRuntime:&runtime
+                scheduler:schedulerHandle
+                 dispatch:schedulerHandle ? reinterpret_cast<const void *>(&expo::dispatchOnReactScheduler) : nullptr];`;
+if (factorySource.includes(factoryBefore)) {
+  fs.writeFileSync(factoryFile, factorySource.replace(factoryBefore, factoryAfter));
+} else if (!factorySource.includes('createReactSchedulerHandle(scheduler)')) {
+  throw new Error('Patch no longer applies: ExpoReactNativeFactory.mm');
+}
+
+console.log('Applied RuntimeScheduler handle patch for ExpoReactNativeFactory.');

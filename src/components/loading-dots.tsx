@@ -42,9 +42,9 @@ export function LoadingDots() {
 
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 9 }}>
-      <Animated.View style={[{ width: 7, height: 7, borderRadius: 3.5, backgroundColor: '#1A1A1A' }, s1]} />
-      <Animated.View style={[{ width: 7, height: 7, borderRadius: 3.5, backgroundColor: '#1A1A1A' }, s2]} />
-      <Animated.View style={[{ width: 7, height: 7, borderRadius: 3.5, backgroundColor: '#1A1A1A' }, s3]} />
+      <Animated.View style={[{ width: 7, height: 7, borderRadius: 3.5, backgroundColor: '#6E45E2' }, s1]} />
+      <Animated.View style={[{ width: 7, height: 7, borderRadius: 3.5, backgroundColor: '#6E45E2' }, s2]} />
+      <Animated.View style={[{ width: 7, height: 7, borderRadius: 3.5, backgroundColor: '#6E45E2' }, s3]} />
     </View>
   );
 }

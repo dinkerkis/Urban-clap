@@ -12,10 +12,17 @@ type ProfileEntryScreenProps = {
   name?: string;
   phone?: string;
   profilePicture?: string;
+  onAbout?: () => void;
   onBack: () => void;
   onCompleteProfile: () => void;
   onLogout: () => void;
   onManageAddresses?: () => void;
+  onManagePaymentMethods?: () => void;
+  onMyPlans?: () => void;
+  onMyRating?: () => void;
+  onPassesMembership?: () => void;
+  onSettings?: () => void;
+  onWallet?: () => void;
 };
 
 export function ProfileEntryScreen(props: ProfileEntryScreenProps) {

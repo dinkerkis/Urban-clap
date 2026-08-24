@@ -37,7 +37,7 @@ const BACKDROP_OUT = FadeOut.duration(200);
 const SHEET_IN = SlideInDown.duration(380).easing(Easing.out(Easing.cubic));
 const SHEET_OUT = SlideOutDown.duration(300).easing(Easing.in(Easing.cubic));
 
-export function ProductDetailScreen({ cart, cartItemsById, item, onAdd, onBack, onViewCart, totalCartItems }: ProductDetailScreenProps) {
+export function ProductDetailScreen({ item, onAdd, onBack }: ProductDetailScreenProps) {
   const insets = useSafeAreaInsets();
   const { height: windowHeight, width } = useWindowDimensions();
   const dragY = useSharedValue(0);
@@ -63,14 +63,6 @@ export function ProductDetailScreen({ cart, cartItemsById, item, onAdd, onBack, 
     selectedVariantLabel: selectedVariant?.label,
     variantKey: selectedVariant?.key,
   };
-  const selectedCartEntry = Object.entries(cartItemsById).find(([cartKey, cartItem]) => {
-    const sameProduct = (cartItem.productId || cartKey.split('::')[0]) === (item.productId || item.id.split('::')[0]);
-    if (!sameProduct) return false;
-    if (!selectedVariant) return cartKey === selectedItem.id;
-    return selectedVariant.key ? cartItem.variantKey === selectedVariant.key : cartItem.selectedVariantLabel === selectedVariant.label;
-  });
-  const selectedCartKey = selectedCartEntry?.[0] ?? selectedItem.id;
-  const quantity = cart[selectedCartKey] ?? 0;
   const cardWidth = Math.min(176, Math.max(142, width * 0.43));
   const hasVariants = Boolean(item.variants?.length);
   const hasRequiredSelection = !hasVariants || Boolean(selectedVariant);
@@ -113,14 +105,11 @@ export function ProductDetailScreen({ cart, cartItemsById, item, onAdd, onBack, 
 
   const handleConsultation = async () => {
     if (!canContinue || isAddingToCart) return;
-    if (quantity > 0) onViewCart();
-    else {
-      setIsAddingToCart(true);
-      try {
-        await onAdd(selectedItem);
-      } finally {
-        setIsAddingToCart(false);
-      }
+    setIsAddingToCart(true);
+    try {
+      await onAdd(selectedItem);
+    } finally {
+      setIsAddingToCart(false);
     }
   };
 
@@ -270,7 +259,7 @@ export function ProductDetailScreen({ cart, cartItemsById, item, onAdd, onBack, 
               onPress={handleConsultation}
               style={({ pressed }) => ({ height: 55, alignItems: 'center', justifyContent: 'center', borderRadius: 10, borderCurve: 'continuous', backgroundColor: canContinue ? '#6E45E2' : '#EEEEEE', opacity: pressed || isAddingToCart ? 0.78 : 1 })}
             >
-              {isAddingToCart ? <ActivityIndicator color="#FFFFFF" /> : <Text style={{ fontSize: 16, fontWeight: '600', color: canContinue ? '#FFFFFF' : '#B7B5B8' }}>{quantity > 0 ? 'View cart' : 'Book Consultation at ₹49'}</Text>}
+              {isAddingToCart ? <ActivityIndicator color="#FFFFFF" /> : <Text style={{ fontSize: 16, fontWeight: '600', color: canContinue ? '#FFFFFF' : '#B7B5B8' }}>Book Consultation at ₹49</Text>}
             </Pressable>
           </View>
         </View>

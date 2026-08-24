@@ -9,6 +9,15 @@ import { useCurrentLocation } from '../../hooks/use-current-location';
 
 const SEARCH_SUGGESTIONS = ['AC service', 'Facial', 'Kitchen cleaning'];
 
+function formatCategoryLabel(title: string) {
+  const commaIndex = title.indexOf(', ');
+  const ampIndex = title.lastIndexOf(' & ');
+  if (commaIndex >= 0 && ampIndex > commaIndex) {
+    return `${title.slice(0, ampIndex)}\n& ${title.slice(ampIndex + 3)}`;
+  }
+  return title;
+}
+
 function LocationPinIcon() {
   return (
     <View style={{ width: 18, height: 22, alignItems: 'center' }}>
@@ -249,17 +258,17 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
                   <Text
                     numberOfLines={2}
                     style={{
-                      width: categoryWidth,
+                      width: categoryWidth + 8,
                       minHeight: 34,
-                      paddingHorizontal: category.title.toLowerCase().includes('electric') ? 0 : 2,
-                      textAlign: category.title.toLowerCase().includes('electric') ? 'left' : 'center',
+                      paddingHorizontal: 0,
+                      textAlign: 'center',
                       fontSize: 13,
                       lineHeight: 17,
                       fontWeight: '400',
                       color: '#2B2433',
                     }}
                   >
-                    {category.title}
+                    {formatCategoryLabel(category.title)}
                   </Text>
                 </Pressable>
               ))}

@@ -277,7 +277,7 @@ export function ProfileDetailsScreen({ email, name, phone, onBack, onVerified }:
         contentContainerStyle={{ minHeight: '100%', paddingTop: Math.max(insets.top, 18) + 8, paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 18) + 84, gap: 18 }}
       >
         <View style={{ minHeight: 45, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <Pressable accessibilityRole="button" accessibilityLabel="Go back" onPress={onBack} hitSlop={10} style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: '#F5F2F8', opacity: pressed ? 0.65 : 1 })}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Go back" onPress={onBack} hitSlop={10} style={({ pressed }) => ({ width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 17, borderWidth: 0.7, borderColor: '#E4E0E6', backgroundColor: 'transparent', opacity: pressed ? 0.65 : 1 })}>
             <BackIcon color="#241A30" />
           </Pressable>
           <Text selectable style={{ fontSize: 18, lineHeight: 25, fontWeight: '700', color: '#1D1820' }}>Profile details</Text>

@@ -3,16 +3,24 @@ import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BackIcon } from '../../components/back-icon';
+import { EditIcon } from '../../components/edit-icon';
 
 type ProfileScreenProps = {
   email?: string;
   name?: string;
   phone?: string;
   profilePicture?: string;
+  onAbout?: () => void;
   onBack: () => void;
   onCompleteProfile: () => void;
   onLogout: () => void;
   onManageAddresses?: () => void;
+  onManagePaymentMethods?: () => void;
+  onMyPlans?: () => void;
+  onMyRating?: () => void;
+  onPassesMembership?: () => void;
+  onSettings?: () => void;
+  onWallet?: () => void;
 };
 
 type QuickAction = {
@@ -52,16 +60,7 @@ function ChevronRight() {
   );
 }
 
-function EditIcon() {
-  return (
-    <View style={{ width: 18, height: 18, transform: [{ rotate: '-45deg' }] }}>
-      <View style={{ position: 'absolute', left: 7, top: 1, width: 5, height: 14, borderWidth: 1.5, borderColor: '#3E3742', borderRadius: 2 }} />
-      <View style={{ position: 'absolute', left: 7, top: 0, width: 5, height: 4, backgroundColor: '#3E3742', borderRadius: 1 }} />
-    </View>
-  );
-}
-
-export function ProfileScreen({ email, name, phone, profilePicture, onBack, onCompleteProfile, onLogout, onManageAddresses }: ProfileScreenProps) {
+export function ProfileScreen({ email, name, phone, profilePicture, onAbout, onBack, onCompleteProfile, onLogout, onManageAddresses, onManagePaymentMethods, onMyPlans, onMyRating, onPassesMembership, onSettings, onWallet }: ProfileScreenProps) {
   const insets = useSafeAreaInsets();
   const displayName = name?.trim() || 'Urban Clap User';
   const displayEmail = email?.trim();
@@ -69,14 +68,14 @@ export function ProfileScreen({ email, name, phone, profilePicture, onBack, onCo
   const isProfileIncomplete = !name?.trim() || !displayPhone || !displayEmail;
 
   const menuItems: MenuItem[] = [
-    { imageSource: require('../../../assets/plans.png'), label: 'My Plans' },
-    { imageSource: require('../../../assets/wallet.png'), label: 'Wallet' },
-    { imageSource: require('../../../assets/passes.png'), label: 'Passes & membership' },
-    { imageSource: require('../../../assets/rating.png'), label: 'My rating' },
+    { imageSource: require('../../../assets/plans.png'), label: 'My Plans', onPress: onMyPlans },
+    { imageSource: require('../../../assets/wallet.png'), label: 'Wallet', onPress: onWallet },
+    { imageSource: require('../../../assets/passes.png'), label: 'Passes & membership', onPress: onPassesMembership },
+    { imageSource: require('../../../assets/rating.png'), label: 'My rating', onPress: onMyRating },
     { imageSource: require('../../../assets/addresses.png'), label: 'Manage addresses', onPress: onManageAddresses },
-    { imageSource: require('../../../assets/payment.png'), label: 'Manage payment methods' },
-    { imageSource: require('../../../assets/setting.png'), label: 'Settings' },
-    { isAbout: true, label: 'About UC' },
+    { imageSource: require('../../../assets/payment.png'), label: 'Manage payment methods', onPress: onManagePaymentMethods },
+    { imageSource: require('../../../assets/setting.png'), label: 'Settings', onPress: onSettings },
+    { isAbout: true, label: 'About UC', onPress: onAbout },
   ];
 
   return (
@@ -94,12 +93,14 @@ export function ProfileScreen({ email, name, phone, profilePicture, onBack, onCo
             hitSlop={10}
             onPress={onBack}
             style={({ pressed }) => ({
-              width: 40,
-              height: 40,
+              width: 34,
+              height: 34,
               alignItems: 'center',
               justifyContent: 'center',
-              borderRadius: 20,
-              backgroundColor: '#F5F2F8',
+              borderRadius: 17,
+              borderWidth: 1,
+              borderColor: '#E4E0E6',
+              backgroundColor: 'transparent',
               opacity: pressed ? 0.65 : 1,
             })}
           >
@@ -137,7 +138,7 @@ export function ProfileScreen({ email, name, phone, profilePicture, onBack, onCo
               onPress={onCompleteProfile}
               style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.55 : 1 })}
             >
-              <EditIcon />
+              <EditIcon size={17} />
             </Pressable>
           ) : <View style={{ width: 40 }} />}
         </View>
@@ -210,7 +211,7 @@ export function ProfileScreen({ email, name, phone, profilePicture, onBack, onCo
         </View>
       </View>
 
-      <View style={{ height: 9, marginTop: 22, backgroundColor: '#F7F5F8' }} />
+      <View style={{ height: 8, marginTop: 22, backgroundColor: '#F6F5F7' }} />
 
       <View style={{ paddingHorizontal: 20, paddingVertical: 6 }}>
         {menuItems.map((item) => (
@@ -229,11 +230,11 @@ export function ProfileScreen({ email, name, phone, profilePicture, onBack, onCo
           >
             <View style={{ width: 24, alignItems: 'center' }}>
               {item.isAbout ? (
-                <View style={{ width: 19, height: 19, alignItems: 'center', justifyContent: 'center', borderWidth: 1.3, borderColor: '#4E4752', borderRadius: 4, borderCurve: 'continuous' }}>
+                <View style={{ width: 16, height: 16, alignItems: 'center', justifyContent: 'center', borderWidth: 1.2, borderColor: '#4E4752', borderRadius: 4, borderCurve: 'continuous' }}>
                   <Text style={{ fontSize: 7, lineHeight: 9, fontWeight: '800', color: '#4E4752' }}>UC</Text>
                 </View>
               ) : item.imageSource ? (
-                <Image source={item.imageSource} contentFit="contain" style={{ width: 18, height: 18 }} />
+                <Image source={item.imageSource} contentFit="contain" style={{ width: 16, height: 16 }} />
               ) : null}
             </View>
             <Text style={{ flex: 1, fontSize: 15, lineHeight: 21, fontWeight: '400', color: '#332E35' }}>{item.label}</Text>
