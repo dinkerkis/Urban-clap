@@ -1,12 +1,13 @@
 import { Image } from 'expo-image';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import MapView, { PROVIDER_GOOGLE, type Region } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BackIcon } from '../../components/back-icon';
 import { EditIcon } from '../../components/edit-icon';
 import { useAddresses } from '../../hooks/use-addresses';
-import { fetchCurrentLocation, formatLocationDisplay } from '../../hooks/use-current-location';
+import { fetchCurrentLocation, formatLocationDisplay, reverseGeocodeLocation } from '../../hooks/use-current-location';
 import { addAddress, buildAddressFromCurrentLocation, deleteAddress, formatAddressLabel, formatSavedAddress, updateAddress, type AddAddressPayload, type UserAddress } from '../../services/address-api';
 
 const PURPLE = '#6E45E2';
@@ -47,7 +48,29 @@ function SearchIcon() {
 }
 
 function TargetIcon() {
-  return <View style={{ width: 19, height: 19, alignItems: 'center', justifyContent: 'center', borderWidth: 1.6, borderColor: PURPLE, borderRadius: 10 }}><View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: PURPLE }} /></View>;
+  return (
+    <View style={{ width: 22, height: 22, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ width: 18, height: 18, borderRadius: 9, borderWidth: 1.7, borderColor: PURPLE }} />
+      <View style={{ position: 'absolute', width: 7, height: 7, borderRadius: 3.5, backgroundColor: PURPLE }} />
+      <View style={{ position: 'absolute', top: 0, width: 1.6, height: 4, backgroundColor: PURPLE }} />
+      <View style={{ position: 'absolute', bottom: 0, width: 1.6, height: 4, backgroundColor: PURPLE }} />
+      <View style={{ position: 'absolute', left: 0, width: 4, height: 1.6, backgroundColor: PURPLE }} />
+      <View style={{ position: 'absolute', right: 0, width: 4, height: 1.6, backgroundColor: PURPLE }} />
+    </View>
+  );
+}
+
+function GoogleMark() {
+  return (
+    <Text style={{ marginLeft: -2, fontSize: 12, fontWeight: '700', letterSpacing: -0.3 }}>
+      <Text style={{ color: '#4285F4' }}>G</Text>
+      <Text style={{ color: '#EA4335' }}>o</Text>
+      <Text style={{ color: '#FBBC05' }}>o</Text>
+      <Text style={{ color: '#4285F4' }}>g</Text>
+      <Text style={{ color: '#34A853' }}>l</Text>
+      <Text style={{ color: '#EA4335' }}>e</Text>
+    </Text>
+  );
 }
 
 export function LocationSearchSheet({ addresses, onClose, onSelect }: { addresses: ReturnType<typeof useAddresses>['addresses']; onClose: () => void; onSelect: (place: SelectedPlace) => void }) {
@@ -78,40 +101,115 @@ export function LocationSearchSheet({ addresses, onClose, onSelect }: { addresse
     onSelect({ ...buildAddressFromCurrentLocation(location.geocodedAddress, location.coords), title: display.title, subtitle: display.subtitle });
   };
 
-  return <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+  return <View style={{ flex: 1 }}>
     <Pressable onPress={onClose} style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.72)' }} />
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ height: '82%' }}>
-      <View style={{ flex: 1, paddingTop: 24, paddingHorizontal: 18, paddingBottom: Math.max(insets.bottom, 14), borderTopLeftRadius: 16, borderTopRightRadius: 16, backgroundColor: '#FFFFFF' }}>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'height' : undefined} style={{ flex: 1, justifyContent: 'flex-end' }}>
+      <View style={{ height: '82%', paddingTop: 24, paddingHorizontal: 18, paddingBottom: 0, borderTopLeftRadius: 16, borderTopRightRadius: 16, borderBottomLeftRadius: 0, borderBottomRightRadius: 0, backgroundColor: '#FFFFFF' }}>
+        <View pointerEvents="none" style={{ position: 'absolute', right: 0, bottom: -36, left: 0, height: 36, backgroundColor: '#FFFFFF' }} />
         <CloseButton onPress={onClose} />
         <View style={{ height: 48, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 15, borderWidth: 1, borderColor: PURPLE, borderRadius: 8 }}>
-          <SearchIcon /><TextInput autoFocus value={query} onChangeText={setQuery} placeholder="Search for your location/society/apartment" placeholderTextColor="#AAA4AC" style={{ flex: 1, height: 46, marginLeft: 13, fontSize: 14, color: TEXT }} />
+          <SearchIcon /><TextInput value={query} onChangeText={setQuery} placeholder="Search for your location/society/apartment" placeholderTextColor="#AAA4AC" style={{ flex: 1, height: 46, marginLeft: 13, fontSize: 14, color: TEXT }} />
         </View>
-        <Pressable onPress={() => void currentLocation()} style={{ height: 62, flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-          {locating ? <ActivityIndicator size="small" color={PURPLE} /> : <TargetIcon />}<Text style={{ fontSize: 15, fontWeight: '600', color: PURPLE }}>Use current location</Text>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => void currentLocation()}
+          disabled={locating}
+          style={({ pressed }) => ({
+            minHeight: 54,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 12,
+            backgroundColor: pressed ? '#F8F7F9' : '#FFFFFF',
+            opacity: locating ? 0.7 : 1,
+          })}
+        >
+          {locating ? (
+            <View style={{ width: 22, height: 22, alignItems: 'center', justifyContent: 'center' }}>
+              <ActivityIndicator size="small" color={PURPLE} />
+            </View>
+          ) : <TargetIcon />}
+          <Text style={{ fontSize: 15, fontWeight: '600', color: PURPLE }}>Use current location</Text>
         </Pressable>
         <View style={{ height: 1, backgroundColor: '#F1EEF2' }} />
-        <Text style={{ marginTop: 23, marginBottom: 8, fontSize: 16, lineHeight: 22, fontWeight: '700', color: TEXT }}>{query ? 'Results' : 'Recents'}</Text>
-        {places.map((place, index) => <Pressable key={`${place.title}-${index}`} onPress={() => onSelect(place)} style={({ pressed }) => ({ minHeight: 76, flexDirection: 'row', paddingVertical: 13, opacity: pressed ? 0.55 : 1, borderBottomWidth: 1, borderBottomColor: '#F1EEF2' })}>
-          <Text style={{ width: 28, paddingTop: 2, fontSize: 20, color: '#58515B' }}>↶</Text><View style={{ flex: 1 }}><Text style={{ fontSize: 15, lineHeight: 21, fontWeight: '600', color: TEXT }}>{place.title}</Text><Text style={{ marginTop: 3, fontSize: 13, lineHeight: 19, color: MUTED }}>{place.subtitle}</Text></View>
-        </Pressable>)}
-        <Text style={{ marginTop: 'auto', textAlign: 'center', fontSize: 12, color: '#8E8790' }}>powered by <Text style={{ fontWeight: '700', color: '#4285F4' }}>Google</Text></Text>
+        <ScrollView keyboardDismissMode="interactive" keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 12 }}>
+          <Text style={{ marginTop: 23, marginBottom: 8, fontSize: 16, lineHeight: 22, fontWeight: '700', color: TEXT }}>{query ? 'Results' : 'Recents'}</Text>
+          {places.map((place, index) => <Pressable key={`${place.title}-${index}`} onPress={() => onSelect(place)} style={({ pressed }) => ({ minHeight: 76, flexDirection: 'row', paddingVertical: 13, opacity: pressed ? 0.55 : 1, borderBottomWidth: 1, borderBottomColor: '#F1EEF2' })}>
+            <View style={{ width: 28, paddingTop: 3 }}>
+              <Image source={require('../../../assets/recent.png')} contentFit="contain" tintColor="#58515B" style={{ width: 17, height: 17 }} />
+            </View>
+            <View style={{ flex: 1 }}><Text style={{ fontSize: 15, lineHeight: 21, fontWeight: '600', color: TEXT }}>{place.title}</Text><Text style={{ marginTop: 3, fontSize: 13, lineHeight: 19, color: MUTED }}>{place.subtitle}</Text></View>
+          </Pressable>)}
+        </ScrollView>
+        <View
+          style={{
+            marginHorizontal: -18,
+            paddingTop: 10,
+            paddingBottom: Math.max(insets.bottom, 12),
+            alignItems: 'center',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            gap: 4,
+            backgroundColor: '#FFFFFF',
+            borderTopWidth: 1,
+            borderTopColor: '#EDECEE',
+            boxShadow: '0 -3px 10px rgba(23, 20, 25, 0.06)',
+          }}
+        >
+          <Text style={{ fontSize: 11, color: '#9A959C' }}>powered by</Text>
+          <GoogleMark />
+        </View>
       </View>
     </KeyboardAvoidingView>
   </View>;
 }
 
-function MapPreview() {
+function MapPreview({ latitude, longitude, onPinChange }: { latitude: number; longitude: number; onPinChange: (latitude: number, longitude: number) => void }) {
+  const mapRef = useRef<MapView>(null);
+  const [locating, setLocating] = useState(false);
+  const initialRegion: Region = { latitude, longitude, latitudeDelta: 0.006, longitudeDelta: 0.006 };
+  const goToCurrentLocation = async () => {
+    setLocating(true);
+    const location = await fetchCurrentLocation();
+    setLocating(false);
+    if (location.status !== 'ready' || !location.coords) {
+      Alert.alert('Location unavailable', location.label);
+      return;
+    }
+    const region = { latitude: location.coords.latitude, longitude: location.coords.longitude, latitudeDelta: 0.006, longitudeDelta: 0.006 };
+    mapRef.current?.animateToRegion(region);
+    onPinChange(region.latitude, region.longitude);
+  };
   return <View style={{ height: 300, overflow: 'hidden', backgroundColor: '#E5E9E2' }}>
-    <View style={{ position: 'absolute', left: -50, top: 110, width: 520, height: 58, backgroundColor: '#B8BEC4', transform: [{ rotate: '-17deg' }] }} />
-    <View style={{ position: 'absolute', left: 165, top: -30, width: 58, height: 390, backgroundColor: '#C3C8CC', transform: [{ rotate: '29deg' }] }} />
-    <View style={{ position: 'absolute', left: 22, top: 182, width: 125, height: 95, backgroundColor: '#C8E1C2', transform: [{ rotate: '7deg' }] }} />
-    <Text style={{ position: 'absolute', left: 18, bottom: 14, fontSize: 15, fontWeight: '700', color: '#4285F4' }}>Google</Text>
-    <View style={{ position: 'absolute', alignSelf: 'center', top: 118, width: 35, height: 35, alignItems: 'center', justifyContent: 'center', borderRadius: 18, backgroundColor: PURPLE }}><View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: '#FFFFFF' }} /></View>
-    <View style={{ position: 'absolute', alignSelf: 'center', top: 63, paddingHorizontal: 12, paddingVertical: 7, borderRadius: 6, backgroundColor: '#211B22' }}><Text style={{ fontSize: 12, fontWeight: '600', color: '#FFFFFF' }}>Place the pin accurately on map</Text></View>
+    <MapView
+      ref={mapRef}
+      initialRegion={initialRegion}
+      mapType="standard"
+      provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
+      rotateEnabled={false}
+      showsCompass={false}
+      showsMyLocationButton={false}
+      style={{ position: 'absolute', inset: 0 }}
+      onRegionChangeComplete={(region) => onPinChange(region.latitude, region.longitude)}
+    />
+    <View pointerEvents="none" style={{ position: 'absolute', alignSelf: 'center', top: '50%', alignItems: 'center', marginTop: -46 }}>
+      <View style={{ marginBottom: 4, alignItems: 'center' }}>
+        <View style={{ paddingHorizontal: 12, paddingVertical: 10, borderRadius: 6, backgroundColor: '#211B22' }}>
+          <Text style={{ fontSize: 13, lineHeight: 12, fontWeight: '600', color: '#FFFFFF' }}>Place the pin accurately on map</Text>
+        </View>
+        <View style={{ width: 0, height: 0, borderLeftWidth: 6, borderRightWidth: 6, borderTopWidth: 7, borderLeftColor: 'transparent', borderRightColor: 'transparent', borderTopColor: '#211B22' }} />
+      </View>
+      <View style={{ width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: PURPLE }}>
+        <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#FFFFFF' }} />
+      </View>
+      <View style={{ width: 2, height: 14, backgroundColor: PURPLE }} />
+    </View>
+    <Pressable accessibilityRole="button" accessibilityLabel="Use current location" onPress={() => void goToCurrentLocation()} style={({ pressed }) => ({ position: 'absolute', right: 12, bottom: 12, width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: '#FFFFFF', opacity: pressed ? 0.7 : 1, shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 4 })}>
+      {locating ? <ActivityIndicator size="small" color={TEXT} /> : <View style={{ width: 18, height: 18, alignItems: 'center', justifyContent: 'center' }}><View style={{ width: 14, height: 14, borderWidth: 1.6, borderColor: TEXT, borderRadius: 7 }} /><View style={{ position: 'absolute', width: 5, height: 5, borderRadius: 3, backgroundColor: TEXT }} /><View style={{ position: 'absolute', top: 0, width: 1.5, height: 3, backgroundColor: TEXT }} /><View style={{ position: 'absolute', bottom: 0, width: 1.5, height: 3, backgroundColor: TEXT }} /><View style={{ position: 'absolute', left: 0, width: 3, height: 1.5, backgroundColor: TEXT }} /><View style={{ position: 'absolute', right: 0, width: 3, height: 1.5, backgroundColor: TEXT }} /></View>}
+    </Pressable>
   </View>;
 }
 
-function ContactDetailsModal({ initialName, initialPhone, onClose, onSave }: { initialName: string; initialPhone: string; onClose: () => void; onSave: (name: string, phone: string) => void }) {
+export function ContactDetailsModal({ initialName, initialPhone, onClose, onSave }: { initialName: string; initialPhone: string; onClose: () => void; onSave: (name: string, phone: string) => void }) {
   const insets = useSafeAreaInsets();
   const [contactName, setContactName] = useState(initialName);
   const [contactPhone, setContactPhone] = useState(initialPhone.replace(/^\+91\s*/, '').replace(/\D/g, '').slice(-10));
@@ -144,6 +242,43 @@ export function AddressDetailsSheet({ authToken, name, phone, place, onChange, o
   const [contactName, setContactName] = useState(place.contactName?.trim() || name?.trim() || 'User');
   const [contactPhone, setContactPhone] = useState(place.contactPhone?.trim() || phone?.trim() || '');
   const [contactEditorVisible, setContactEditorVisible] = useState(false);
+  const [pinLocation, setPinLocation] = useState({ latitude: place.latitude, longitude: place.longitude });
+  const [resolvedPlace, setResolvedPlace] = useState(place);
+  const [lookingUpAddress, setLookingUpAddress] = useState(false);
+  const lookupIdRef = useRef(0);
+  const lookupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const updateAddressFromPin = (latitude: number, longitude: number) => {
+    const didMove = Math.abs(latitude - pinLocation.latitude) > 0.00008 || Math.abs(longitude - pinLocation.longitude) > 0.00008;
+    setPinLocation({ latitude, longitude });
+    if (!didMove) return;
+    if (lookupTimerRef.current) clearTimeout(lookupTimerRef.current);
+    const lookupId = ++lookupIdRef.current;
+    setLookingUpAddress(true);
+    lookupTimerRef.current = setTimeout(() => {
+      void reverseGeocodeLocation({ latitude, longitude })
+        .then(({ display, geocodedAddress }) => {
+          if (lookupId !== lookupIdRef.current) return;
+          const next = buildAddressFromCurrentLocation(geocodedAddress, { latitude, longitude });
+          setResolvedPlace((current) => ({
+            ...current,
+            addressLine1: next.addressLine1,
+            addressLine2: next.addressLine2,
+            city: next.city,
+            country: next.country,
+            latitude,
+            longitude,
+            pincode: next.pincode,
+            state: next.state,
+            subtitle: display.subtitle,
+            title: display.title,
+          }));
+        })
+        .catch(() => undefined)
+        .finally(() => {
+          if (lookupId === lookupIdRef.current) setLookingUpAddress(false);
+        });
+    }, 350);
+  };
   const save = async () => {
     if (!houseNo.trim()) return;
     if (!authToken) return Alert.alert('Sign in required', 'Please sign in to save an address.');
@@ -155,23 +290,23 @@ export function AddressDetailsSheet({ authToken, name, phone, place, onChange, o
     setSaving(true);
     try {
       const payload: AddAddressPayload = {
-        addressLine1: place.addressLine1,
-        addressLine2: place.addressLine2,
-        addressType: place.addressType ?? (label === 'Home' ? 'apartment' : 'other'),
-        city: place.city,
+        addressLine1: resolvedPlace.addressLine1,
+        addressLine2: resolvedPlace.addressLine2,
+        addressType: resolvedPlace.addressType ?? (label === 'Home' ? 'apartment' : 'other'),
+        city: resolvedPlace.city,
         contactName: contactName.trim(),
         contactPhone: contactPhoneDigits,
-        country: place.country,
+        country: resolvedPlace.country,
         houseNo: houseNo.trim(),
-        instructions: place.instructions,
+        instructions: resolvedPlace.instructions,
         label: label.toLowerCase() as 'home' | 'other',
         landmark: landmark.trim(),
-        latitude: place.latitude,
-        longitude: place.longitude,
-        pincode: place.pincode,
-        state: place.state,
+        latitude: pinLocation.latitude,
+        longitude: pinLocation.longitude,
+        pincode: resolvedPlace.pincode,
+        state: resolvedPlace.state,
       };
-      const savedAddress = place.addressId ? await updateAddress(authToken, place.addressId, payload) : await addAddress(authToken, payload);
+      const savedAddress = resolvedPlace.addressId ? await updateAddress(authToken, resolvedPlace.addressId, payload) : await addAddress(authToken, payload);
       onSaved(savedAddress);
     } catch (error) { Alert.alert('Could not save address', error instanceof Error ? error.message : 'Please try again.'); }
     finally { setSaving(false); }
@@ -179,12 +314,12 @@ export function AddressDetailsSheet({ authToken, name, phone, place, onChange, o
   return <View style={{ flex: 1, justifyContent: 'flex-end' }}><Pressable onPress={onClose} style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.72)' }} />
     <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} style={({ pressed }) => ({ position: 'absolute', right: 18, top: '4.5%', zIndex: 5, width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: '#FFFFFF', opacity: pressed ? 0.65 : 1 })}><Text style={{ fontSize: 20, lineHeight: 22, fontWeight: '300', color: TEXT }}>×</Text></Pressable>
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ height: '91%' }}><View style={{ flex: 1, overflow: 'hidden', borderTopLeftRadius: 16, borderTopRightRadius: 16, backgroundColor: '#FFFFFF' }}>
-      <MapPreview /><ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingHorizontal: 18, paddingBottom: Math.max(insets.bottom, 14) + 14 }}>
+      <MapPreview latitude={pinLocation.latitude} longitude={pinLocation.longitude} onPinChange={updateAddressFromPin} /><ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingHorizontal: 18, paddingBottom: Math.max(insets.bottom, 14) + 14 }}>
         <View style={{ width: 34, height: 4, alignSelf: 'center', marginTop: 9, borderRadius: 2, backgroundColor: '#BEB8C0' }} />
-        <View style={{ minHeight: 89, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: BORDER }}><View style={{ flex: 1 }}><Text style={{ fontSize: 16, fontWeight: '700', color: TEXT }}>{place.title}</Text><Text style={{ marginTop: 5, fontSize: 13, lineHeight: 19, color: MUTED }}>{place.subtitle}</Text></View><Pressable onPress={onChange} style={{ paddingHorizontal: 14, paddingVertical: 8, borderWidth: 1, borderColor: PURPLE, borderRadius: 8 }}><Text style={{ fontSize: 13, fontWeight: '600', color: PURPLE }}>Change</Text></Pressable></View>
+        <View style={{ minHeight: 89, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: BORDER }}><View style={{ flex: 1 }}><Text style={{ fontSize: 16, fontWeight: '700', color: TEXT }}>{resolvedPlace.title}</Text><Text style={{ marginTop: 5, fontSize: 13, lineHeight: 19, color: MUTED }}>{lookingUpAddress ? 'Updating address...' : resolvedPlace.subtitle}</Text></View><Pressable onPress={onChange} style={{ paddingHorizontal: 14, paddingVertical: 8, borderWidth: 1, borderColor: PURPLE, borderRadius: 8 }}><Text style={{ fontSize: 13, fontWeight: '600', color: PURPLE }}>Change</Text></Pressable></View>
         <TextInput value={houseNo} onChangeText={setHouseNo} placeholder="House/Flat Number" placeholderTextColor="#B2ACB4" style={{ height: 50, marginTop: 16, paddingHorizontal: 13, borderWidth: 1, borderColor: BORDER, borderRadius: 8, fontSize: 14, color: TEXT }} />
         <TextInput value={landmark} onChangeText={setLandmark} placeholder="Landmark (Optional)" placeholderTextColor="#B2ACB4" style={{ height: 50, marginTop: 11, paddingHorizontal: 13, borderWidth: 1, borderColor: BORDER, borderRadius: 8, fontSize: 14, color: TEXT }} />
-        <Text style={{ marginTop: 18, fontSize: 13, color: TEXT }}>Save as</Text><View style={{ marginTop: 9, flexDirection: 'row', gap: 10 }}>{(['Home', 'Other'] as const).map((item) => <Pressable key={item} onPress={() => setLabel(item)} style={{ paddingHorizontal: 19, height: 38, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: PURPLE, borderRadius: 7, backgroundColor: label === item ? PURPLE : '#FFFFFF' }}><Text style={{ fontSize: 14, fontWeight: '600', color: label === item ? '#FFFFFF' : PURPLE }}>{label === item ? '✓ ' : ''}{item}</Text></Pressable>)}</View>
+        <Text style={{ marginTop: 18, fontSize: 13, color: TEXT }}>Save as</Text><View style={{ marginTop: 9, flexDirection: 'row', gap: 10 }}>{(['Home', 'Other'] as const).map((item) => <Pressable key={item} onPress={() => setLabel(item)} style={{ paddingHorizontal: 19, height: 38, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: PURPLE, borderRadius: 7, backgroundColor: label === item ? PURPLE : '#FFFFFF' }}><Text style={{ fontSize: 14, fontWeight: '600', color: label === item ? '#FFFFFF' : PURPLE }}>{item}</Text></Pressable>)}</View>
         <View style={{ height: 60, marginTop: 14, flexDirection: 'row', alignItems: 'center', borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#F0EDF1' }}><Image source={require('../../../assets/voice_calls.png')} contentFit="contain" tintColor={TEXT} style={{ width: 18, height: 18 }} /><Text style={{ flex: 1, marginLeft: 13, fontSize: 14, color: TEXT }}>{contactName}, {contactPhone || 'Phone number'}</Text><Pressable accessibilityRole="button" accessibilityLabel="Edit contact details" hitSlop={10} onPress={() => setContactEditorVisible(true)} style={({ pressed }) => ({ width: 38, height: 38, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.55 : 1 })}><EditIcon size={16} /></Pressable></View>
         <Pressable disabled={!houseNo.trim() || saving} onPress={() => void save()} style={({ pressed }) => ({ height: 48, marginTop: 18, alignItems: 'center', justifyContent: 'center', borderRadius: 8, backgroundColor: houseNo.trim() ? PURPLE : '#D9D5DD', opacity: pressed ? 0.7 : 1 })}>{saving ? <ActivityIndicator color="#FFFFFF" /> : <Text style={{ fontSize: 15, fontWeight: '700', color: '#FFFFFF' }}>{saveLabel}</Text>}</Pressable>
       </ScrollView></View></KeyboardAvoidingView>

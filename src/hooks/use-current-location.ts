@@ -126,6 +126,19 @@ export function formatLocationDisplay(
   return { title, subtitle };
 }
 
+export async function reverseGeocodeLocation(coords: CurrentLocationCoords): Promise<{
+  display: LocationDisplay;
+  geocodedAddress: Location.LocationGeocodedAddress | null;
+}> {
+  const addresses = await Location.reverseGeocodeAsync(coords);
+  const geocodedAddress = addresses[0] ?? null;
+  const fallback = `${coords.latitude.toFixed(5)}, ${coords.longitude.toFixed(5)}`;
+  return {
+    display: formatLocationDisplay(geocodedAddress, fallback),
+    geocodedAddress,
+  };
+}
+
 export async function fetchCurrentLocation(): Promise<LocationSnapshot> {
   if (cachedSnapshot?.status === 'ready') return cachedSnapshot;
   if (inFlight) return inFlight;

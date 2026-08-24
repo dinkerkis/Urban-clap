@@ -60,7 +60,7 @@ function ChevronRight() {
   );
 }
 
-export function ProfileScreen({ email, name, phone, profilePicture, onAbout, onBack, onCompleteProfile, onLogout, onManageAddresses, onManagePaymentMethods, onMyPlans, onMyRating, onPassesMembership, onSettings, onWallet }: ProfileScreenProps) {
+export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteProfile, onLogout, onManageAddresses, onManagePaymentMethods, onMyPlans, onMyRating, onPassesMembership, onSettings, onWallet }: ProfileScreenProps) {
   const insets = useSafeAreaInsets();
   const displayName = name?.trim() || 'Urban Clap User';
   const displayEmail = email?.trim();
@@ -86,7 +86,7 @@ export function ProfileScreen({ email, name, phone, profilePicture, onAbout, onB
       contentContainerStyle={{ paddingBottom: Math.max(insets.bottom, 20) + 24 }}
     >
       <View style={{ paddingTop: Math.max(insets.top, 18) + 8, paddingHorizontal: 20, gap: 18 }}>
-        <View style={{ minHeight: isProfileIncomplete ? 40 : 74, flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+        <View style={{ minHeight: 40, flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' }}>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Go back"
@@ -108,29 +108,6 @@ export function ProfileScreen({ email, name, phone, profilePicture, onAbout, onB
           </Pressable>
 
           {!isProfileIncomplete ? (
-            <View
-              style={{
-                position: 'absolute',
-                left: '50%',
-                width: 72,
-                height: 72,
-                marginLeft: -36,
-                overflow: 'hidden',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 36,
-                backgroundColor: '#EEE8F8',
-              }}
-            >
-              {profilePicture ? (
-                <Image source={profilePicture} contentFit="cover" style={{ width: 72, height: 72 }} />
-              ) : (
-                <Text style={{ fontSize: 28, fontWeight: '700', color: '#6E45E2' }}>{displayName.charAt(0).toUpperCase()}</Text>
-              )}
-            </View>
-          ) : null}
-
-          {!isProfileIncomplete ? (
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Edit profile"
@@ -138,7 +115,7 @@ export function ProfileScreen({ email, name, phone, profilePicture, onAbout, onB
               onPress={onCompleteProfile}
               style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.55 : 1 })}
             >
-              <EditIcon size={17} />
+              <EditIcon size={19} />
             </Pressable>
           ) : <View style={{ width: 40 }} />}
         </View>

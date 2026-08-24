@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Image } from 'expo-image';
 import { ActivityIndicator, Alert, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -7,9 +7,8 @@ import { BackIcon } from '../../components/back-icon';
 import { EditIcon } from '../../components/edit-icon';
 import type { ServiceItem } from '../../data/service-catalog';
 import { useAddresses } from '../../hooks/use-addresses';
-import { fetchCurrentLocation, formatLocationDisplay } from '../../hooks/use-current-location';
-import { buildAddressFromCurrentLocation, formatAddressLabel, formatSavedAddress, setDefaultAddress, type UserAddress } from '../../services/address-api';
-import { AddressDetailsSheet, formatContactPhone, LocationSearchSheet, type SelectedPlace } from '../manage-addresses/manage-addresses-screen';
+import { formatAddressLabel, formatSavedAddress, setDefaultAddress, type UserAddress } from '../../services/address-api';
+import { AddressDetailsSheet, ContactDetailsModal, formatContactPhone, LocationSearchSheet, type SelectedPlace } from '../manage-addresses/manage-addresses-screen';
 
 type CartScreenProps = {
   authToken?: string;
@@ -62,15 +61,19 @@ export function CartScreen({
   const [selectedSlotDate, setSelectedSlotDate] = useState<string | null>(null);
   const [selectedSlotTime, setSelectedSlotTime] = useState<string | null>(null);
   const [checkoutAddress, setCheckoutAddress] = useState<UserAddress | null>(null);
-  const [isPreparingAddress, setIsPreparingAddress] = useState(false);
+  const [contactEditorVisible, setContactEditorVisible] = useState(false);
+  const [contactOverride, setContactOverride] = useState<{ name: string; phone: string } | null>(null);
   const [isSettingDefaultAddress, setIsSettingDefaultAddress] = useState(false);
   const addressState = useAddresses(authToken);
   const cartItems = items.filter((item) => (cart[item.id] ?? 0) > 0);
   const displayedCartItems = consultationMode ? cartItems.slice(0, 1) : cartItems;
   const displayedTotalPrice = consultationMode ? (cartItems.length > 0 ? 49 : 0) : totalPrice;
+  const displayedContactName = contactOverride?.name || checkoutAddress?.contactName?.trim() || name?.trim() || 'User';
+  const rawContactPhone = contactOverride?.phone || checkoutAddress?.contactPhone?.trim() || phone?.trim() || '';
+  const displayedContactPhone = formatContactPhone(rawContactPhone);
   const checkoutReady = Boolean(checkoutAddress && selectedSlotDate && selectedSlotTime);
   const actionBottom = showBottomTab ? (process.env.EXPO_OS === 'ios' ? 112 : insets.bottom + 100) : 0;
-  const actionHeight = checkoutReady ? 226 : 112;
+  const actionHeight = checkoutReady ? 226 : checkoutAddress ? 168 : 112;
   const removeConsultation = async (item: ServiceItem, quantity: number) => {
     for (let count = 0; count < quantity; count += 1) await onRemove(item);
   };
@@ -80,24 +83,12 @@ export function CartScreen({
     }
   };
 
-  const openNewAddressFlow = async () => {
-    setIsPreparingAddress(true);
-    const location = await fetchCurrentLocation();
-    setIsPreparingAddress(false);
-    if (location.status === 'ready' && location.coords) {
-      const display = formatLocationDisplay(location.geocodedAddress, location.label);
-      setSelectedPlace({
-        ...buildAddressFromCurrentLocation(location.geocodedAddress, location.coords),
-        title: display.title,
-        subtitle: display.subtitle,
-      });
-      setAddressSheet('details');
-      return;
-    }
+  const openNewAddressFlow = () => {
+    setSelectedPlace(null);
     setAddressSheet('search');
   };
 
-  const openAddressAndSlot = async () => {
+  const openAddressAndSlot = () => {
     if (addressState.isLoading) return;
     if (addressState.addresses.length > 0) {
       const preferred = addressState.addresses.find((address) => address.isDefault) ?? addressState.addresses[0];
@@ -105,7 +96,7 @@ export function CartScreen({
       setAddressSheet('saved');
       return;
     }
-    await openNewAddressFlow();
+    openNewAddressFlow();
   };
 
   const openSlotSheet = () => {
@@ -208,7 +199,7 @@ export function CartScreen({
         ) : (
           <>
             <View style={{ paddingHorizontal: 20, paddingTop: 30, paddingBottom: 18, gap: 16, backgroundColor: '#FFFFFF' }}>
-              <Text selectable style={{ fontSize: 21, lineHeight: 28, fontWeight: '600', color: '#171319' }}>
+              <Text selectable style={{ fontSize: 19, lineHeight: 26, fontWeight: '600', color: '#171319' }}>
                 {categoryTitle || 'Selected services'}
               </Text>
 
@@ -282,6 +273,49 @@ export function CartScreen({
 
             <Pressable
               accessibilityRole="button"
+              onPress={() => Alert.alert('Coupons and offers', 'No coupons are available right now.')}
+              style={({ pressed }) => ({
+                minHeight: 64,
+                marginTop: 10,
+                paddingHorizontal: 22,
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: pressed ? '#FBF9FD' : '#FFFFFF',
+              })}
+            >
+              <View style={{ width: 28, alignItems: 'flex-start' }}>
+                <View style={{ width: 18, height: 18, alignItems: 'center', justifyContent: 'center', borderRadius: 9, backgroundColor: '#0B784E' }}>
+                  <Text style={{ fontSize: 10, lineHeight: 12, fontWeight: '700', color: '#FFFFFF' }}>%</Text>
+                </View>
+              </View>
+              <Text selectable style={{ flex: 1, paddingLeft: 7, fontSize: 14, lineHeight: 20, color: '#29232C' }}>Coupons and offers</Text>
+              <Text style={{ fontSize: 13, lineHeight: 19, fontWeight: '600', color: '#6E45E2' }}>View all</Text>
+              <Text style={{ marginLeft: 8, fontSize: 22, lineHeight: 24, color: '#6E45E2' }}>›</Text>
+            </Pressable>
+
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => setContactEditorVisible(true)}
+              style={({ pressed }) => ({
+                minHeight: 64,
+                marginTop: 10,
+                paddingHorizontal: 22,
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: pressed ? '#FBF9FD' : '#FFFFFF',
+              })}
+            >
+              <View style={{ width: 28, alignItems: 'flex-start' }}>
+                <Image source={require('../../../assets/voice_calls.png')} contentFit="contain" tintColor="#211A28" style={{ width: 18, height: 18 }} />
+              </View>
+              <Text numberOfLines={1} selectable style={{ flex: 1, paddingLeft: 7, fontSize: 14, lineHeight: 20, color: '#29232C' }}>
+                {displayedContactName}, {displayedContactPhone}
+              </Text>
+              <Text style={{ marginLeft: 12, fontSize: 13, lineHeight: 19, fontWeight: '600', color: '#6E45E2' }}>Change</Text>
+            </Pressable>
+
+            <Pressable
+              accessibilityRole="button"
               onPress={() => setShowBillSummary(true)}
               style={({ pressed }) => ({
                 marginTop: 10,
@@ -293,7 +327,7 @@ export function CartScreen({
               })}
             >
               <View style={{ width: 32, height: 40, alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ fontSize: 24 }}>▤</Text>
+                <Image source={require('../../../assets/receipt.png')} contentFit="contain" style={{ width: 22, height: 22 }} />
               </View>
               <View style={{ flex: 1, paddingLeft: 11 }}>
                 <Text selectable style={{ fontSize: 15, lineHeight: 21, color: '#211A28' }}>
@@ -309,23 +343,35 @@ export function CartScreen({
 
       {cartItems.length > 0 && !isLoading ? (
         <View style={{ position: 'absolute', left: 0, right: 0, bottom: actionBottom, paddingHorizontal: 20, paddingTop: 10, paddingBottom: showBottomTab ? 9 : Math.max(insets.bottom, 10), backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: '#E7E4E8' }}>
-          {checkoutReady && checkoutAddress && selectedSlotDate && selectedSlotTime ? (
+          {checkoutAddress ? (
             <>
-              <CheckoutDetailRow icon="⌂" label={`${formatAddressLabel(checkoutAddress.label)} - ${formatSavedAddress(checkoutAddress)}`} onPress={() => void openAddressAndSlot()} />
-              <CheckoutDetailRow icon="◷" label={formatCheckoutSlot(selectedSlotDate, selectedSlotTime)} onPress={() => setAddressSheet('slot')} />
-              <Pressable accessibilityRole="button" onPress={() => Alert.alert('Payment', 'Payment flow will be connected here.')} style={({ pressed }) => ({ height: 48, marginTop: 8, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: pressed ? '#5D35CE' : '#6E45E2' })}>
-                <Text style={{ fontSize: 15, fontWeight: '700', color: '#FFFFFF' }}>Proceed to pay</Text>
-              </Pressable>
-              <Text style={{ marginTop: 8, textAlign: 'center', fontSize: 10.5, lineHeight: 15, color: '#625D64' }}>By proceeding, you agree to our <Text style={{ textDecorationLine: 'underline' }}>T&amp;C</Text>, <Text style={{ textDecorationLine: 'underline' }}>Privacy</Text> and <Text style={{ textDecorationLine: 'underline' }}>Cancellation Policy</Text>.</Text>
+              <CheckoutDetailRow icon={<Image source={require('../../../assets/addresses.png')} contentFit="contain" style={{ width: 18, height: 18 }} />} label={`${formatAddressLabel(checkoutAddress.label)} - ${formatSavedAddress(checkoutAddress)}`} onPress={() => void openAddressAndSlot()} />
+              {checkoutReady && selectedSlotDate && selectedSlotTime ? (
+                <>
+                  <CheckoutDetailRow icon={<Image source={require('../../../assets/time.png')} contentFit="contain" style={{ width: 16, height: 16 }} />} label={formatCheckoutSlot(selectedSlotDate, selectedSlotTime)} onPress={() => setAddressSheet('slot')} />
+                  <Pressable accessibilityRole="button" onPress={() => Alert.alert('Payment', 'Payment flow will be connected here.')} style={({ pressed }) => ({ height: 48, marginTop: 8, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: pressed ? '#5D35CE' : '#6E45E2' })}>
+                    <Text style={{ fontSize: 15, fontWeight: '700', color: '#FFFFFF' }}>Proceed to pay</Text>
+                  </Pressable>
+                  <Text style={{ marginTop: 8, textAlign: 'center', fontSize: 10.5, lineHeight: 15, color: '#625D64' }}>By proceeding, you agree to our <Text style={{ fontWeight: '700', textDecorationLine: 'underline' }}>T&amp;C</Text>, <Text style={{ fontWeight: '700', textDecorationLine: 'underline' }}>Privacy</Text> and <Text style={{ fontWeight: '700', textDecorationLine: 'underline' }}>Cancellation Policy</Text>.</Text>
+                </>
+              ) : (
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={() => setAddressSheet('slot')}
+                  style={({ pressed }) => ({ height: 48, marginTop: 8, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: pressed ? '#5D35CE' : '#6E45E2' })}
+                >
+                  <Text style={{ fontSize: 15, fontWeight: '600', color: '#FFFFFF' }}>Select slot</Text>
+                </Pressable>
+              )}
             </>
           ) : (
             <Pressable
               accessibilityRole="button"
-              disabled={isPreparingAddress || addressState.isLoading}
+              disabled={addressState.isLoading}
               onPress={() => void openAddressAndSlot()}
               style={({ pressed }) => ({ height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: pressed ? '#5D35CE' : '#6E45E2' })}
             >
-              {isPreparingAddress || addressState.isLoading ? <ActivityIndicator color="#FFFFFF" /> : <Text style={{ fontSize: 15, fontWeight: '600', color: '#FFFFFF' }}>Add address and slot</Text>}
+              {addressState.isLoading ? <ActivityIndicator color="#FFFFFF" /> : <Text style={{ fontSize: 15, fontWeight: '600', color: '#FFFFFF' }}>Add address and slot</Text>}
             </Pressable>
           )}
         </View>
@@ -350,12 +396,24 @@ export function CartScreen({
         </View>
       </Modal>
 
+      {contactEditorVisible ? (
+        <ContactDetailsModal
+          initialName={displayedContactName}
+          initialPhone={rawContactPhone}
+          onClose={() => setContactEditorVisible(false)}
+          onSave={(nextName, nextPhone) => {
+            setContactOverride({ name: nextName, phone: nextPhone });
+            setContactEditorVisible(false);
+          }}
+        />
+      ) : null}
+
       <Modal animationType="fade" transparent visible={addressSheet === 'saved'} onRequestClose={() => setAddressSheet(null)}>
         <SavedAddressSheet
           addresses={addressState.addresses}
           isProceeding={isSettingDefaultAddress}
           selectedAddressId={selectedAddressId}
-          onAddAnother={() => void openNewAddressFlow()}
+          onAddAnother={openNewAddressFlow}
           onClose={() => setAddressSheet(null)}
           onProceed={proceedWithSavedAddress}
           onSelect={setSelectedAddressId}
@@ -409,10 +467,10 @@ function formatCheckoutSlot(dateValue: string, time: string): string {
   return `${date.toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' })} - ${time}`;
 }
 
-function CheckoutDetailRow({ icon, label, onPress }: { icon: string; label: string; onPress: () => void }) {
+function CheckoutDetailRow({ icon, label, onPress }: { icon: ReactNode; label: string; onPress: () => void }) {
   return (
     <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => ({ minHeight: 48, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#F0EDF1', opacity: pressed ? 0.65 : 1 })}>
-      <Text style={{ width: 30, fontSize: 20, color: '#241F26' }}>{icon}</Text>
+      <View style={{ width: 30, alignItems: 'flex-start', justifyContent: 'center' }}>{typeof icon === 'string' ? <Text style={{ fontSize: 20, color: '#241F26' }}>{icon}</Text> : icon}</View>
       <Text numberOfLines={1} style={{ flex: 1, fontSize: 13, color: '#3F3942' }}>{label}</Text>
       <View style={{ width: 32, alignItems: 'flex-end' }}>
         <EditIcon size={15} />
@@ -487,15 +545,15 @@ function SavedAddressSheet({ addresses, isProceeding, selectedAddressId, onAddAn
         <Text style={{ fontSize: 20, lineHeight: 27, fontWeight: '600', color: '#171319' }}>Saved address</Text>
         <Pressable onPress={onAddAnother} style={{ height: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#F0EDF1' }}>
           <Text style={{ width: 28, fontSize: 22, fontWeight: '300', color: '#6E45E2' }}>+</Text>
-          <Text style={{ fontSize: 15, fontWeight: '600', color: '#6E45E2' }}>Add another address</Text>
+          <Text style={{ fontSize: 15, fontWeight: '700', color: '#6E45E2' }}>Add another address</Text>
         </Pressable>
         <ScrollView showsVerticalScrollIndicator={false}>
           {addresses.map((address) => {
             const selected = selectedAddressId === address._id;
             return (
               <Pressable key={address._id} onPress={() => onSelect(address._id)} style={{ minHeight: 112, paddingVertical: 18, flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#F0EDF1' }}>
-                <View style={{ width: 22, height: 22, marginTop: 2, marginRight: 14, alignItems: 'center', justifyContent: 'center', borderRadius: 11, borderWidth: 1.5, borderColor: selected ? '#6E45E2' : '#7B747D' }}>
-                  {selected ? <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#6E45E2' }} /> : null}
+                <View style={{ width: 18, height: 18, marginTop: 2, marginRight: 14, alignItems: 'center', justifyContent: 'center', borderRadius: 9, borderWidth: 1.25, borderColor: selected ? '#6E45E2' : '#7B747D' }}>
+                  {selected ? <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#6E45E2' }} /> : null}
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={{ fontSize: 16, lineHeight: 21, fontWeight: '700', color: '#1F1A22' }}>{formatAddressLabel(address.label)}</Text>

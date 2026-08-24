@@ -183,7 +183,6 @@ function VerifyEmailModal({ email, visible, onClose, onVerified }: VerifyEmailMo
             <Text selectable style={{ fontSize: 15, lineHeight: 21, color: '#777078' }}>We sent a 6-digit code to {email}.</Text>
             <TextInput
               accessibilityLabel="6-digit verification code"
-              autoFocus
               keyboardType="number-pad"
               maxLength={6}
               placeholder="6-digit code"
@@ -246,6 +245,7 @@ export function ProfileDetailsScreen({ email, name, phone, onBack, onVerified }:
   const [errors, setErrors] = useState<{ email?: boolean; name?: boolean; phone?: boolean }>({});
 
   const submit = () => {
+    Keyboard.dismiss();
     const nextErrors = {
       name: fullName.trim().length < 2,
       email: !EMAIL_PATTERN.test(emailAddress.trim()),
