@@ -131,10 +131,10 @@ export function PaymentMethodsScreen({ onBack }: PaymentMethodsScreenProps) {
     <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
       <View style={{ paddingTop: Math.max(insets.top, 16) + 6, paddingHorizontal: 20, paddingBottom: 10 }}>
         <View style={{ height: 44, flexDirection: 'row', alignItems: 'center' }}>
-          <Pressable accessibilityRole="button" accessibilityLabel="Go back" hitSlop={10} onPress={onBack} style={({ pressed }) => ({ width: 34, height: 34, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.65 : 1 })}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Go back" hitSlop={10} onPress={onBack} style={({ pressed }) => ({ width: 34, height: 34, alignItems: 'flex-start', justifyContent: 'center', opacity: pressed ? 0.65 : 1 })}>
             <BackIcon color="#241A30" />
           </Pressable>
-          <Text style={{ marginLeft: 13, fontSize: 16, lineHeight: 22, fontWeight: '700', color: '#1F1A22' }}>Manage payment methods</Text>
+          <Text style={{ marginLeft: 5, fontSize: 16, lineHeight: 22, fontWeight: '700', color: '#1F1A22' }}>Manage payment methods</Text>
         </View>
       </View>
       <View style={{ height: 1, backgroundColor: '#F0EDF1' }} />

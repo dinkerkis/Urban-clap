@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { Alert, View } from 'react-native';
+import { Alert, Text, View } from 'react-native';
 import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Animated, { Easing, FadeIn, FadeOut, SlideInRight, SlideOutRight } from 'react-native-reanimated';
+import Animated, { Easing, FadeIn, FadeOut, SlideInLeft, SlideInRight, SlideOutRight } from 'react-native-reanimated';
 
 import { BottomTabBar, type DashboardTab } from '../../components/bottom-tab-bar';
 import { CategorySubcategoriesSheet, isFullPageCategory } from '../../components/category-subcategories-sheet';
@@ -22,13 +22,14 @@ import { NativeScreen } from '../native';
 import { PaymentMethodsScreen } from '../payment-methods';
 import { ProfileDetailsScreen, ProfileEntryScreen, type CompletedProfile } from '../profile';
 import { ProductDetailScreen } from '../product-detail';
-import { MyPlansScreen, MyRatingScreen, PassesMembershipScreen } from '../profile-options';
+import { AccountArticleScreen, AccountHelpScreen, ChangePhoneHelpScreen, GettingStartedArticleScreen, GettingStartedHelpScreen, HelpSupportScreen, MyPlansScreen, MyRatingScreen, NativeDevicesScreen, PassesMembershipScreen, PaymentCreditsArticleScreen, PaymentCreditsHelpScreen, ProfileMyBookingsScreen, type GettingStartedArticleKey, type PaymentCreditsArticleKey } from '../profile-options';
 import { RewardsScreen } from '../rewards';
 import { ServiceListScreen } from '../service-list';
 import { PrivacyCenterScreen, SettingsScreen } from '../settings';
 import { WalletScreen } from '../wallet';
 
 const STACK_SLIDE_IN = SlideInRight.duration(280).easing(Easing.out(Easing.cubic));
+const STACK_POP_IN = SlideInLeft.duration(260).easing(Easing.out(Easing.cubic));
 const STACK_SLIDE_OUT = SlideOutRight.duration(260).easing(Easing.out(Easing.cubic));
 
 type CategoryStackParams = {
@@ -45,17 +46,29 @@ const categoryNavigationRef = createNavigationContainerRef<CategoryStackParams>(
 type DashboardPage =
   | { type: 'root' }
   | { type: 'location' }
-  | { type: 'manage-addresses' }
+  | { type: 'manage-addresses'; from?: 'help-address-article' }
   | { type: 'profile' }
-  | { type: 'profile-details' }
+  | { type: 'profile-details'; from?: 'help-email-article' | 'help-phone-article' }
   | { type: 'about' }
+  | { type: 'help-support'; from?: 'my-bookings' | 'profile' }
+  | { type: 'help-account'; from?: 'my-bookings' | 'profile' }
+  | { type: 'help-getting-started'; from?: 'my-bookings' | 'profile' }
+  | { type: 'help-getting-started-article'; article: GettingStartedArticleKey; from?: 'my-bookings' | 'profile' }
+  | { type: 'help-payment-credits'; from?: 'my-bookings' | 'profile' }
+  | { type: 'help-payment-credits-article'; article: PaymentCreditsArticleKey; from?: 'my-bookings' | 'profile' }
+  | { type: 'help-phone-article'; from?: 'my-bookings' | 'profile' }
+  | { type: 'help-address-article'; from?: 'my-bookings' | 'profile' }
+  | { type: 'help-email-article'; from?: 'my-bookings' | 'profile' }
+  | { type: 'help-payment-article'; from?: 'my-bookings' | 'profile' }
+  | { type: 'my-bookings' }
   | { type: 'my-plans' }
   | { type: 'my-rating' }
+  | { type: 'native-devices' }
   | { type: 'passes-membership' }
-  | { type: 'payment-methods' }
+  | { type: 'payment-methods'; from?: 'help-payment-article' | 'help-payment-credits-article'; helpArticle?: PaymentCreditsArticleKey; helpFrom?: 'my-bookings' | 'profile' }
   | { type: 'settings' }
   | { type: 'privacy-center' }
-  | { type: 'wallet' }
+  | { type: 'wallet'; from?: 'help-payment-credits-article'; helpArticle?: PaymentCreditsArticleKey; helpFrom?: 'my-bookings' | 'profile' }
   | { type: 'category'; category: ServiceCategory }
   | { type: 'services'; category: ServiceCategory; subcategory: ServiceSubcategory }
   | { type: 'product'; category: ServiceCategory; subcategory: ServiceSubcategory; item: ServiceItem }
@@ -78,6 +91,7 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
   const [sheetCategory, setSheetCategory] = useState<ServiceCategory | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<{ subtitle: string; title: string } | null>(null);
   const [isConsultationLoading, setIsConsultationLoading] = useState(false);
+  const [profileTransition, setProfileTransition] = useState<'pop' | 'push'>('push');
   const productNavigationPendingRef = useRef(false);
   const cartState = useCart(authToken);
   const { categories, errorMessage: categoriesError, isLoading: categoriesLoading, retry: retryCategories } = useServiceCategories();
@@ -145,7 +159,7 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
         }}
       />
     );
-  } else if (page.type === 'profile' || page.type === 'profile-details' || page.type === 'about' || page.type === 'wallet' || page.type === 'my-plans' || page.type === 'passes-membership' || page.type === 'payment-methods' || page.type === 'manage-addresses' || page.type === 'my-rating' || page.type === 'settings' || page.type === 'privacy-center') {
+  } else if (page.type === 'profile' || page.type === 'profile-details' || page.type === 'about' || page.type === 'wallet' || page.type === 'my-bookings' || page.type === 'native-devices' || page.type === 'help-support' || page.type === 'help-account' || page.type === 'help-getting-started' || page.type === 'help-getting-started-article' || page.type === 'help-payment-credits' || page.type === 'help-payment-credits-article' || page.type === 'help-phone-article' || page.type === 'help-address-article' || page.type === 'help-email-article' || page.type === 'help-payment-article' || page.type === 'my-plans' || page.type === 'passes-membership' || page.type === 'payment-methods' || page.type === 'manage-addresses' || page.type === 'my-rating' || page.type === 'settings' || page.type === 'privacy-center') {
     content = (
       <Animated.View entering={STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
         <ProfileEntryScreen
@@ -156,11 +170,14 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
           onAbout={() => setPage({ type: 'about' })}
           onBack={() => setPage({ type: 'root' })}
           onCompleteProfile={() => setPage({ type: 'profile-details' })}
+          onHelpSupport={() => { setProfileTransition('push'); setPage({ type: 'help-support', from: 'profile' }); }}
           onLogout={onLogout}
           onManageAddresses={() => setPage({ type: 'manage-addresses' })}
           onManagePaymentMethods={() => setPage({ type: 'payment-methods' })}
+          onMyBookings={() => setPage({ type: 'my-bookings' })}
           onMyPlans={() => setPage({ type: 'my-plans' })}
           onMyRating={() => setPage({ type: 'my-rating' })}
+          onNativeDevices={() => setPage({ type: 'native-devices' })}
           onPassesMembership={() => setPage({ type: 'passes-membership' })}
           onSettings={() => setPage({ type: 'settings' })}
           onWallet={() => setPage({ type: 'wallet' })}
@@ -324,7 +341,7 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
       {page.type === 'root' ? <BottomTabBar activeTab={activeTab} cartCount={cartState.totalItems} onChange={changeTab} /> : null}
       {page.type === 'profile-details' ? (
         <Animated.View
-          entering={STACK_SLIDE_IN}
+          entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN}
           exiting={STACK_SLIDE_OUT}
           style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}
         >
@@ -332,7 +349,7 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
             email={email}
             name={name}
             phone={phone}
-            onBack={() => setPage({ type: 'profile' })}
+            onBack={() => { setProfileTransition('pop'); setPage(page.from === 'help-phone-article' ? { type: 'help-phone-article', from: 'profile' } : page.from === 'help-email-article' ? { type: 'help-email-article', from: 'profile' } : { type: 'profile' }); }}
             onVerified={(profile) => {
               onProfileUpdated(profile);
               setPage({ type: 'profile' });
@@ -342,11 +359,11 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
       ) : null}
       {page.type === 'wallet' ? (
         <Animated.View
-          entering={STACK_SLIDE_IN}
+          entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN}
           exiting={STACK_SLIDE_OUT}
           style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}
         >
-          <WalletScreen onBack={() => setPage({ type: 'profile' })} />
+          <WalletScreen onBack={() => { setProfileTransition('pop'); setPage(page.from === 'help-payment-credits-article' && page.helpArticle ? { type: 'help-payment-credits-article', article: page.helpArticle, from: page.helpFrom } : { type: 'profile' }); }} />
         </Animated.View>
       ) : null}
       {page.type === 'about' ? (
@@ -355,13 +372,138 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
         </Animated.View>
       ) : null}
       {page.type === 'payment-methods' ? (
-        <Animated.View entering={STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
-          <PaymentMethodsScreen onBack={() => setPage({ type: 'profile' })} />
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+          <PaymentMethodsScreen onBack={() => { setProfileTransition('pop'); setPage(page.from === 'help-payment-article' ? { type: 'help-payment-article', from: 'profile' } : page.from === 'help-payment-credits-article' && page.helpArticle ? { type: 'help-payment-credits-article', article: page.helpArticle, from: page.helpFrom } : { type: 'profile' }); }} />
         </Animated.View>
       ) : null}
       {page.type === 'manage-addresses' ? (
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+          <ManageAddressesScreen authToken={authToken} name={name} phone={phone} onBack={() => { setProfileTransition('pop'); setPage(page.from === 'help-address-article' ? { type: 'help-address-article', from: 'profile' } : { type: 'profile' }); }} />
+        </Animated.View>
+      ) : null}
+      {page.type === 'my-bookings' ? (
         <Animated.View entering={STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
-          <ManageAddressesScreen authToken={authToken} name={name} phone={phone} onBack={() => setPage({ type: 'profile' })} />
+          <ProfileMyBookingsScreen
+            onBack={() => setPage({ type: 'profile' })}
+            onExplore={() => {
+              setActiveTab('home');
+              setPage({ type: 'root' });
+            }}
+            onHelp={() => { setProfileTransition('push'); setPage({ type: 'help-support', from: 'my-bookings' }); }}
+          />
+        </Animated.View>
+      ) : null}
+      {page.type === 'native-devices' ? (
+        <Animated.View entering={STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+          <NativeDevicesScreen onBack={() => setPage({ type: 'profile' })} />
+        </Animated.View>
+      ) : null}
+      {page.type === 'help-support' ? (
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+          <HelpSupportScreen
+            onBack={() => { setProfileTransition('pop'); setPage({ type: page.from === 'my-bookings' ? 'my-bookings' : 'profile' }); }}
+            onAccount={() => { setProfileTransition('push'); setPage({ type: 'help-account', from: page.from }); }}
+            onGettingStarted={() => { setProfileTransition('push'); setPage({ type: 'help-getting-started', from: page.from }); }}
+            onPaymentCredits={() => { setProfileTransition('push'); setPage({ type: 'help-payment-credits', from: page.from }); }}
+          />
+        </Animated.View>
+      ) : null}
+      {page.type === 'help-account' ? (
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+          <AccountHelpScreen
+            onBack={() => { setProfileTransition('pop'); setPage({ type: 'help-support', from: page.from }); }}
+            onChangeEmail={() => { setProfileTransition('push'); setPage({ type: 'help-email-article', from: page.from }); }}
+            onChangePhone={() => { setProfileTransition('push'); setPage({ type: 'help-phone-article', from: page.from }); }}
+            onPaymentDetails={() => { setProfileTransition('push'); setPage({ type: 'help-payment-article', from: page.from }); }}
+            onSavedAddresses={() => { setProfileTransition('push'); setPage({ type: 'help-address-article', from: page.from }); }}
+          />
+        </Animated.View>
+      ) : null}
+      {page.type === 'help-getting-started' ? (
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+          <GettingStartedHelpScreen
+            onBack={() => { setProfileTransition('pop'); setPage({ type: 'help-support', from: page.from }); }}
+            onTopic={(article) => { setProfileTransition('push'); setPage({ type: 'help-getting-started-article', article, from: page.from }); }}
+          />
+        </Animated.View>
+      ) : null}
+      {page.type === 'help-getting-started-article' ? (
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+          <GettingStartedArticleScreen
+            article={page.article}
+            onBack={() => { setProfileTransition('pop'); setPage({ type: 'help-getting-started', from: page.from }); }}
+          />
+        </Animated.View>
+      ) : null}
+      {page.type === 'help-payment-credits' ? (
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+          <PaymentCreditsHelpScreen
+            onBack={() => { setProfileTransition('pop'); setPage({ type: 'help-support', from: page.from }); }}
+            onTopic={(article) => { setProfileTransition('push'); setPage({ type: 'help-payment-credits-article', article, from: page.from }); }}
+          />
+        </Animated.View>
+      ) : null}
+      {page.type === 'help-payment-credits-article' ? (
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+          <PaymentCreditsArticleScreen
+            article={page.article}
+            onBack={() => { setProfileTransition('pop'); setPage({ type: 'help-payment-credits', from: page.from }); }}
+            onSavedPayments={() => { setProfileTransition('push'); setPage({ type: 'payment-methods', from: 'help-payment-credits-article', helpArticle: page.article, helpFrom: page.from }); }}
+            onWallet={() => { setProfileTransition('push'); setPage({ type: 'wallet', from: 'help-payment-credits-article', helpArticle: page.article, helpFrom: page.from }); }}
+          />
+        </Animated.View>
+      ) : null}
+      {page.type === 'help-phone-article' ? (
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+          <ChangePhoneHelpScreen
+            onBack={() => { setProfileTransition('pop'); setPage({ type: 'help-account', from: page.from }); }}
+            onChangePhone={() => { setProfileTransition('push'); setPage({ type: 'profile-details', from: 'help-phone-article' }); }}
+          />
+        </Animated.View>
+      ) : null}
+      {page.type === 'help-address-article' ? (
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+          <AccountArticleScreen
+            title="Where can I check my saved addresses?"
+            description="You can check your saved addresses using the following ways:"
+            buttonLabel="My addresses"
+            onBack={() => { setProfileTransition('pop'); setPage({ type: 'help-account', from: page.from }); }}
+            onAction={() => { setProfileTransition('push'); setPage({ type: 'manage-addresses', from: 'help-address-article' }); }}
+          >
+            <View style={{ paddingTop: 16, gap: 10 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start', paddingLeft: 12 }}>
+                <Text style={{ width: 28, fontSize: 15, lineHeight: 23, color: '#625D64' }}>1.</Text>
+                <Text style={{ flex: 1, fontSize: 15, lineHeight: 23, color: '#625D64' }}>While selecting the location on the app homescreen</Text>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start', paddingLeft: 12 }}>
+                <Text style={{ width: 28, fontSize: 15, lineHeight: 23, color: '#625D64' }}>2.</Text>
+                <Text style={{ flex: 1, fontSize: 15, lineHeight: 23, color: '#625D64' }}>Check address on the checkout screen before making payment</Text>
+              </View>
+              <Text style={{ paddingTop: 8, fontSize: 15, lineHeight: 23, color: '#625D64' }}>Alternatively, you can also use the link below to check all saved addresses.</Text>
+            </View>
+          </AccountArticleScreen>
+        </Animated.View>
+      ) : null}
+      {page.type === 'help-email-article' ? (
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+          <AccountArticleScreen
+            title="I want to change my email address"
+            description="You can change your email address from the profile section after verifying it with an OTP."
+            buttonLabel="Change email address"
+            onBack={() => { setProfileTransition('pop'); setPage({ type: 'help-account', from: page.from }); }}
+            onAction={() => { setProfileTransition('push'); setPage({ type: 'profile-details', from: 'help-email-article' }); }}
+          />
+        </Animated.View>
+      ) : null}
+      {page.type === 'help-payment-article' ? (
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+          <AccountArticleScreen
+            title="Where can I see my saved payment details?"
+            description="You can check all your saved payment details using the button below. To remove a saved payment method, open your saved payments and delete the card."
+            buttonLabel="Check saved payments"
+            onBack={() => { setProfileTransition('pop'); setPage({ type: 'help-account', from: page.from }); }}
+            onAction={() => { setProfileTransition('push'); setPage({ type: 'payment-methods', from: 'help-payment-article' }); }}
+          />
         </Animated.View>
       ) : null}
       {page.type === 'my-plans' ? (

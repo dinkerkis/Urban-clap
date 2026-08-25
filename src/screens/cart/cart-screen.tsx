@@ -145,7 +145,7 @@ export function CartScreen({
           minHeight: insets.top + 72,
           flexDirection: 'row',
           alignItems: 'center',
-          gap: 17,
+          gap: 9,
           backgroundColor: '#FFFFFF',
           borderBottomWidth: 1,
           borderBottomColor: '#E8E8E8',
@@ -157,7 +157,7 @@ export function CartScreen({
             accessibilityRole="button"
             hitSlop={12}
             onPress={onBack}
-            style={({ pressed }) => ({ width: 30, height: 36, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.55 : 1 })}
+            style={({ pressed }) => ({ width: 30, height: 36, alignItems: 'flex-start', justifyContent: 'center', opacity: pressed ? 0.55 : 1 })}
           >
             <BackIcon color="#171319" />
           </Pressable>

@@ -13,7 +13,7 @@ export function AuthHeader({ onPress }: Props) {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'flex-start',
-        paddingHorizontal: 12,
+        paddingHorizontal: 20,
         paddingTop: process.env.EXPO_OS === 'ios' ? 48 : 0,
       }}
     >
@@ -26,7 +26,7 @@ export function AuthHeader({ onPress }: Props) {
           minWidth: 44,
           minHeight: 44,
           paddingHorizontal: 4,
-          alignItems: 'center',
+          alignItems: 'flex-start',
           justifyContent: 'center',
           borderRadius: 22,
           borderCurve: 'continuous',
