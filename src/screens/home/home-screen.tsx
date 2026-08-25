@@ -19,26 +19,7 @@ function formatCategoryLabel(title: string) {
 }
 
 function LocationPinIcon() {
-  return (
-    <View style={{ width: 18, height: 22, alignItems: 'center' }}>
-      <View style={{ width: 14, height: 14, alignItems: 'center', justifyContent: 'center', borderRadius: 7, borderWidth: 1.8, borderColor: '#FFFFFF' }}>
-        <View style={{ width: 4.5, height: 4.5, borderRadius: 2.25, backgroundColor: '#FFFFFF' }} />
-      </View>
-      <View
-        style={{
-          width: 0,
-          height: 0,
-          marginTop: -2,
-          borderLeftWidth: 4,
-          borderRightWidth: 4,
-          borderTopWidth: 7,
-          borderLeftColor: 'transparent',
-          borderRightColor: 'transparent',
-          borderTopColor: '#FFFFFF',
-        }}
-      />
-    </View>
-  );
+  return <Image source={require('../../../assets/pin.png')} contentFit="contain" tintColor="#FFFFFF" style={{ width: 18, height: 18 }} />;
 }
 
 function ChevronDownIcon() {

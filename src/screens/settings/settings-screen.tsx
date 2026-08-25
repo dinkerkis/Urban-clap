@@ -24,7 +24,7 @@ type NotificationKey = (typeof NOTIFICATIONS)[number]['key'];
 function ScreenHeader({ onBack, title }: { onBack: () => void; title: string }) {
   const insets = useSafeAreaInsets();
   return (
-    <View style={{ paddingTop: Math.max(insets.top, 16) + 6, paddingHorizontal: 20, paddingBottom: 10, backgroundColor: '#FFFFFF' }}>
+    <View style={{ position: 'absolute', zIndex: 10, top: 0, right: 0, left: 0, paddingTop: Math.max(insets.top, 16) + 6, paddingHorizontal: 20, paddingBottom: 10, backgroundColor: 'rgba(255, 255, 255, 0.88)' }}>
       <View style={{ height: 44, flexDirection: 'row', alignItems: 'center' }}>
         <Pressable
           accessibilityRole="button"
@@ -101,13 +101,14 @@ function DownloadDataModal({ initialEmail, visible, onClose }: { initialEmail?: 
 
 export function SettingsScreen({ email, onBack, onDeleteAccount }: SettingsScreenProps) {
   const insets = useSafeAreaInsets();
+  const headerHeight = Math.max(insets.top, 16) + 60;
   const [downloadVisible, setDownloadVisible] = useState(false);
   const [notifications, setNotifications] = useState<Record<NotificationKey, boolean>>({ whatsapp: true, push: true, email: true, sms: true, calls: true });
 
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
       <ScreenHeader title="Settings" onBack={onBack} />
-      <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: Math.max(insets.bottom, 20) + 28 }}>
+      <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} style={{ backgroundColor: 'transparent' }} contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: Math.max(insets.bottom, 20) + 28 }}>
         <View style={{ paddingHorizontal: 20, paddingTop: 26 }}>
           <Text style={{ paddingBottom: 10, fontSize: 21, lineHeight: 27, fontWeight: '700', color: '#1D1820' }}>Notifications & reminders</Text>
           {NOTIFICATIONS.map((item) => (
@@ -124,7 +125,7 @@ export function SettingsScreen({ email, onBack, onDeleteAccount }: SettingsScree
                   trackColor={{ false: '#D5D1D7', true: '#08784D' }}
                   value={notifications[item.key]}
                   onValueChange={(value) => setNotifications((current) => ({ ...current, [item.key]: value }))}
-                  style={{ transform: [{ scaleX: 0.82 }, { scaleY: 0.82 }] }}
+                  style={{ transform: [{ scaleX: 0.69 }, { scaleY: 0.78 }] }}
                 />
               </View>
             </View>
@@ -157,6 +158,7 @@ export function SettingsScreen({ email, onBack, onDeleteAccount }: SettingsScree
 
 export function PrivacyCenterScreen({ onBack }: { onBack: () => void }) {
   const insets = useSafeAreaInsets();
+  const headerHeight = Math.max(insets.top, 16) + 60;
   const policies = [
     'You’ll no longer be able to access your saved professionals',
     'Your customer rating will be reset',
@@ -168,7 +170,7 @@ export function PrivacyCenterScreen({ onBack }: { onBack: () => void }) {
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
       <ScreenHeader title="Privacy Center" onBack={onBack} />
-      <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 28, paddingBottom: Math.max(insets.bottom, 20) + 28 }}>
+      <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingTop: headerHeight + 28, paddingBottom: Math.max(insets.bottom, 20) + 28 }}>
         <Text style={{ fontSize: 21, lineHeight: 27, fontWeight: '700', color: '#1D1820' }}>Account Deletion Policy</Text>
         <View style={{ paddingTop: 18, gap: 12 }}>
           {policies.map((policy) => (

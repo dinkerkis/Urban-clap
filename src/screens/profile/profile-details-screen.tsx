@@ -242,7 +242,20 @@ export function ProfileDetailsScreen({ email, name, phone, onBack, onVerified }:
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [anniversary, setAnniversary] = useState('');
   const [showVerification, setShowVerification] = useState(false);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [errors, setErrors] = useState<{ email?: boolean; name?: boolean; phone?: boolean }>({});
+  const countrySelectorWidth = country.id === 'SA' || country.id === 'AE' ? 100 : 90;
+
+  useEffect(() => {
+    const showEvent = process.env.EXPO_OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = process.env.EXPO_OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+    const showSubscription = Keyboard.addListener(showEvent, () => setKeyboardVisible(true));
+    const hideSubscription = Keyboard.addListener(hideEvent, () => setKeyboardVisible(false));
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
 
   const submit = () => {
     Keyboard.dismiss();
@@ -274,7 +287,8 @@ export function ProfileDetailsScreen({ email, name, phone, onBack, onVerified }:
         contentInsetAdjustmentBehavior="never"
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ minHeight: '100%', paddingTop: Math.max(insets.top, 18) + 8, paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 18) + 84, gap: 18 }}
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingTop: Math.max(insets.top, 18) + 8, paddingHorizontal: 20, paddingBottom: 20, gap: 18 }}
       >
         <View style={{ minHeight: 45, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <Pressable accessibilityRole="button" accessibilityLabel="Go back" onPress={onBack} hitSlop={10} style={({ pressed }) => ({ width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 17, borderWidth: 0.7, borderColor: '#E4E0E6', backgroundColor: 'transparent', opacity: pressed ? 0.65 : 1 })}>
@@ -292,10 +306,21 @@ export function ProfileDetailsScreen({ email, name, phone, onBack, onVerified }:
                 Keyboard.dismiss();
                 setIsTitlePickerOpen(true);
               }}
-              style={({ pressed }) => ({ width: 84, minHeight: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, borderWidth: 1, borderRightWidth: 0, borderColor: errors.name ? '#D53A4D' : '#E2DEE5', borderTopLeftRadius: 10, borderBottomLeftRadius: 10, opacity: pressed ? 0.65 : 1 })}
+              style={({ pressed }) => ({ width: 65, minHeight: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, borderWidth: 1, borderRightWidth: 0, borderColor: errors.name ? '#D53A4D' : '#E2DEE5', borderTopLeftRadius: 10, borderBottomLeftRadius: 10, opacity: pressed ? 0.65 : 1 })}
             >
-              <Text style={{ fontSize: 15, color: '#2B252E' }}>{TITLE_OPTIONS[titleIndex]}</Text>
-              <Text style={{ fontSize: 13, color: '#5D5660' }}>⌄</Text>
+              <Text style={{ fontSize: 14, fontWeight: '600', color: '#241F27' }}>{TITLE_OPTIONS[titleIndex]}</Text>
+              <View
+                accessibilityElementsHidden
+                importantForAccessibility="no"
+                style={{
+                  width: 7,
+                  height: 7,
+                  borderRightWidth: 1.7,
+                  borderBottomWidth: 1.7,
+                  borderColor: '#241F27',
+                  transform: [{ rotate: '45deg' }, { translateY: -2 }],
+                }}
+              />
             </Pressable>
             <TextInput value={fullName} onChangeText={setFullName} autoCapitalize="words" placeholder="Enter your name" placeholderTextColor="#A9A3AC" style={[inputStyle(Boolean(errors.name)), { flex: 1, borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }]} />
           </View>
@@ -328,7 +353,7 @@ export function ProfileDetailsScreen({ email, name, phone, onBack, onVerified }:
                 Keyboard.dismiss();
                 setIsCountryPickerOpen(true);
               }}
-              style={({ pressed }) => ({ height: '100%', minWidth: 108, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, opacity: pressed ? 0.62 : 1 })}
+              style={({ pressed }) => ({ height: '100%', width: countrySelectorWidth, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: pressed ? 0.62 : 1 })}
             >
               <Text style={{ fontSize: 17 }}>{country.flag}</Text>
               <Text selectable style={{ fontSize: 14, fontWeight: '600', color: '#241F27' }}>{country.callingCode}</Text>
@@ -345,7 +370,7 @@ export function ProfileDetailsScreen({ email, name, phone, onBack, onVerified }:
                 }}
               />
             </Pressable>
-            <View style={{ width: 1, height: '52%', backgroundColor: '#E2DEE5' }} />
+            <View style={{ width: 1, height: '100%', backgroundColor: '#E2DEE5' }} />
             <TextInput
               value={phoneNumber}
               onChangeText={(value) => {
@@ -374,7 +399,7 @@ export function ProfileDetailsScreen({ email, name, phone, onBack, onVerified }:
         </View>
       </ScrollView>
 
-      <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 20, paddingTop: 10, paddingBottom: Math.max(insets.bottom, 14), backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: '#F1EEF2' }}>
+      <View style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: keyboardVisible ? 6 : Math.max(insets.bottom, 14), backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: '#EDECEE', boxShadow: '0 -3px 10px rgba(23, 20, 25, 0.06)' }}>
         <Pressable accessibilityRole="button" onPress={submit} style={({ pressed }) => ({ minHeight: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 9, borderCurve: 'continuous', backgroundColor: '#5432DB', opacity: pressed ? 0.72 : 1 })}>
           <Text style={{ fontSize: 15, fontWeight: '700', color: '#FFFFFF' }}>Complete</Text>
         </Pressable>

@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
-import { useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, Keyboard, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, type Region } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -8,7 +8,10 @@ import { BackIcon } from '../../components/back-icon';
 import { EditIcon } from '../../components/edit-icon';
 import { useAddresses } from '../../hooks/use-addresses';
 import { fetchCurrentLocation, formatLocationDisplay, reverseGeocodeLocation } from '../../hooks/use-current-location';
+import { usePlaceSuggestions } from '../../hooks/use-place-suggestions';
 import { addAddress, buildAddressFromCurrentLocation, deleteAddress, formatAddressLabel, formatSavedAddress, updateAddress, type AddAddressPayload, type UserAddress } from '../../services/address-api';
+import { fetchPlaceDetails, type PlaceSuggestion } from '../../services/places-api';
+import { getRecentLocations, saveRecentLocation, type RecentLocation } from '../../services/recent-locations-storage';
 
 const PURPLE = '#6E45E2';
 const TEXT = '#1F1A22';
@@ -34,28 +37,23 @@ type Props = {
   onBack: () => void;
 };
 
-const samplePlaces: SelectedPlace[] = [
-  { title: 'Mohali walk', subtitle: 'Sector 62, Sahibzada Ajit Singh Nagar, Chandigarh, India', addressLine1: 'Sector 62', city: 'Sahibzada Ajit Singh Nagar', state: 'Punjab', country: 'India', pincode: '160062', latitude: 30.7033, longitude: 76.7176 },
-  { title: 'Chandigarh Airport Area', subtitle: 'Chandigarh, India', addressLine1: 'Chandigarh Airport Area', city: 'Chandigarh', state: 'Chandigarh', country: 'India', pincode: '160003', latitude: 30.6735, longitude: 76.7885 },
-];
-
 function CloseButton({ onPress }: { onPress: () => void }) {
   return <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={onPress} style={({ pressed }) => ({ position: 'absolute', right: 18, top: -42, zIndex: 5, width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: '#FFFFFF', opacity: pressed ? 0.65 : 1 })}><Text style={{ fontSize: 20, lineHeight: 22, fontWeight: '300', color: TEXT }}>×</Text></Pressable>;
 }
 
 function SearchIcon() {
-  return <View style={{ width: 15, height: 15, borderWidth: 1.7, borderColor: TEXT, borderRadius: 8 }}><View style={{ position: 'absolute', width: 7, height: 1.7, right: -5, bottom: -3, backgroundColor: TEXT, transform: [{ rotate: '45deg' }] }} /></View>;
+  return <Image source={require('../../../assets/search.png')} contentFit="contain" tintColor="#6B6572" style={{ width: 18, height: 18 }} />;
 }
 
 function TargetIcon() {
   return (
-    <View style={{ width: 22, height: 22, alignItems: 'center', justifyContent: 'center' }}>
-      <View style={{ width: 18, height: 18, borderRadius: 9, borderWidth: 1.7, borderColor: PURPLE }} />
-      <View style={{ position: 'absolute', width: 7, height: 7, borderRadius: 3.5, backgroundColor: PURPLE }} />
-      <View style={{ position: 'absolute', top: 0, width: 1.6, height: 4, backgroundColor: PURPLE }} />
-      <View style={{ position: 'absolute', bottom: 0, width: 1.6, height: 4, backgroundColor: PURPLE }} />
-      <View style={{ position: 'absolute', left: 0, width: 4, height: 1.6, backgroundColor: PURPLE }} />
-      <View style={{ position: 'absolute', right: 0, width: 4, height: 1.6, backgroundColor: PURPLE }} />
+    <View style={{ width: 20, height: 20, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ width: 16, height: 16, borderRadius: 8, borderWidth: 1.6, borderColor: PURPLE }} />
+      <View style={{ position: 'absolute', width: 6, height: 6, borderRadius: 3, backgroundColor: PURPLE }} />
+      <View style={{ position: 'absolute', top: 0, width: 1.5, height: 3.5, backgroundColor: PURPLE }} />
+      <View style={{ position: 'absolute', bottom: 0, width: 1.5, height: 3.5, backgroundColor: PURPLE }} />
+      <View style={{ position: 'absolute', left: 0, width: 3.5, height: 1.5, backgroundColor: PURPLE }} />
+      <View style={{ position: 'absolute', right: 0, width: 3.5, height: 1.5, backgroundColor: PURPLE }} />
     </View>
   );
 }
@@ -73,21 +71,66 @@ function GoogleMark() {
   );
 }
 
-export function LocationSearchSheet({ addresses, onClose, onSelect }: { addresses: ReturnType<typeof useAddresses>['addresses']; onClose: () => void; onSelect: (place: SelectedPlace) => void }) {
+export function LocationSearchSheet({ onClose, onSelect }: { addresses: ReturnType<typeof useAddresses>['addresses']; onClose: () => void; onSelect: (place: SelectedPlace) => Promise<void> | void }) {
   const insets = useSafeAreaInsets();
   const [query, setQuery] = useState('');
   const [locating, setLocating] = useState(false);
-  const places = useMemo(() => {
-    const saved: SelectedPlace[] = addresses.map((address) => ({
-      title: formatAddressLabel(address.label), subtitle: formatSavedAddress(address), addressLine1: address.addressLine1, addressLine2: address.addressLine2,
-      city: address.city, state: address.state, country: address.country, pincode: address.pincode, houseNo: address.houseNo, landmark: address.landmark,
-      contactName: address.contactName, contactPhone: address.contactPhone, addressType: address.addressType, instructions: address.instructions, label: address.label?.toLowerCase() as AddAddressPayload['label'],
-      latitude: address.location?.coordinates?.[1] ?? 30.7033, longitude: address.location?.coordinates?.[0] ?? 76.7176,
-    }));
-    const all = saved.length ? saved : samplePlaces;
-    const key = query.trim().toLowerCase();
-    return key ? all.filter((item) => `${item.title} ${item.subtitle}`.toLowerCase().includes(key)) : all;
-  }, [addresses, query]);
+  const [selectingPlace, setSelectingPlace] = useState(false);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [recentLocations, setRecentLocations] = useState<RecentLocation[]>([]);
+  const [showAllRecents, setShowAllRecents] = useState(false);
+  const { consumeSessionToken, errorMessage: searchError, isSearching, suggestions } = usePlaceSuggestions(query);
+
+  useEffect(() => {
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+    const showSubscription = Keyboard.addListener(showEvent, () => setKeyboardVisible(true));
+    const hideSubscription = Keyboard.addListener(hideEvent, () => setKeyboardVisible(false));
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    void getRecentLocations().then((stored) => {
+      if (active) setRecentLocations(stored);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const isSearchActive = query.trim().length >= 2;
+  const displayedRecents = showAllRecents ? recentLocations : recentLocations.slice(0, 2);
+
+  const selectSuggestion = async (suggestion: PlaceSuggestion) => {
+    if (selectingPlace) return;
+    setSelectingPlace(true);
+    try {
+      const place = await fetchPlaceDetails(suggestion.placeId, consumeSessionToken());
+      setRecentLocations((current) => saveRecentLocation({ placeId: suggestion.placeId, title: place.title, subtitle: place.subtitle }, current));
+      await onSelect(place);
+    } catch (error) {
+      Alert.alert('Could not select location', error instanceof Error ? error.message : 'Please try again.');
+    } finally {
+      setSelectingPlace(false);
+    }
+  };
+
+  const selectRecent = async (location: RecentLocation) => {
+    if (selectingPlace) return;
+    setSelectingPlace(true);
+    try {
+      await onSelect(await fetchPlaceDetails(location.placeId));
+    } catch (error) {
+      Alert.alert('Could not select location', error instanceof Error ? error.message : 'Please try again.');
+    } finally {
+      setSelectingPlace(false);
+    }
+  };
 
   const currentLocation = async () => {
     setLocating(true);
@@ -105,10 +148,10 @@ export function LocationSearchSheet({ addresses, onClose, onSelect }: { addresse
     <Pressable onPress={onClose} style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.72)' }} />
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'height' : undefined} style={{ flex: 1, justifyContent: 'flex-end' }}>
       <View style={{ height: '82%', paddingTop: 24, paddingHorizontal: 18, paddingBottom: 0, borderTopLeftRadius: 16, borderTopRightRadius: 16, borderBottomLeftRadius: 0, borderBottomRightRadius: 0, backgroundColor: '#FFFFFF' }}>
-        <View pointerEvents="none" style={{ position: 'absolute', right: 0, bottom: -36, left: 0, height: 36, backgroundColor: '#FFFFFF' }} />
+        <View pointerEvents="none" style={{ position: 'absolute', right: 0, bottom: -28, left: 0, height: 28, backgroundColor: '#FFFFFF' }} />
         <CloseButton onPress={onClose} />
-        <View style={{ height: 48, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 15, borderWidth: 1, borderColor: PURPLE, borderRadius: 8 }}>
-          <SearchIcon /><TextInput value={query} onChangeText={setQuery} placeholder="Search for your location/society/apartment" placeholderTextColor="#AAA4AC" style={{ flex: 1, height: 46, marginLeft: 13, fontSize: 14, color: TEXT }} />
+        <View style={{ height: 48, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 15, borderWidth: 1, borderColor: '#DDD9DE', borderRadius: 8 }}>
+          <SearchIcon /><TextInput value={query} onChangeText={setQuery} placeholder="Search for your location/society/apartment" placeholderTextColor="#AAA4AC" style={{ flex: 1, height: 46, marginLeft: 13, fontSize: 15, color: TEXT }} />
         </View>
         <Pressable
           accessibilityRole="button"
@@ -130,21 +173,52 @@ export function LocationSearchSheet({ addresses, onClose, onSelect }: { addresse
           ) : <TargetIcon />}
           <Text style={{ fontSize: 15, fontWeight: '600', color: PURPLE }}>Use current location</Text>
         </Pressable>
-        <View style={{ height: 1, backgroundColor: '#F1EEF2' }} />
-        <ScrollView keyboardDismissMode="interactive" keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 12 }}>
-          <Text style={{ marginTop: 23, marginBottom: 8, fontSize: 16, lineHeight: 22, fontWeight: '700', color: TEXT }}>{query ? 'Results' : 'Recents'}</Text>
-          {places.map((place, index) => <Pressable key={`${place.title}-${index}`} onPress={() => onSelect(place)} style={({ pressed }) => ({ minHeight: 76, flexDirection: 'row', paddingVertical: 13, opacity: pressed ? 0.55 : 1, borderBottomWidth: 1, borderBottomColor: '#F1EEF2' })}>
-            <View style={{ width: 28, paddingTop: 3 }}>
-              <Image source={require('../../../assets/recent.png')} contentFit="contain" tintColor="#58515B" style={{ width: 17, height: 17 }} />
-            </View>
-            <View style={{ flex: 1 }}><Text style={{ fontSize: 15, lineHeight: 21, fontWeight: '600', color: TEXT }}>{place.title}</Text><Text style={{ marginTop: 3, fontSize: 13, lineHeight: 19, color: MUTED }}>{place.subtitle}</Text></View>
-          </Pressable>)}
+        <View style={{ height: 8, marginHorizontal: -18, backgroundColor: '#F6F5F7' }} />
+        <ScrollView keyboardDismissMode="interactive" keyboardShouldPersistTaps="handled" style={{ flex: 1, marginHorizontal: -18 }} contentContainerStyle={{ paddingHorizontal: 18, paddingBottom: 12 }}>
+          {!isSearchActive ? <Text style={{ marginTop: 23, marginBottom: 8, fontSize: 16, lineHeight: 22, fontWeight: '700', color: TEXT }}>Recents</Text> : null}
+          {isSearchActive ? (
+            isSearching && suggestions.length === 0 ? (
+              <View style={{ minHeight: 72, alignItems: 'center', justifyContent: 'center' }}><ActivityIndicator color={PURPLE} /></View>
+            ) : searchError ? (
+              <Text style={{ paddingVertical: 16, fontSize: 13, color: MUTED }}>{searchError}</Text>
+            ) : suggestions.length === 0 ? (
+              <Text style={{ paddingVertical: 16, fontSize: 13, color: MUTED }}>No locations found.</Text>
+            ) : suggestions.map((suggestion) => (
+              <Pressable key={suggestion.placeId} disabled={selectingPlace} onPress={() => void selectSuggestion(suggestion)} style={({ pressed }) => ({ minHeight: 76, flexDirection: 'row', paddingVertical: 13, opacity: pressed || selectingPlace ? 0.55 : 1, borderBottomWidth: 1, borderBottomColor: '#F1EEF2' })}>
+                <View style={{ width: 28, paddingTop: 3 }}>
+                  <Image source={require('../../../assets/location.png')} contentFit="contain" tintColor="#58515B" style={{ width: 17, height: 17 }} />
+                </View>
+                <View style={{ flex: 1 }}><Text style={{ fontSize: 15, lineHeight: 21, fontWeight: '600', color: TEXT }}>{suggestion.title}</Text><Text style={{ marginTop: 3, fontSize: 13, lineHeight: 19, color: MUTED }}>{suggestion.subtitle}</Text></View>
+              </Pressable>
+            ))
+          ) : recentLocations.length === 0 ? (
+            <Text style={{ paddingVertical: 16, fontSize: 13, color: MUTED }}>No recent locations yet.</Text>
+          ) : (
+            <>
+              {displayedRecents.map((place, index) => (
+                <Pressable key={place.placeId} disabled={selectingPlace} onPress={() => void selectRecent(place)} style={({ pressed }) => ({ minHeight: 76, flexDirection: 'row', paddingVertical: 13, opacity: pressed || selectingPlace ? 0.55 : 1, borderBottomWidth: index < displayedRecents.length - 1 ? 1 : 0, borderBottomColor: '#F1EEF2' })}>
+                  <View style={{ width: 28, paddingTop: 3 }}>
+                    <Image source={require('../../../assets/recent.png')} contentFit="contain" tintColor="#58515B" style={{ width: 17, height: 17 }} />
+                  </View>
+                  <View style={{ flex: 1 }}><Text style={{ fontSize: 15, lineHeight: 21, fontWeight: '600', color: TEXT }}>{place.title}</Text><Text style={{ marginTop: 3, fontSize: 13, lineHeight: 19, color: MUTED }}>{place.subtitle}</Text></View>
+                </Pressable>
+              ))}
+              {!showAllRecents && recentLocations.length > 2 ? (
+                <>
+                  <Pressable accessibilityRole="button" onPress={() => setShowAllRecents(true)} style={({ pressed }) => ({ alignSelf: 'flex-start', paddingTop: 4, paddingBottom: 12, opacity: pressed ? 0.55 : 1 })}>
+                    <Text style={{ fontSize: 15, fontWeight: '600', color: PURPLE }}>View more</Text>
+                  </Pressable>
+                  <View style={{ height: 8, marginHorizontal: -18, alignSelf: 'stretch', backgroundColor: '#F6F5F7' }} />
+                </>
+              ) : null}
+            </>
+          )}
         </ScrollView>
         <View
           style={{
             marginHorizontal: -18,
-            paddingTop: 10,
-            paddingBottom: Math.max(insets.bottom, 12),
+            paddingTop: keyboardVisible ? 12 : 10,
+            paddingBottom: keyboardVisible ? 9 : Math.max(insets.bottom, 12),
             alignItems: 'center',
             flexDirection: 'row',
             justifyContent: 'center',
@@ -213,12 +287,25 @@ export function ContactDetailsModal({ initialName, initialPhone, onClose, onSave
   const insets = useSafeAreaInsets();
   const [contactName, setContactName] = useState(initialName);
   const [contactPhone, setContactPhone] = useState(initialPhone.replace(/^\+91\s*/, '').replace(/\D/g, '').slice(-10));
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const isValid = contactName.trim().length > 1 && contactPhone.length === 10;
 
+  useEffect(() => {
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+    const showSubscription = Keyboard.addListener(showEvent, () => setKeyboardVisible(true));
+    const hideSubscription = Keyboard.addListener(hideEvent, () => setKeyboardVisible(false));
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
+
   return <Modal animationType="fade" transparent onRequestClose={onClose} visible>
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1, justifyContent: 'flex-end' }}>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'height' : undefined} style={{ flex: 1, justifyContent: 'flex-end' }}>
       <Pressable onPress={onClose} style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.72)' }} />
-      <View style={{ paddingHorizontal: 18, paddingTop: 24, paddingBottom: Math.max(insets.bottom, 14) + 12, borderTopLeftRadius: 16, borderTopRightRadius: 16, backgroundColor: '#FFFFFF' }}>
+      <View style={{ paddingHorizontal: 18, paddingTop: 24, paddingBottom: keyboardVisible ? 14 : Math.max(insets.bottom, 14) + 12, borderTopLeftRadius: 16, borderTopRightRadius: 16, backgroundColor: '#FFFFFF' }}>
+        <View pointerEvents="none" style={{ position: 'absolute', right: 0, bottom: -36, left: 0, height: 36, backgroundColor: '#FFFFFF' }} />
         <CloseButton onPress={onClose} />
         <Text style={{ fontSize: 20, lineHeight: 27, fontWeight: '700', color: TEXT }}>Where should we send this booking&apos;s updates?</Text>
         <View style={{ height: 50, marginTop: 22, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: BORDER, borderRadius: 8 }}>

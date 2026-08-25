@@ -8,6 +8,10 @@ module.exports = {
   ...appJson,
   expo: {
     ...appJson.expo,
+    extra: {
+      ...appJson.expo.extra,
+      googleMapsApiKey,
+    },
     plugins: [
       ...appJson.expo.plugins,
       [

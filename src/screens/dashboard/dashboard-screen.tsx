@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import { Alert, View } from 'react-native';
 import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Animated, { Easing, SlideInRight, SlideOutRight } from 'react-native-reanimated';
+import Animated, { Easing, FadeIn, FadeOut, SlideInRight, SlideOutRight } from 'react-native-reanimated';
 
 import { BottomTabBar, type DashboardTab } from '../../components/bottom-tab-bar';
 import { CategorySubcategoriesSheet, isFullPageCategory } from '../../components/category-subcategories-sheet';
+import { LoadingDots } from '../../components/loading-dots';
 import type { ServiceCategory, ServiceItem, ServiceSubcategory } from '../../data/service-catalog';
 import { useCart } from '../../hooks/use-cart';
 import { useServiceCategories } from '../../hooks/use-service-categories';
@@ -76,6 +77,7 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
   const [page, setPage] = useState<DashboardPage>({ type: 'root' });
   const [sheetCategory, setSheetCategory] = useState<ServiceCategory | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<{ subtitle: string; title: string } | null>(null);
+  const [isConsultationLoading, setIsConsultationLoading] = useState(false);
   const productNavigationPendingRef = useRef(false);
   const cartState = useCart(authToken);
   const { categories, errorMessage: categoriesError, isLoading: categoriesLoading, retry: retryCategories } = useServiceCategories();
@@ -209,6 +211,7 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
         onRemove={removeFromCart}
         onViewCart={() => setPage({ type: 'checkout-cart', categoryTitle: 'Selected services' })}
         onBack={() => changeTab('cart')}
+        onLoadingChange={setIsConsultationLoading}
         totalCartItems={cartState.totalItems}
       />
     );
@@ -240,6 +243,7 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
           categoryTitle: page.category.title,
         })}
         onBack={() => setPage({ type: 'services', category: page.category, subcategory: page.subcategory })}
+        onLoadingChange={setIsConsultationLoading}
         totalCartItems={cartState.totalItems}
       />
     );
@@ -399,6 +403,7 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
   );
 
   return (
+    <View style={{ flex: 1 }}>
     <NavigationContainer ref={categoryNavigationRef}>
       <CategoryStack.Navigator screenOptions={{ animation: 'slide_from_right', headerShown: false }}>
         <CategoryStack.Screen name="DashboardRoot">{() => dashboardRoot}</CategoryStack.Screen>
@@ -470,6 +475,7 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
                 });
               }}
               onBack={navigation.goBack}
+              onLoadingChange={setIsConsultationLoading}
               totalCartItems={cartState.totalItems}
             />
           )}
@@ -517,5 +523,17 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
         </CategoryStack.Screen>
       </CategoryStack.Navigator>
     </NavigationContainer>
+    {isConsultationLoading ? (
+      <Animated.View
+        entering={FadeIn.duration(140)}
+        exiting={FadeOut.duration(120)}
+        accessibilityLabel="Adding consultation to cart"
+        accessibilityRole="progressbar"
+        style={{ position: 'absolute', inset: 0, zIndex: 100, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255, 255, 255, 0.72)' }}
+      >
+        <LoadingDots />
+      </Animated.View>
+    ) : null}
+    </View>
   );
 }

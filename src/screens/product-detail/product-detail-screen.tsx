@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, PanResponder, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { PanResponder, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import Animated, {
   Easing,
   FadeIn,
@@ -26,6 +26,7 @@ type ProductDetailScreenProps = {
   item: ServiceItem;
   onAdd: (item: ServiceItem) => Promise<void> | void;
   onBack: () => void;
+  onLoadingChange?: (isLoading: boolean) => void;
   onRemove: (item: ServiceItem) => void;
   onViewCart: () => void;
   subcategoryTitle: string;
@@ -37,7 +38,7 @@ const BACKDROP_OUT = FadeOut.duration(200);
 const SHEET_IN = SlideInDown.duration(380).easing(Easing.out(Easing.cubic));
 const SHEET_OUT = SlideOutDown.duration(300).easing(Easing.in(Easing.cubic));
 
-export function ProductDetailScreen({ item, onAdd, onBack }: ProductDetailScreenProps) {
+export function ProductDetailScreen({ item, onAdd, onBack, onLoadingChange }: ProductDetailScreenProps) {
   const insets = useSafeAreaInsets();
   const { height: windowHeight, width } = useWindowDimensions();
   const dragY = useSharedValue(0);
@@ -106,9 +107,12 @@ export function ProductDetailScreen({ item, onAdd, onBack }: ProductDetailScreen
   const handleConsultation = async () => {
     if (!canContinue || isAddingToCart) return;
     setIsAddingToCart(true);
+    onLoadingChange?.(true);
+    onBack();
     try {
       await onAdd(selectedItem);
     } finally {
+      onLoadingChange?.(false);
       setIsAddingToCart(false);
     }
   };
@@ -257,9 +261,9 @@ export function ProductDetailScreen({ item, onAdd, onBack }: ProductDetailScreen
               disabled={!canContinue || isAddingToCart}
               accessibilityRole="button"
               onPress={handleConsultation}
-              style={({ pressed }) => ({ height: 55, alignItems: 'center', justifyContent: 'center', borderRadius: 10, borderCurve: 'continuous', backgroundColor: canContinue ? '#6E45E2' : '#EEEEEE', opacity: pressed || isAddingToCart ? 0.78 : 1 })}
+              style={({ pressed }) => ({ height: 55, alignItems: 'center', justifyContent: 'center', borderRadius: 10, borderCurve: 'continuous', backgroundColor: canContinue ? '#6E45E2' : '#EEEEEE', opacity: pressed ? 0.78 : 1 })}
             >
-              {isAddingToCart ? <ActivityIndicator color="#FFFFFF" /> : <Text style={{ fontSize: 16, fontWeight: '600', color: canContinue ? '#FFFFFF' : '#B7B5B8' }}>Book Consultation at ₹49</Text>}
+              <Text style={{ fontSize: 16, fontWeight: '600', color: canContinue ? '#FFFFFF' : '#B7B5B8' }}>Book Consultation at ₹49</Text>
             </Pressable>
           </View>
         </View>
