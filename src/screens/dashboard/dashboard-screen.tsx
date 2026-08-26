@@ -19,6 +19,7 @@ import { HomeScreen } from '../home';
 import { LocationPickerScreen } from '../location-picker';
 import { ManageAddressesScreen } from '../manage-addresses';
 import { NativeScreen } from '../native';
+import type { NativeCartSelection } from '../native/native-product-detail-modal';
 import { PaymentMethodsScreen } from '../payment-methods';
 import { ProfileDetailsScreen, ProfileEntryScreen, type CompletedProfile } from '../profile';
 import { ProductDetailScreen } from '../product-detail';
@@ -102,9 +103,9 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
     void cartState.refresh().catch(() => undefined);
   }, [authToken, cartState.refresh, isCartScreenVisible]);
 
-  const tryAddToCart = async (item: ServiceItem) => {
+  const tryAddToCart = async (item: ServiceItem, quantity = 1) => {
     try {
-      await cartState.add(item);
+      await cartState.add(item, quantity);
       return true;
     } catch (error) {
       Alert.alert('Could not add to cart', error instanceof Error ? error.message : 'Please try again.');
@@ -114,6 +115,13 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
 
   const addToCart = async (item: ServiceItem) => {
     await tryAddToCart(item);
+  };
+
+  const addNativeSelectionsToCart = async (selections: NativeCartSelection[]) => {
+    for (const selection of selections) {
+      if (!(await tryAddToCart(selection.item, selection.quantity))) return false;
+    }
+    return true;
   };
 
   const removeFromCart = async (item: ServiceItem) => {
@@ -285,7 +293,7 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
   } else if (activeTab === 'rewards') {
     content = <RewardsScreen />;
   } else if (activeTab === 'native') {
-    content = <NativeScreen />;
+    content = <NativeScreen cart={cartState.quantities} onAddToCart={addNativeSelectionsToCart} onViewCart={() => changeTab('cart')} />;
   } else if (activeTab === 'categories') {
     content = (
       <CategoriesScreen

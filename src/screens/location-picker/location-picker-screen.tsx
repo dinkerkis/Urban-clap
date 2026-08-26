@@ -1,9 +1,10 @@
 import { Image } from 'expo-image';
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BackIcon } from '../../components/back-icon';
+import { LoadingDots } from '../../components/loading-dots';
 import { useAddresses } from '../../hooks/use-addresses';
 import { usePlaceSuggestions } from '../../hooks/use-place-suggestions';
 import { formatAddressLabel, formatSavedAddress, setDefaultAddress, type UserAddress } from '../../services/address-api';
@@ -177,7 +178,7 @@ export function LocationPickerScreen({ authToken, onBack, onSelectAddress, onUse
           <>
             {isSearching && suggestions.length === 0 ? (
               <View style={{ minHeight: 88, alignItems: 'center', justifyContent: 'center' }}>
-                <ActivityIndicator color="#6E45E2" />
+                <LoadingDots />
               </View>
             ) : searchError ? (
               <Text selectable style={{ paddingHorizontal: 20, paddingVertical: 18, fontSize: 13, color: '#77717D' }}>{searchError}</Text>
@@ -210,7 +211,7 @@ export function LocationPickerScreen({ authToken, onBack, onSelectAddress, onUse
             <Text style={{ paddingHorizontal: 20, paddingTop: 22, paddingBottom: 8, fontSize: 16, fontWeight: '700', color: '#171419' }}>Saved</Text>
             {isLoading ? (
               <View style={{ minHeight: 120, alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                <ActivityIndicator color="#6E45E2" />
+                <LoadingDots />
                 <Text style={{ fontSize: 13, color: '#625D64' }}>Loading addresses...</Text>
               </View>
             ) : errorMessage ? (

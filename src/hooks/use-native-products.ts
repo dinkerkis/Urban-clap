@@ -2,18 +2,25 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { fetchNativeProducts, type NativeProductsData } from '../services/native-products-api';
 
+let cachedNativeProducts: NativeProductsData | null = null;
+
 export function useNativeProducts() {
   const [requestKey, setRequestKey] = useState(0);
-  const [data, setData] = useState<NativeProductsData>({ categories: [], categorySections: [] });
+  const [data, setData] = useState<NativeProductsData>(() => cachedNativeProducts ?? { categories: [], categorySections: [] });
   const [errorMessage, setErrorMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() => cachedNativeProducts == null);
 
   useEffect(() => {
+    if (requestKey === 0 && cachedNativeProducts) {
+      setData(cachedNativeProducts);
+      setIsLoading(false);
+      return;
+    }
     const controller = new AbortController();
     setErrorMessage('');
     setIsLoading(true);
     void fetchNativeProducts(controller.signal)
-      .then((result) => { setData(result); setIsLoading(false); })
+      .then((result) => { cachedNativeProducts = result; setData(result); setIsLoading(false); })
       .catch((error: unknown) => {
         if (controller.signal.aborted) return;
         setErrorMessage(error instanceof Error ? error.message : 'Unable to load Native products. Please try again.');

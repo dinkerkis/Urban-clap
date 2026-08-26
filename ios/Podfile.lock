@@ -82,6 +82,8 @@ PODS:
     - ExpoModulesCore
   - ExpoSplashScreen (57.0.2):
     - ExpoModulesCore
+  - ExpoVideo (57.0.2):
+    - ExpoModulesCore
   - FBLazyVector (0.86.0)
   - hermes-engine (250829098.0.14):
     - hermes-engine/Pre-built (= 250829098.0.14)
@@ -2285,6 +2287,7 @@ DEPENDENCIES:
   - ExpoModulesWorklets (from `../node_modules/expo-modules-core`)
   - ExpoSecureStore (from `../node_modules/expo-secure-store/ios`)
   - ExpoSplashScreen (from `../node_modules/expo-splash-screen/ios`)
+  - ExpoVideo (from `../node_modules/expo-video/ios`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - RCTDeprecation (from `../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation`)
@@ -2408,6 +2411,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-secure-store/ios"
   ExpoSplashScreen:
     :path: "../node_modules/expo-splash-screen/ios"
+  ExpoVideo:
+    :path: "../node_modules/expo-video/ios"
   FBLazyVector:
     :path: "../node_modules/react-native/Libraries/FBLazyVector"
   hermes-engine:
@@ -2586,6 +2591,7 @@ SPEC CHECKSUMS:
   ExpoModulesWorklets: e539f9940e89dd7abfc37dbb1d964d1110658589
   ExpoSecureStore: 8e3efc4a558e43fbbd80b61b0106b8521a409545
   ExpoSplashScreen: 30410cb4714241e37bedee927e572335f591042f
+  ExpoVideo: 5e8b2e059c9db48c4c639f7e84d07647b59ffca0
   FBLazyVector: b3e7ad108f0d882e30445c5527d774e3fd432f3d
   hermes-engine: f87aa5b3242aea788fa64896b756c466d8bc763e
   libavif: 5f8e715bea24debec477006f21ef9e95432e254d

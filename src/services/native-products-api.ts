@@ -24,6 +24,43 @@ export type NativeProduct = {
   rating?: { average?: number; count?: number };
 };
 
+export type NativeProductRating = { average?: number; count?: number };
+
+export type NativeProductOption = {
+  image?: string;
+  key?: string;
+  label: string;
+  price: number;
+  rating?: NativeProductRating;
+};
+
+export type NativeProductMediaItem = {
+  sort_order: number;
+  type: 'image' | 'video';
+  url: string;
+};
+
+export type NativeProductSliderItem = {
+  slider_images: string[];
+  slider_title?: string;
+  sort_order: number;
+  type: 'slider';
+};
+
+export type NativeProductDetailMedia = NativeProductMediaItem | NativeProductSliderItem;
+
+export type NativeProductDetail = NativeProduct & {
+  banner_gallery: NativeProductMediaItem[];
+  exchange_steps: unknown[];
+  options: NativeProductOption[];
+  product_details: NativeProductDetailMedia[];
+  product_specification?: {
+    full_desc_content?: { image: string; sort_order: number }[];
+    short_desc_image?: string;
+  };
+  slug?: string;
+};
+
 export type NativeProductCategory = {
   _id: string;
   category_image?: string;
@@ -89,6 +126,22 @@ export async function fetchNativeProducts(signal?: AbortSignal): Promise<NativeP
     categories,
     categorySections,
     newlyLaunched: data.newly_launched && Array.isArray(data.newly_launched.products) ? data.newly_launched : undefined,
+  };
+}
+
+export async function fetchNativeProductDetail(productId: string, signal?: AbortSignal): Promise<NativeProductDetail> {
+  const response = await apiRequest<ApiResponse<NativeProductDetail>>(`/native-products/${encodeURIComponent(productId)}/mobile`, {
+    defaultErrorMessage: 'Unable to load this Native product. Please try again.',
+    logScope: 'Native Product Detail API',
+    signal,
+  });
+  const data = requireApiData(response);
+  return {
+    ...data,
+    banner_gallery: Array.isArray(data.banner_gallery) ? [...data.banner_gallery].sort((left, right) => left.sort_order - right.sort_order) : [],
+    exchange_steps: Array.isArray(data.exchange_steps) ? data.exchange_steps : [],
+    options: Array.isArray(data.options) ? data.options : [],
+    product_details: Array.isArray(data.product_details) ? [...data.product_details].sort((left, right) => left.sort_order - right.sort_order) : [],
   };
 }
 

@@ -1,7 +1,8 @@
 import { Image } from 'expo-image';
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 
 import { DashboardScreenHeader } from '../../components/dashboard-screen-header';
+import { LoadingDots } from '../../components/loading-dots';
 import type { ServiceCategory } from '../../data/service-catalog';
 
 type CategoriesScreenProps = {
@@ -23,7 +24,7 @@ export function CategoriesScreen({ categories, errorMessage, isLoading, onCatego
       >
         {isLoading ? (
           <View style={{ minHeight: 260, alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-            <ActivityIndicator color="#6E45E2" />
+            <LoadingDots />
             <Text style={{ fontSize: 12, color: '#77717D' }}>Loading categories...</Text>
           </View>
         ) : errorMessage ? (

@@ -101,13 +101,13 @@ export function useCart(authToken?: string) {
     else setState(emptyState);
   }, [authToken, refresh]);
 
-  const add = useCallback(async (item: ServiceItem) => {
+  const add = useCallback(async (item: ServiceItem, quantity = 1) => {
     const productId = item.productId || item.id.split('::')[0];
     const data = await addCartItem(
       {
         product_id: productId,
         variant_key: item.variantKey,
-        quantity: 1,
+        quantity,
       },
       authToken,
     );

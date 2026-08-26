@@ -11,7 +11,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-export function LoadingDots() {
+export function LoadingDots({ color = '#6E45E2', gap = 9, size = 7 }: { color?: string; gap?: number; size?: number }) {
   const d1 = useSharedValue(0.25);
   const d2 = useSharedValue(0.25);
   const d3 = useSharedValue(0.25);
@@ -41,10 +41,10 @@ export function LoadingDots() {
   const s3 = useAnimatedStyle(() => ({ opacity: d3.value, transform: [{ scale: 0.82 + d3.value * 0.18 }] }));
 
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 9 }}>
-      <Animated.View style={[{ width: 7, height: 7, borderRadius: 3.5, backgroundColor: '#6E45E2' }, s1]} />
-      <Animated.View style={[{ width: 7, height: 7, borderRadius: 3.5, backgroundColor: '#6E45E2' }, s2]} />
-      <Animated.View style={[{ width: 7, height: 7, borderRadius: 3.5, backgroundColor: '#6E45E2' }, s3]} />
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap }}>
+      <Animated.View style={[{ width: size, height: size, borderRadius: size / 2, backgroundColor: color }, s1]} />
+      <Animated.View style={[{ width: size, height: size, borderRadius: size / 2, backgroundColor: color }, s2]} />
+      <Animated.View style={[{ width: size, height: size, borderRadius: size / 2, backgroundColor: color }, s3]} />
     </View>
   );
 }

@@ -1,9 +1,10 @@
 import { Image } from 'expo-image';
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, useWindowDimensions, View } from 'react-native';
+import { Pressable, ScrollView, Text, TextInput, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { DEFAULT_OFFER_HEADER_COLOR, OfferCarousel } from '../../components/offer-carousel';
+import { LoadingDots } from '../../components/loading-dots';
 import type { ServiceCategory } from '../../data/service-catalog';
 import { useCurrentLocation } from '../../hooks/use-current-location';
 
@@ -152,7 +153,7 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
             <View style={{ flex: 1, gap: 2 }}>
               <Text style={{ fontSize: 14, lineHeight: 19, fontWeight: '700', color: 'rgba(255, 255, 255, 0.90)' }}>{locationHeading}</Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                {!locationSubtitle && currentLocation.status === 'loading' && <ActivityIndicator size="small" color="#FFFFFF" />}
+                {!locationSubtitle && currentLocation.status === 'loading' && <LoadingDots color="#FFFFFF" gap={5} size={5} />}
                 <Text selectable numberOfLines={1} ellipsizeMode="tail" style={{ flexShrink: 1, fontSize: 12, lineHeight: 17, fontWeight: '500', color: 'rgba(255, 255, 255, 0.90)' }}>
                   {locationLine}
                 </Text>
@@ -205,7 +206,7 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
           ) : null}
           {isLoading ? (
             <View style={{ minHeight: 150, alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-              <ActivityIndicator color="#6E45E2" />
+              <LoadingDots />
               <Text style={{ fontSize: 12, color: '#77717D' }}>Loading categories...</Text>
             </View>
           ) : errorMessage ? (

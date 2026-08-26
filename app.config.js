@@ -14,6 +14,7 @@ module.exports = {
     },
     plugins: [
       ...appJson.expo.plugins,
+      'expo-video',
       [
         'react-native-maps',
         {

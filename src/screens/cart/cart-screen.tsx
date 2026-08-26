@@ -1,10 +1,11 @@
 import { useState, type ReactNode } from 'react';
 import { Image } from 'expo-image';
-import { ActivityIndicator, Alert, Modal, Pressable, ScrollView, Text, View } from 'react-native';
+import { Alert, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BackIcon } from '../../components/back-icon';
 import { EditIcon } from '../../components/edit-icon';
+import { LoadingDots } from '../../components/loading-dots';
 import type { ServiceItem } from '../../data/service-catalog';
 import { useAddresses } from '../../hooks/use-addresses';
 import { formatAddressLabel, formatSavedAddress, setDefaultAddress, type UserAddress } from '../../services/address-api';
@@ -172,7 +173,7 @@ export function CartScreen({
       >
         {isLoading ? (
           <View style={{ flex: 1, minHeight: 430, alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-            <ActivityIndicator color="#6E45E2" />
+            <LoadingDots />
             <Text selectable style={{ fontSize: 13, color: '#77717D' }}>Loading your cart...</Text>
           </View>
         ) : errorMessage && cartItems.length === 0 ? (
@@ -371,7 +372,7 @@ export function CartScreen({
               onPress={() => void openAddressAndSlot()}
               style={({ pressed }) => ({ height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: pressed ? '#5D35CE' : '#6E45E2' })}
             >
-              {addressState.isLoading ? <ActivityIndicator color="#FFFFFF" /> : <Text style={{ fontSize: 15, fontWeight: '600', color: '#FFFFFF' }}>Add address and slot</Text>}
+              {addressState.isLoading ? <LoadingDots color="#FFFFFF" gap={6} size={5} /> : <Text style={{ fontSize: 15, fontWeight: '600', color: '#FFFFFF' }}>Add address and slot</Text>}
             </Pressable>
           )}
         </View>
@@ -565,7 +566,7 @@ function SavedAddressSheet({ addresses, isProceeding, selectedAddressId, onAddAn
           })}
         </ScrollView>
         <Pressable disabled={!selectedAddressId || isProceeding} onPress={onProceed} style={({ pressed }) => ({ height: 48, marginTop: 14, alignItems: 'center', justifyContent: 'center', borderRadius: 8, backgroundColor: selectedAddressId ? '#6E45E2' : '#D9D5DD', opacity: pressed ? 0.72 : 1 })}>
-          {isProceeding ? <ActivityIndicator color="#FFFFFF" /> : <Text style={{ fontSize: 15, fontWeight: '700', color: '#FFFFFF' }}>Proceed</Text>}
+          {isProceeding ? <LoadingDots color="#FFFFFF" gap={6} size={5} /> : <Text style={{ fontSize: 15, fontWeight: '700', color: '#FFFFFF' }}>Proceed</Text>}
         </Pressable>
       </View>
     </View>

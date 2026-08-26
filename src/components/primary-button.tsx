@@ -1,4 +1,6 @@
-import { ActivityIndicator, Pressable, Text } from 'react-native';
+import { Pressable, Text } from 'react-native';
+
+import { LoadingDots } from './loading-dots';
 
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
@@ -32,7 +34,7 @@ export function PrimaryButton({ disabled = false, label, loading = false, onPres
       })}
     >
       {loading ? (
-        <ActivityIndicator color="#FFFFFF" />
+        <LoadingDots color="#FFFFFF" gap={6} size={5} />
       ) : (
         <Text
           style={{
