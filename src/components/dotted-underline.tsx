@@ -1,3 +1,4 @@
+import { colors } from '../theme';
 import { type ReactNode, useState } from 'react';
 import { View } from 'react-native';
 
@@ -7,14 +8,14 @@ const DOT_STYLE = {
   width: DOT_SIZE,
   height: DOT_SIZE,
   borderRadius: DOT_SIZE / 2,
-  backgroundColor: '#C5C1C6',
+  backgroundColor: colors.mauveTone77,
 } as const;
 
 export function DottedUnderline({
   children,
   fullWidth = false,
   lineMarginTop = 2,
-  dotColor = '#C5C1C6',
+  dotColor = colors.mauveTone77,
 }: {
   children: ReactNode;
   fullWidth?: boolean;

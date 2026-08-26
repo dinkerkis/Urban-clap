@@ -1,3 +1,4 @@
+import { colors, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
 import { useState, type ReactNode } from 'react';
 import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
@@ -34,8 +35,8 @@ function ProfilePageHeader({
       style={[
         { paddingTop: Math.max(insets.top, 18) + 8, paddingHorizontal: 20, paddingBottom: 10 },
         overlay
-          ? { position: 'absolute', zIndex: 10, top: 0, left: 0, right: 0, backgroundColor: 'rgba(255, 255, 255, 0.88)' }
-          : { backgroundColor: '#FFFFFF' },
+          ? { position: 'absolute', zIndex: 10, top: 0, left: 0, right: 0, backgroundColor: colors.whiteAlpha88 }
+          : { backgroundColor: colors.white },
       ]}
     >
       <View style={{ height: 34, flexDirection: 'row', alignItems: 'center' }}>
@@ -49,13 +50,13 @@ function ProfilePageHeader({
             height: 34,
             alignItems: 'flex-start',
             justifyContent: 'center',
-            backgroundColor: 'transparent',
+            backgroundColor: colors.transparent,
             opacity: pressed ? 0.65 : 1,
           })}
         >
-          <BackIcon color="#241A30" />
+          <BackIcon color={colors.violetTone15} />
         </Pressable>
-        {title ? <Text style={{ marginLeft: 5, flex: 1, fontSize: 18, lineHeight: 24, fontWeight: '700', color: '#1F1A22' }}>{title}</Text> : <View style={{ flex: 1 }} />}
+        {title ? <Text style={{ marginLeft: 5, flex: 1, fontSize: fontSizes.size18, lineHeight: 24, fontWeight: '700', color: colors.mauveTone12_2 }}>{title}</Text> : <View style={{ flex: 1 }} />}
         {rightSlot ?? null}
       </View>
     </View>
@@ -66,12 +67,12 @@ export function MyPlansScreen({ onBack }: ProfileOptionScreenProps) {
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+    <View style={{ flex: 1, backgroundColor: colors.white }}>
       <ProfilePageHeader title="My plan" onBack={onBack} />
-      <View style={{ height: 1, backgroundColor: '#F0EDF1' }} />
+      <View style={{ height: 1, backgroundColor: colors.mauveTone94 }} />
       <View style={{ paddingHorizontal: 20, paddingTop: 28, paddingBottom: Math.max(insets.bottom, 20) }}>
-        <Text style={{ fontSize: 21, lineHeight: 27, fontWeight: '700', color: '#1D1820' }}>Active plans</Text>
-        <Text style={{ paddingTop: 16, fontSize: 15, lineHeight: 23, color: '#777078' }}>You have no active plans</Text>
+        <Text style={{ fontSize: fontSizes.size21, lineHeight: 27, fontWeight: '700', color: colors.mauveTone11 }}>Active plans</Text>
+        <Text style={{ paddingTop: 16, fontSize: fontSizes.size15, lineHeight: 23, color: colors.neutralTone45 }}>You have no active plans</Text>
       </View>
     </View>
   );
@@ -80,11 +81,11 @@ export function MyPlansScreen({ onBack }: ProfileOptionScreenProps) {
 function EmptyPassIcon() {
   return (
     <View style={{ width: 48, height: 48 }}>
-      <View style={{ position: 'absolute', left: 5, top: 2, width: 34, height: 42, paddingTop: 9, paddingHorizontal: 7, gap: 5, borderRadius: 3, backgroundColor: '#F2F0F2' }}>
-        {[0, 1, 2].map((line) => <View key={line} style={{ width: line === 2 ? 13 : 20, height: 3, borderRadius: 2, backgroundColor: '#C7C3C8' }} />)}
+      <View style={{ position: 'absolute', left: 5, top: 2, width: 34, height: 42, paddingTop: 9, paddingHorizontal: 7, gap: 5, borderRadius: 3, backgroundColor: colors.mauveTone95 }}>
+        {[0, 1, 2].map((line) => <View key={line} style={{ width: line === 2 ? 13 : 20, height: 3, borderRadius: 2, backgroundColor: colors.mauveTone77_2 }} />)}
       </View>
-      <View style={{ position: 'absolute', right: 0, bottom: 0, width: 20, height: 20, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: '#EF2538' }}>
-        <Text style={{ marginTop: -1, fontSize: 14, lineHeight: 17, fontWeight: '700', color: '#FFFFFF' }}>×</Text>
+      <View style={{ position: 'absolute', right: 0, bottom: 0, width: 20, height: 20, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: colors.redTone54_2 }}>
+        <Text style={{ marginTop: -1, fontSize: fontSizes.size14, lineHeight: 17, fontWeight: '700', color: colors.white }}>×</Text>
       </View>
     </View>
   );
@@ -92,11 +93,11 @@ function EmptyPassIcon() {
 
 export function PassesMembershipScreen({ onBack }: ProfileOptionScreenProps) {
   return (
-    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+    <View style={{ flex: 1, backgroundColor: colors.white }}>
       <ProfilePageHeader title="Passes & membership" onBack={onBack} />
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingBottom: 70 }}>
         <EmptyPassIcon />
-        <Text style={{ paddingTop: 18, fontSize: 15, lineHeight: 23, color: '#363037' }}>No passes or memberships found</Text>
+        <Text style={{ paddingTop: 18, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone20 }}>No passes or memberships found</Text>
       </View>
     </View>
   );
@@ -113,7 +114,7 @@ export function MyRatingScreen({ onBack }: ProfileOptionScreenProps) {
   const headerHeight = Math.max(insets.top, 18) + 52;
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+    <View style={{ flex: 1, backgroundColor: colors.white }}>
       <ProfilePageHeader overlay onBack={onBack} />
       <ScrollView
         contentInsetAdjustmentBehavior="never"
@@ -121,30 +122,30 @@ export function MyRatingScreen({ onBack }: ProfileOptionScreenProps) {
         contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: Math.max(insets.bottom, 20) + 28 }}
       >
         <View style={{ paddingHorizontal: 20, paddingTop: 26, paddingBottom: 28, gap: 7 }}>
-          <Text style={{ fontSize: 13, lineHeight: 19, color: '#777078' }}>Your rating</Text>
-          <Text style={{ alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 5, backgroundColor: '#EEF8F1', fontSize: 12, lineHeight: 17, fontWeight: '600', color: '#31804D' }}>New user</Text>
-          <Text style={{ paddingTop: 3, fontSize: 24, lineHeight: 30, fontWeight: '700', color: '#1D1820' }}>No rating yet</Text>
+          <Text style={{ fontSize: fontSizes.size13, lineHeight: 19, color: colors.neutralTone45 }}>Your rating</Text>
+          <Text style={{ alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 5, backgroundColor: colors.greenTone95_2, fontSize: fontSizes.size12, lineHeight: 17, fontWeight: '600', color: colors.greenTone35 }}>New user</Text>
+          <Text style={{ paddingTop: 3, fontSize: fontSizes.size24, lineHeight: 30, fontWeight: '700', color: colors.mauveTone11 }}>No rating yet</Text>
         </View>
 
-        <View style={{ height: 8, backgroundColor: '#F6F5F7' }} />
+        <View style={{ height: 8, backgroundColor: colors.violetTone96_6 }} />
 
         <View style={{ paddingHorizontal: 20, paddingTop: 28, gap: 10 }}>
-          <Text style={{ fontSize: 19, lineHeight: 25, fontWeight: '600', color: '#1D1820' }}>Introducing customer ratings</Text>
-          <Text style={{ fontSize: 17, lineHeight: 25, color: '#777078' }}>Just like you rate UC professionals for the overall quality of the service, they also rate you on a scale of 1 to 5. Your aggregate rating is calculated after you have received ratings in at least 3 services.</Text>
+          <Text style={{ fontSize: fontSizes.size19, lineHeight: 25, fontWeight: '600', color: colors.mauveTone11 }}>Introducing customer ratings</Text>
+          <Text style={{ fontSize: fontSizes.size17, lineHeight: 25, color: colors.neutralTone45 }}>Just like you rate UC professionals for the overall quality of the service, they also rate you on a scale of 1 to 5. Your aggregate rating is calculated after you have received ratings in at least 3 services.</Text>
 
-          <Text style={{ paddingTop: 26, fontSize: 19, lineHeight: 25, fontWeight: '600', color: '#1D1820' }}>How can I be a 5-star customer?</Text>
-          <Text style={{ fontSize: 17, lineHeight: 25, color: '#777078' }}>Did you know that nearly 80% of UC customers are 5-star rated. If you also want that coveted rating, here are a few kind gestures.</Text>
+          <Text style={{ paddingTop: 26, fontSize: fontSizes.size19, lineHeight: 25, fontWeight: '600', color: colors.mauveTone11 }}>How can I be a 5-star customer?</Text>
+          <Text style={{ fontSize: fontSizes.size17, lineHeight: 25, color: colors.neutralTone45 }}>Did you know that nearly 80% of UC customers are 5-star rated. If you also want that coveted rating, here are a few kind gestures.</Text>
 
           {RATING_TIPS.map((tip) => (
             <View key={tip.title} style={{ paddingTop: 24, gap: 7 }}>
-              <Text style={{ fontSize: 42, lineHeight: 48 }}>{tip.icon}</Text>
-              <Text style={{ fontSize: 17, lineHeight: 23, fontWeight: '500', color: '#1D1820' }}>{tip.title}</Text>
-              <Text style={{ fontSize: 17, lineHeight: 25, color: '#777078' }}>{tip.description}</Text>
+              <Text style={{ fontSize: fontSizes.size42, lineHeight: 48 }}>{tip.icon}</Text>
+              <Text style={{ fontSize: fontSizes.size17, lineHeight: 23, fontWeight: '500', color: colors.mauveTone11 }}>{tip.title}</Text>
+              <Text style={{ fontSize: fontSizes.size17, lineHeight: 25, color: colors.neutralTone45 }}>{tip.description}</Text>
             </View>
           ))}
 
-          <Text style={{ paddingTop: 28, fontSize: 19, lineHeight: 25, fontWeight: '600', color: '#1D1820' }}>How is customer rating calculated?</Text>
-          <Text style={{ fontSize: 17, lineHeight: 25, color: '#777078' }}>Your aggregate rating is a simple average of all the ratings you’ve received from UC professionals in the past. These individual ratings are anonymous, and so won’t be visible to you or the professional.</Text>
+          <Text style={{ paddingTop: 28, fontSize: fontSizes.size19, lineHeight: 25, fontWeight: '600', color: colors.mauveTone11 }}>How is customer rating calculated?</Text>
+          <Text style={{ fontSize: fontSizes.size17, lineHeight: 25, color: colors.neutralTone45 }}>Your aggregate rating is a simple average of all the ratings you’ve received from UC professionals in the past. These individual ratings are anonymous, and so won’t be visible to you or the professional.</Text>
         </View>
       </ScrollView>
     </View>
@@ -166,11 +167,11 @@ function HelpChip({ onPress }: { onPress: () => void }) {
         borderRadius: 8,
         borderCurve: 'continuous',
         borderWidth: 1,
-        borderColor: '#C9B8F5',
+        borderColor: colors.violetTone84,
         opacity: pressed ? 0.6 : 1,
       })}
     >
-      <Text style={{ fontSize: 14, fontWeight: '600', color: '#6E45E2' }}>Help</Text>
+      <Text style={{ fontSize: fontSizes.size14, fontWeight: '600', color: colors.violetTone58 }}>Help</Text>
     </Pressable>
   );
 }
@@ -183,7 +184,7 @@ function TopicChevron() {
         height: 7,
         borderTopWidth: 1.5,
         borderRightWidth: 1.5,
-        borderColor: '#9A949E',
+        borderColor: colors.mauveTone60_2,
         transform: [{ rotate: '45deg' }],
       }}
     />
@@ -199,14 +200,14 @@ function NativeDevicesArt() {
           height: 52,
           borderRadius: 8,
           borderCurve: 'continuous',
-          backgroundColor: '#2A2C31',
+          backgroundColor: colors.slateTone18,
           alignItems: 'center',
           justifyContent: 'center',
           transform: [{ rotate: '-8deg' }],
         }}
       >
-        <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: '#5BB0E8' }} />
-        <View style={{ position: 'absolute', right: -4, top: 14, width: 8, height: 22, borderRadius: 3, backgroundColor: '#1A1C20' }} />
+        <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: colors.cyanTone63 }} />
+        <View style={{ position: 'absolute', right: -4, top: 14, width: 8, height: 22, borderRadius: 3, backgroundColor: colors.slateTone11 }} />
       </View>
       <View
         style={{
@@ -216,12 +217,12 @@ function NativeDevicesArt() {
           width: 28,
           height: 68,
           borderRadius: 5,
-          backgroundColor: '#D8D9DC',
+          backgroundColor: colors.slateTone85,
           transform: [{ rotate: '6deg' }],
         }}
       >
-        <View style={{ width: 14, height: 3, marginTop: 10, alignSelf: 'center', borderRadius: 2, backgroundColor: '#B0B1B5' }} />
-        <View style={{ width: 14, height: 3, marginTop: 5, alignSelf: 'center', borderRadius: 2, backgroundColor: '#B0B1B5' }} />
+        <View style={{ width: 14, height: 3, marginTop: 10, alignSelf: 'center', borderRadius: 2, backgroundColor: colors.neutralTone70 }} />
+        <View style={{ width: 14, height: 3, marginTop: 5, alignSelf: 'center', borderRadius: 2, backgroundColor: colors.neutralTone70 }} />
       </View>
     </View>
   );
@@ -240,7 +241,7 @@ export function ProfileMyBookingsScreen({ onBack, onExplore, onHelp }: MyBooking
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+    <View style={{ flex: 1, backgroundColor: colors.white }}>
       <ProfilePageHeader
         title="My bookings"
         onBack={onBack}
@@ -248,8 +249,8 @@ export function ProfileMyBookingsScreen({ onBack, onExplore, onHelp }: MyBooking
       />
 
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 36, paddingBottom: Math.max(insets.bottom, 20) + 40 }}>
-        <Text style={{ fontSize: 20, lineHeight: 26, fontWeight: '700', color: '#1A151E', textAlign: 'center' }}>No bookings yet.</Text>
-        <Text style={{ paddingTop: 10, maxWidth: 280, textAlign: 'center', fontSize: 14, lineHeight: 21, color: '#777078' }}>
+        <Text style={{ fontSize: fontSizes.size20, lineHeight: 26, fontWeight: '700', color: colors.violetTone10_2, textAlign: 'center' }}>No bookings yet.</Text>
+        <Text style={{ paddingTop: 10, maxWidth: 280, textAlign: 'center', fontSize: fontSizes.size14, lineHeight: 21, color: colors.neutralTone45 }}>
           Looks like you haven’t experienced quality services at home.
         </Text>
         <Pressable
@@ -257,7 +258,7 @@ export function ProfileMyBookingsScreen({ onBack, onExplore, onHelp }: MyBooking
           onPress={onExplore}
           style={({ pressed }) => ({ marginTop: 18, opacity: pressed ? 0.55 : 1 })}
         >
-          <Text style={{ fontSize: 15, lineHeight: 21, fontWeight: '600', color: '#6E45E2' }}>Explore our services →</Text>
+          <Text style={{ fontSize: fontSizes.size15, lineHeight: 21, fontWeight: '600', color: colors.violetTone58 }}>Explore our services →</Text>
         </Pressable>
       </View>
     </View>
@@ -268,14 +269,14 @@ export function NativeDevicesScreen({ onBack }: ProfileOptionScreenProps) {
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+    <View style={{ flex: 1, backgroundColor: colors.white }}>
       <ProfilePageHeader onBack={onBack} />
-      <Text style={{ paddingHorizontal: 20, paddingTop: 8, fontSize: 28, lineHeight: 34, fontWeight: '700', color: '#1A151E' }}>Your Native devices</Text>
+      <Text style={{ paddingHorizontal: 20, paddingTop: 8, fontSize: fontSizes.size28, lineHeight: 34, fontWeight: '700', color: colors.violetTone10_2 }}>Your Native devices</Text>
 
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingBottom: Math.max(insets.bottom, 20) + 60 }}>
         <NativeDevicesArt />
-        <Text style={{ paddingTop: 22, fontSize: 16, lineHeight: 22, fontWeight: '700', color: '#1A151E' }}>No devices</Text>
-        <Text style={{ paddingTop: 6, fontSize: 14, lineHeight: 20, color: '#8A848E' }}>Your Native devices will be visible here</Text>
+        <Text style={{ paddingTop: 22, fontSize: fontSizes.size16, lineHeight: 22, fontWeight: '700', color: colors.violetTone10_2 }}>No devices</Text>
+        <Text style={{ paddingTop: 6, fontSize: fontSizes.size14, lineHeight: 20, color: colors.mauveTone54 }}>Your Native devices will be visible here</Text>
       </View>
     </View>
   );
@@ -285,14 +286,14 @@ export function HelpSupportScreen({ onAccount, onBack, onGettingStarted, onPayme
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+    <View style={{ flex: 1, backgroundColor: colors.white }}>
       <ProfilePageHeader title="Help" onBack={onBack} />
       <ScrollView
         contentInsetAdjustmentBehavior="never"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 18, paddingBottom: Math.max(insets.bottom, 20) + 28 }}
       >
-        <Text style={{ fontSize: 22, lineHeight: 28, fontWeight: '700', color: '#1A151E' }}>All topics</Text>
+        <Text style={{ fontSize: fontSizes.size22, lineHeight: 28, fontWeight: '700', color: colors.violetTone10_2 }}>All topics</Text>
         <View style={{ marginTop: 14 }}>
           {HELP_TOPICS.map((topic, index) => (
             <Pressable
@@ -305,14 +306,14 @@ export function HelpSupportScreen({ onAccount, onBack, onGettingStarted, onPayme
                 alignItems: 'center',
                 gap: 14,
                 borderBottomWidth: index === HELP_TOPICS.length - 1 ? 0 : 1,
-                borderBottomColor: '#F0EDF1',
+                borderBottomColor: colors.mauveTone94,
                 opacity: pressed ? 0.55 : 1,
               })}
             >
               <View style={{ width: 22, alignItems: 'center', justifyContent: 'center' }}>
-                <Image source={topic.imageSource} contentFit="contain" tintColor="#171419" style={{ width: 18, height: 18 }} />
+                <Image source={topic.imageSource} contentFit="contain" tintColor={colors.mauveTone9_2} style={{ width: 18, height: 18 }} />
               </View>
-              <Text style={{ flex: 1, fontSize: 15, lineHeight: 21, color: '#2E2932' }}>{topic.label}</Text>
+              <Text style={{ flex: 1, fontSize: fontSizes.size15, lineHeight: 21, color: colors.violetTone18 }}>{topic.label}</Text>
               <TopicChevron />
             </Pressable>
           ))}
@@ -350,16 +351,16 @@ export function GettingStartedHelpScreen({ onBack, onTopic }: ProfileOptionScree
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+    <View style={{ flex: 1, backgroundColor: colors.white }}>
       <ProfilePageHeader onBack={onBack} />
       <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: Math.max(insets.bottom, 20) + 28 }}>
-        <Text style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 14, fontSize: 26, lineHeight: 33, fontWeight: '700', color: '#1A151E' }}>Getting started with UC</Text>
+        <Text style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 14, fontSize: fontSizes.size26, lineHeight: 33, fontWeight: '700', color: colors.violetTone10_2 }}>Getting started with UC</Text>
         {GETTING_STARTED_SECTIONS.map((section, sectionIndex) => (
-          <View key={section.title} style={{ borderTopWidth: sectionIndex === 0 ? 1 : 8, borderTopColor: sectionIndex === 0 ? '#F0EDF1' : '#F6F5F7', paddingHorizontal: 20, paddingTop: 18 }}>
-            <Text style={{ paddingBottom: 8, fontSize: 17, lineHeight: 23, fontWeight: '600', color: '#1A151E' }}>{section.title}</Text>
+          <View key={section.title} style={{ borderTopWidth: sectionIndex === 0 ? 1 : 8, borderTopColor: sectionIndex === 0 ? colors.mauveTone94 : colors.violetTone96_6, paddingHorizontal: 20, paddingTop: 18 }}>
+            <Text style={{ paddingBottom: 8, fontSize: fontSizes.size17, lineHeight: 23, fontWeight: '600', color: colors.violetTone10_2 }}>{section.title}</Text>
             {section.topics.map((topic, index) => (
-              <Pressable key={topic.key} accessibilityRole="button" onPress={() => onTopic(topic.key)} style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: index === section.topics.length - 1 ? 0 : 1, borderBottomColor: '#F0EDF1', opacity: pressed ? 0.55 : 1 })}>
-                <Text style={{ flex: 1, paddingRight: 12, fontSize: 15, lineHeight: 22, color: '#2E2932' }}>{topic.label}</Text>
+              <Pressable key={topic.key} accessibilityRole="button" onPress={() => onTopic(topic.key)} style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: index === section.topics.length - 1 ? 0 : 1, borderBottomColor: colors.mauveTone94, opacity: pressed ? 0.55 : 1 })}>
+                <Text style={{ flex: 1, paddingRight: 12, fontSize: fontSizes.size15, lineHeight: 22, color: colors.violetTone18 }}>{topic.label}</Text>
                 <TopicChevron />
               </Pressable>
             ))}
@@ -375,8 +376,8 @@ function NumberedSteps({ steps }: { steps: readonly string[] }) {
     <View style={{ paddingTop: 16, gap: 10 }}>
       {steps.map((step, index) => (
         <View key={step} style={{ flexDirection: 'row', alignItems: 'flex-start', paddingLeft: 12 }}>
-          <Text style={{ width: 28, fontSize: 15, lineHeight: 23, color: '#625D64' }}>{index + 1}.</Text>
-          <Text style={{ flex: 1, fontSize: 15, lineHeight: 23, color: '#625D64' }}>{step}</Text>
+          <Text style={{ width: 28, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>{index + 1}.</Text>
+          <Text style={{ flex: 1, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>{step}</Text>
         </View>
       ))}
     </View>
@@ -388,8 +389,8 @@ function BulletSteps({ steps }: { steps: readonly string[] }) {
     <View style={{ paddingTop: 16, gap: 10 }}>
       {steps.map((step) => (
         <View key={step} style={{ flexDirection: 'row', alignItems: 'flex-start', paddingLeft: 12 }}>
-          <Text style={{ width: 28, fontSize: 15, lineHeight: 23, color: '#625D64' }}>•</Text>
-          <Text style={{ flex: 1, fontSize: 15, lineHeight: 23, color: '#625D64' }}>{step}</Text>
+          <Text style={{ width: 28, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>•</Text>
+          <Text style={{ flex: 1, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>{step}</Text>
         </View>
       ))}
     </View>
@@ -410,13 +411,13 @@ const PAYMENT_CREDITS_TOPICS: readonly { key: PaymentCreditsArticleKey; label: s
 export function PaymentCreditsHelpScreen({ onBack, onTopic }: ProfileOptionScreenProps & { onTopic: (key: PaymentCreditsArticleKey) => void }) {
   const insets = useSafeAreaInsets();
   return (
-    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+    <View style={{ flex: 1, backgroundColor: colors.white }}>
       <ProfilePageHeader onBack={onBack} />
-      <Text style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 14, fontSize: 26, lineHeight: 33, fontWeight: '700', color: '#1A151E' }}>Payment & UC Credits</Text>
-      <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 20) + 28, borderTopWidth: 1, borderTopColor: '#F0EDF1' }}>
+      <Text style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 14, fontSize: fontSizes.size26, lineHeight: 33, fontWeight: '700', color: colors.violetTone10_2 }}>Payment & UC Credits</Text>
+      <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 20) + 28, borderTopWidth: 1, borderTopColor: colors.mauveTone94 }}>
         {PAYMENT_CREDITS_TOPICS.map((topic, index) => (
-          <Pressable key={topic.key} accessibilityRole="button" onPress={() => onTopic(topic.key)} style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: index === PAYMENT_CREDITS_TOPICS.length - 1 ? 0 : 1, borderBottomColor: '#F0EDF1', opacity: pressed ? 0.55 : 1 })}>
-            <Text style={{ flex: 1, paddingRight: 12, fontSize: 15, lineHeight: 22, color: '#2E2932' }}>{topic.label}</Text>
+          <Pressable key={topic.key} accessibilityRole="button" onPress={() => onTopic(topic.key)} style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: index === PAYMENT_CREDITS_TOPICS.length - 1 ? 0 : 1, borderBottomColor: colors.mauveTone94, opacity: pressed ? 0.55 : 1 })}>
+            <Text style={{ flex: 1, paddingRight: 12, fontSize: fontSizes.size15, lineHeight: 22, color: colors.violetTone18 }}>{topic.label}</Text>
             <TopicChevron />
           </Pressable>
         ))}
@@ -430,45 +431,45 @@ export function PaymentCreditsArticleScreen({ article, onBack, onSavedPayments, 
     credits: {
       title: 'How do I use my UC credits?',
       description: 'Usage of UC credits applies to specific services.',
-      children: <><Text style={{ paddingTop: 18, fontSize: 15, lineHeight: 23, color: '#625D64' }}>For more details, you may check by accessing our mobile app &gt; profile &gt; my wallet.</Text><Text style={{ paddingTop: 18, fontSize: 15, lineHeight: 23, color: '#625D64' }}>Activate the usage of your credits at the cart summary page before checking out!</Text></>,
+      children: <><Text style={{ paddingTop: 18, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>For more details, you may check by accessing our mobile app &gt; profile &gt; my wallet.</Text><Text style={{ paddingTop: 18, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>Activate the usage of your credits at the cart summary page before checking out!</Text></>,
       buttonLabel: 'Go to wallet', onAction: onWallet,
     },
     'payment-failed': {
       title: 'I am unable to make payment',
       description: 'If you are not able to complete payment, please try the following steps:',
-      children: <><BulletSteps steps={["Select a different payment mode than the one you’re trying with (e.g. try using your debit card instead of UPI).", 'If switching payment mode doesn’t work - then select “Pay online after service” or “Pay with cash after service”. In case paying online, you will be able to pick a mode of your choice after the service ends.', 'If multiple payment options are failing or pay after service is not available - please wait for some time and try placing the booking again.']} /><Text style={{ paddingTop: 18, fontSize: 15, lineHeight: 23, color: '#625D64' }}>If any amount has been debited and the booking shows “payment failed” - please don’t worry. Any debited amount will be credited back to your source account within 7 working days.</Text></>,
+      children: <><BulletSteps steps={["Select a different payment mode than the one you’re trying with (e.g. try using your debit card instead of UPI).", 'If switching payment mode doesn’t work - then select “Pay online after service” or “Pay with cash after service”. In case paying online, you will be able to pick a mode of your choice after the service ends.', 'If multiple payment options are failing or pay after service is not available - please wait for some time and try placing the booking again.']} /><Text style={{ paddingTop: 18, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>If any amount has been debited and the booking shows “payment failed” - please don’t worry. Any debited amount will be credited back to your source account within 7 working days.</Text></>,
     },
     'pay-later': {
       title: 'Will I be charged extra if I choose to pay later?',
       description: 'Yes, a ₹9 convenience fee is charged if you choose to pay later. You can avoid this fee by choosing to pay online at the time of booking.',
-      children: <Text style={{ paddingTop: 18, fontSize: 15, lineHeight: 23, color: '#625D64' }}>Note: If your payment attempt fails and your booking automatically moves to pay later, no extra fee will be applied.</Text>,
+      children: <Text style={{ paddingTop: 18, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>Note: If your payment attempt fails and your booking automatically moves to pay later, no extra fee will be applied.</Text>,
     },
     referral: {
       title: 'How does referral work?',
       description: 'To be eligible for the referral reward, you have to fulfil the below requirements:',
-      children: <><NumberedSteps steps={['Your friend must be a first-time user of Urban Company', 'Download our mobile app and register via your referral link', 'Account details must have a verified mobile number']} /><Text style={{ paddingTop: 18, fontSize: 15, lineHeight: 23, color: '#625D64' }}>Once your friend takes service with us, they will get instant ₹100 off and you can win up to ₹5000 in rewards.</Text></>,
+      children: <><NumberedSteps steps={['Your friend must be a first-time user of Urban Company', 'Download our mobile app and register via your referral link', 'Account details must have a verified mobile number']} /><Text style={{ paddingTop: 18, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>Once your friend takes service with us, they will get instant ₹100 off and you can win up to ₹5000 in rewards.</Text></>,
     },
     'referral-missing': {
       title: 'I have not received the reward for referral',
       description: 'You are eligible for referral reward when:',
-      children: <><NumberedSteps steps={['Your referral is a first-time user on Urban Company app', 'They have successfully availed at least 1 service from us']} /><Text style={{ paddingTop: 18, fontSize: 15, lineHeight: 23, color: '#625D64' }}>Your reward will be credited within 24 hours of service delivery.</Text></>,
+      children: <><NumberedSteps steps={['Your referral is a first-time user on Urban Company app', 'They have successfully availed at least 1 service from us']} /><Text style={{ paddingTop: 18, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>Your reward will be credited within 24 hours of service delivery.</Text></>,
     },
     'rewards-validity': {
       title: 'Can I extend the validity of the rewards?',
       description: 'No, the validity of the rewards or UC credits cannot be extended. Please use the credits before their validity expire.',
-      children: <Text style={{ paddingTop: 18, fontSize: 15, lineHeight: 23, color: '#625D64' }}>To check the validity of your rewards</Text>,
+      children: <Text style={{ paddingTop: 18, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>To check the validity of your rewards</Text>,
       buttonLabel: 'Go to wallet', onAction: onWallet,
     },
     'saved-payments': {
       title: 'Where can I see my saved payment details?',
       description: 'You can check all your saved payment details by clicking the below button.',
-      children: <Text style={{ paddingTop: 18, fontSize: 15, lineHeight: 23, color: '#625D64' }}>If you wish to remove any saved payment details, you can either unlink wallet account or delete the saved cards.</Text>,
+      children: <Text style={{ paddingTop: 18, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>If you wish to remove any saved payment details, you can either unlink wallet account or delete the saved cards.</Text>,
       buttonLabel: 'Check saved payments', onAction: onSavedPayments,
     },
     'wallet-balance': {
       title: 'How do I check my wallet balance?',
       description: 'You can check your wallet balance from your profile section → My wallet.',
-      children: <Text style={{ paddingTop: 18, fontSize: 15, lineHeight: 23, color: '#625D64' }}>To check your wallet history:</Text>,
+      children: <Text style={{ paddingTop: 18, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>To check your wallet history:</Text>,
       buttonLabel: 'Go to wallet', onAction: onWallet,
     },
   };
@@ -481,7 +482,7 @@ export function GettingStartedArticleScreen({ article, onBack }: ProfileOptionSc
     about: {
       title: 'What is Urban Company?',
       description: "Urban Company (formerly UrbanClap) is Asia’s largest online home services marketplace. It was started in 2014 by Abhiraj Singh Bhal, Varun Khaitan and Raghav Chandra.",
-      children: <Text style={{ paddingTop: 18, fontSize: 15, lineHeight: 23, color: '#625D64' }}>We currently operate in multiple cities in India, Singapore, Saudi Arabia and UAE.</Text>,
+      children: <Text style={{ paddingTop: 18, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>We currently operate in multiple cities in India, Singapore, Saudi Arabia and UAE.</Text>,
     },
     booking: {
       title: 'How to place a booking?',
@@ -491,17 +492,17 @@ export function GettingStartedArticleScreen({ article, onBack }: ProfileOptionSc
     cancellation: {
       title: 'Does Urban Company charge any cancellation fee?',
       description: 'Cancellation fee is charged only if a professional is assigned on your booking and the time of cancellation is closer to your booking time. This is done to fairly compensate our professionals for their time and the cost of travel while travelling to your place.',
-      children: <Text style={{ paddingTop: 18, fontSize: 15, lineHeight: 23, color: '#625D64' }}>Exact cancellation amount will be shown while you proceed with a cancellation request.</Text>,
+      children: <Text style={{ paddingTop: 18, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>Exact cancellation amount will be shown while you proceed with a cancellation request.</Text>,
     },
     'minimum-order': {
       title: 'Do I have to order a minimum value of services before I can place the booking?',
       description: "To ensure efficient use of our professional’s time, there are minimum order requirements for each category.",
-      children: <Text style={{ paddingTop: 18, fontSize: 15, lineHeight: 23, color: '#625D64' }}>If the services you’ve selected do not meet the minimum order requirement, you will be prompted to add more services before you can proceed to checkout.</Text>,
+      children: <Text style={{ paddingTop: 18, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>If the services you’ve selected do not meet the minimum order requirement, you will be prompted to add more services before you can proceed to checkout.</Text>,
     },
     'preferred-professional': {
       title: 'How to book my preferred professional?',
       description: 'If you have already taken the service & rated the professional above 4 stars, you can book your preferred professional by:',
-      children: <><NumberedSteps steps={['Adding services in your cart', 'Selecting your preferred professional from the list of professionals', 'Proceed with placing the booking']} /><Text style={{ paddingTop: 18, fontSize: 15, lineHeight: 23, color: '#625D64' }}>If the slots of your preferred professionals are not available, please proceed with placing the booking and we will try to assign you the best professional available. All our professionals are trained to deliver a high quality experience.</Text></>,
+      children: <><NumberedSteps steps={['Adding services in your cart', 'Selecting your preferred professional from the list of professionals', 'Proceed with placing the booking']} /><Text style={{ paddingTop: 18, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>If the slots of your preferred professionals are not available, please proceed with placing the booking and we will try to assign you the best professional available. All our professionals are trained to deliver a high quality experience.</Text></>,
     },
     rebook: {
       title: 'Can I re-book the same professional if I like their service?',
@@ -522,18 +523,18 @@ export function AccountHelpScreen({ onBack, onChangeEmail, onChangePhone, onPaym
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+    <View style={{ flex: 1, backgroundColor: colors.white }}>
       <ProfilePageHeader onBack={onBack} />
-      <Text style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 12, fontSize: 26, lineHeight: 33, fontWeight: '700', color: '#1A151E' }}>Account</Text>
+      <Text style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 12, fontSize: fontSizes.size26, lineHeight: 33, fontWeight: '700', color: colors.violetTone10_2 }}>Account</Text>
       <View style={{ paddingHorizontal: 20 }}>
         {ACCOUNT_HELP_TOPICS.map((topic, index) => (
           <Pressable
             key={topic.key}
             accessibilityRole="button"
             onPress={actions[topic.key]}
-            style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: index === ACCOUNT_HELP_TOPICS.length - 1 ? 0 : 1, borderBottomColor: '#F0EDF1', opacity: pressed ? 0.55 : 1 })}
+            style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: index === ACCOUNT_HELP_TOPICS.length - 1 ? 0 : 1, borderBottomColor: colors.mauveTone94, opacity: pressed ? 0.55 : 1 })}
           >
-            <Text style={{ flex: 1, paddingRight: 12, fontSize: 15, lineHeight: 22, color: '#2E2932' }}>{topic.label}</Text>
+            <Text style={{ flex: 1, paddingRight: 12, fontSize: fontSizes.size15, lineHeight: 22, color: colors.violetTone18 }}>{topic.label}</Text>
             <TopicChevron />
           </Pressable>
         ))}
@@ -559,25 +560,25 @@ export function AccountArticleScreen({ buttonLabel, children, description, onAct
   const [feedback, setFeedback] = useState<'down' | 'up' | null>(null);
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+    <View style={{ flex: 1, backgroundColor: colors.white }}>
       <ProfilePageHeader onBack={onBack} />
       <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: Math.max(insets.bottom, 20) }}>
         <View style={{ paddingHorizontal: 20, paddingTop: 18 }}>
-          <Text style={{ fontSize: 22, lineHeight: 29, fontWeight: '700', color: '#1A151E' }}>{title}</Text>
-          <Text style={{ paddingTop: 14, fontSize: 15, lineHeight: 23, color: '#625D64' }}>{description}</Text>
+          <Text style={{ fontSize: fontSizes.size22, lineHeight: 29, fontWeight: '700', color: colors.violetTone10_2 }}>{title}</Text>
+          <Text style={{ paddingTop: 14, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>{description}</Text>
           {children}
-          {buttonLabel && onAction ? <Pressable accessibilityRole="button" onPress={onAction} style={({ pressed }) => ({ alignSelf: 'flex-start', height: 40, marginTop: 18, paddingHorizontal: 20, alignItems: 'center', justifyContent: 'center', borderRadius: 8, backgroundColor: '#5432DB', opacity: pressed ? 0.72 : 1 })}>
-            <Text style={{ fontSize: 15, fontWeight: '600', color: '#FFFFFF' }}>{buttonLabel}</Text>
+          {buttonLabel && onAction ? <Pressable accessibilityRole="button" onPress={onAction} style={({ pressed }) => ({ alignSelf: 'flex-start', height: 40, marginTop: 18, paddingHorizontal: 20, alignItems: 'center', justifyContent: 'center', borderRadius: 8, backgroundColor: colors.blueTone53, opacity: pressed ? 0.72 : 1 })}>
+            <Text style={{ fontSize: fontSizes.size15, fontWeight: '600', color: colors.white }}>{buttonLabel}</Text>
           </Pressable> : null}
         </View>
-        <View style={{ height: 8, marginTop: 24, backgroundColor: '#F6F5F7' }} />
+        <View style={{ height: 8, marginTop: 24, backgroundColor: colors.violetTone96_6 }} />
         <View style={{ minHeight: 72, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={{ flex: 1, fontSize: 15, color: '#625D64' }}>{feedback ? 'Thanks for your feedback' : 'Was this article helpful?'}</Text>
+          <Text style={{ flex: 1, fontSize: fontSizes.size15, color: colors.mauveTone38_2 }}>{feedback ? 'Thanks for your feedback' : 'Was this article helpful?'}</Text>
           <Pressable accessibilityRole="button" accessibilityLabel="Not helpful" onPress={() => setFeedback('down')} style={({ pressed }) => ({ width: 42, height: 42, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.55 : 1 })}>
-            <Image source="sf:hand.thumbsdown" contentFit="contain" tintColor="#171419" style={{ width: 20, height: 20, opacity: feedback === 'down' ? 1 : 0.78 }} />
+            <Image source="sf:hand.thumbsdown" contentFit="contain" tintColor={colors.mauveTone9_2} style={{ width: 20, height: 20, opacity: feedback === 'down' ? 1 : 0.78 }} />
           </Pressable>
           <Pressable accessibilityRole="button" accessibilityLabel="Helpful" onPress={() => setFeedback('up')} style={({ pressed }) => ({ width: 42, height: 42, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.55 : 1 })}>
-            <Image source="sf:hand.thumbsup" contentFit="contain" tintColor="#171419" style={{ width: 20, height: 20, opacity: feedback === 'up' ? 1 : 0.78 }} />
+            <Image source="sf:hand.thumbsup" contentFit="contain" tintColor={colors.mauveTone9_2} style={{ width: 20, height: 20, opacity: feedback === 'up' ? 1 : 0.78 }} />
           </Pressable>
         </View>
       </ScrollView>

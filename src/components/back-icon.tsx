@@ -1,3 +1,4 @@
+import { colors } from '../theme';
 import { Image } from 'expo-image';
 
 type BackIconProps = {
@@ -5,7 +6,7 @@ type BackIconProps = {
   size?: number;
 };
 
-export function BackIcon({ color = '#171419', size = 18 }: BackIconProps) {
+export function BackIcon({ color = colors.mauveTone9_2, size = 18 }: BackIconProps) {
   return (
     <Image
       source={require('../../assets/back.png')}

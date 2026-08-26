@@ -1,3 +1,4 @@
+import { colors, fontSizes } from '../../theme';
 import { useEffect, useRef, useState } from 'react';
 import { Alert, Text, View } from 'react-native';
 import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
@@ -169,7 +170,7 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
     );
   } else if (page.type === 'profile' || page.type === 'profile-details' || page.type === 'about' || page.type === 'wallet' || page.type === 'my-bookings' || page.type === 'native-devices' || page.type === 'help-support' || page.type === 'help-account' || page.type === 'help-getting-started' || page.type === 'help-getting-started-article' || page.type === 'help-payment-credits' || page.type === 'help-payment-credits-article' || page.type === 'help-phone-article' || page.type === 'help-address-article' || page.type === 'help-email-article' || page.type === 'help-payment-article' || page.type === 'my-plans' || page.type === 'passes-membership' || page.type === 'payment-methods' || page.type === 'manage-addresses' || page.type === 'my-rating' || page.type === 'settings' || page.type === 'privacy-center') {
     content = (
-      <Animated.View entering={STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+      <Animated.View entering={STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ flex: 1, backgroundColor: colors.white }}>
         <ProfileEntryScreen
           email={email}
           name={name}
@@ -344,14 +345,14 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
   }
 
   const dashboardRoot = (
-    <View style={{ flex: 1, backgroundColor: '#FAF9FB' }}>
+    <View style={{ flex: 1, backgroundColor: colors.violetTone98_2 }}>
       {content}
       {page.type === 'root' ? <BottomTabBar activeTab={activeTab} cartCount={cartState.totalItems} onChange={changeTab} /> : null}
       {page.type === 'profile-details' ? (
         <Animated.View
           entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN}
           exiting={STACK_SLIDE_OUT}
-          style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}
+          style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}
         >
           <ProfileDetailsScreen
             email={email}
@@ -369,28 +370,28 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
         <Animated.View
           entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN}
           exiting={STACK_SLIDE_OUT}
-          style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}
+          style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}
         >
           <WalletScreen onBack={() => { setProfileTransition('pop'); setPage(page.from === 'help-payment-credits-article' && page.helpArticle ? { type: 'help-payment-credits-article', article: page.helpArticle, from: page.helpFrom } : { type: 'profile' }); }} />
         </Animated.View>
       ) : null}
       {page.type === 'about' ? (
-        <Animated.View entering={STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+        <Animated.View entering={STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}>
           <AboutScreen onBack={() => setPage({ type: 'profile' })} />
         </Animated.View>
       ) : null}
       {page.type === 'payment-methods' ? (
-        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}>
           <PaymentMethodsScreen onBack={() => { setProfileTransition('pop'); setPage(page.from === 'help-payment-article' ? { type: 'help-payment-article', from: 'profile' } : page.from === 'help-payment-credits-article' && page.helpArticle ? { type: 'help-payment-credits-article', article: page.helpArticle, from: page.helpFrom } : { type: 'profile' }); }} />
         </Animated.View>
       ) : null}
       {page.type === 'manage-addresses' ? (
-        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}>
           <ManageAddressesScreen authToken={authToken} name={name} phone={phone} onBack={() => { setProfileTransition('pop'); setPage(page.from === 'help-address-article' ? { type: 'help-address-article', from: 'profile' } : { type: 'profile' }); }} />
         </Animated.View>
       ) : null}
       {page.type === 'my-bookings' ? (
-        <Animated.View entering={STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+        <Animated.View entering={STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}>
           <ProfileMyBookingsScreen
             onBack={() => setPage({ type: 'profile' })}
             onExplore={() => {
@@ -402,12 +403,12 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
         </Animated.View>
       ) : null}
       {page.type === 'native-devices' ? (
-        <Animated.View entering={STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+        <Animated.View entering={STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}>
           <NativeDevicesScreen onBack={() => setPage({ type: 'profile' })} />
         </Animated.View>
       ) : null}
       {page.type === 'help-support' ? (
-        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}>
           <HelpSupportScreen
             onBack={() => { setProfileTransition('pop'); setPage({ type: page.from === 'my-bookings' ? 'my-bookings' : 'profile' }); }}
             onAccount={() => { setProfileTransition('push'); setPage({ type: 'help-account', from: page.from }); }}
@@ -417,7 +418,7 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
         </Animated.View>
       ) : null}
       {page.type === 'help-account' ? (
-        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}>
           <AccountHelpScreen
             onBack={() => { setProfileTransition('pop'); setPage({ type: 'help-support', from: page.from }); }}
             onChangeEmail={() => { setProfileTransition('push'); setPage({ type: 'help-email-article', from: page.from }); }}
@@ -428,7 +429,7 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
         </Animated.View>
       ) : null}
       {page.type === 'help-getting-started' ? (
-        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}>
           <GettingStartedHelpScreen
             onBack={() => { setProfileTransition('pop'); setPage({ type: 'help-support', from: page.from }); }}
             onTopic={(article) => { setProfileTransition('push'); setPage({ type: 'help-getting-started-article', article, from: page.from }); }}
@@ -436,7 +437,7 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
         </Animated.View>
       ) : null}
       {page.type === 'help-getting-started-article' ? (
-        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}>
           <GettingStartedArticleScreen
             article={page.article}
             onBack={() => { setProfileTransition('pop'); setPage({ type: 'help-getting-started', from: page.from }); }}
@@ -444,7 +445,7 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
         </Animated.View>
       ) : null}
       {page.type === 'help-payment-credits' ? (
-        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}>
           <PaymentCreditsHelpScreen
             onBack={() => { setProfileTransition('pop'); setPage({ type: 'help-support', from: page.from }); }}
             onTopic={(article) => { setProfileTransition('push'); setPage({ type: 'help-payment-credits-article', article, from: page.from }); }}
@@ -452,7 +453,7 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
         </Animated.View>
       ) : null}
       {page.type === 'help-payment-credits-article' ? (
-        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}>
           <PaymentCreditsArticleScreen
             article={page.article}
             onBack={() => { setProfileTransition('pop'); setPage({ type: 'help-payment-credits', from: page.from }); }}
@@ -462,7 +463,7 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
         </Animated.View>
       ) : null}
       {page.type === 'help-phone-article' ? (
-        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}>
           <ChangePhoneHelpScreen
             onBack={() => { setProfileTransition('pop'); setPage({ type: 'help-account', from: page.from }); }}
             onChangePhone={() => { setProfileTransition('push'); setPage({ type: 'profile-details', from: 'help-phone-article' }); }}
@@ -470,7 +471,7 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
         </Animated.View>
       ) : null}
       {page.type === 'help-address-article' ? (
-        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}>
           <AccountArticleScreen
             title="Where can I check my saved addresses?"
             description="You can check your saved addresses using the following ways:"
@@ -480,20 +481,20 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
           >
             <View style={{ paddingTop: 16, gap: 10 }}>
               <View style={{ flexDirection: 'row', alignItems: 'flex-start', paddingLeft: 12 }}>
-                <Text style={{ width: 28, fontSize: 15, lineHeight: 23, color: '#625D64' }}>1.</Text>
-                <Text style={{ flex: 1, fontSize: 15, lineHeight: 23, color: '#625D64' }}>While selecting the location on the app homescreen</Text>
+                <Text style={{ width: 28, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>1.</Text>
+                <Text style={{ flex: 1, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>While selecting the location on the app homescreen</Text>
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'flex-start', paddingLeft: 12 }}>
-                <Text style={{ width: 28, fontSize: 15, lineHeight: 23, color: '#625D64' }}>2.</Text>
-                <Text style={{ flex: 1, fontSize: 15, lineHeight: 23, color: '#625D64' }}>Check address on the checkout screen before making payment</Text>
+                <Text style={{ width: 28, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>2.</Text>
+                <Text style={{ flex: 1, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>Check address on the checkout screen before making payment</Text>
               </View>
-              <Text style={{ paddingTop: 8, fontSize: 15, lineHeight: 23, color: '#625D64' }}>Alternatively, you can also use the link below to check all saved addresses.</Text>
+              <Text style={{ paddingTop: 8, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>Alternatively, you can also use the link below to check all saved addresses.</Text>
             </View>
           </AccountArticleScreen>
         </Animated.View>
       ) : null}
       {page.type === 'help-email-article' ? (
-        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}>
           <AccountArticleScreen
             title="I want to change my email address"
             description="You can change your email address from the profile section after verifying it with an OTP."
@@ -504,7 +505,7 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
         </Animated.View>
       ) : null}
       {page.type === 'help-payment-article' ? (
-        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}>
           <AccountArticleScreen
             title="Where can I see my saved payment details?"
             description="You can check all your saved payment details using the button below. To remove a saved payment method, open your saved payments and delete the card."
@@ -515,27 +516,27 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
         </Animated.View>
       ) : null}
       {page.type === 'my-plans' ? (
-        <Animated.View entering={STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+        <Animated.View entering={STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}>
           <MyPlansScreen onBack={() => setPage({ type: 'profile' })} />
         </Animated.View>
       ) : null}
       {page.type === 'passes-membership' ? (
-        <Animated.View entering={STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+        <Animated.View entering={STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}>
           <PassesMembershipScreen onBack={() => setPage({ type: 'profile' })} />
         </Animated.View>
       ) : null}
       {page.type === 'my-rating' ? (
-        <Animated.View entering={STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+        <Animated.View entering={STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}>
           <MyRatingScreen onBack={() => setPage({ type: 'profile' })} />
         </Animated.View>
       ) : null}
       {page.type === 'settings' || page.type === 'privacy-center' ? (
-        <Animated.View entering={STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+        <Animated.View entering={STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}>
           <SettingsScreen email={email} onBack={() => setPage({ type: 'profile' })} onDeleteAccount={() => setPage({ type: 'privacy-center' })} />
         </Animated.View>
       ) : null}
       {page.type === 'privacy-center' ? (
-        <Animated.View entering={STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: '#FFFFFF' }}>
+        <Animated.View entering={STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}>
           <PrivacyCenterScreen onBack={() => setPage({ type: 'settings' })} />
         </Animated.View>
       ) : null}
@@ -679,7 +680,7 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
         exiting={FadeOut.duration(120)}
         accessibilityLabel="Adding consultation to cart"
         accessibilityRole="progressbar"
-        style={{ position: 'absolute', inset: 0, zIndex: 100, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255, 255, 255, 0.72)' }}
+        style={{ position: 'absolute', inset: 0, zIndex: 100, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.whiteAlpha72 }}
       >
         <LoadingDots />
       </Animated.View>

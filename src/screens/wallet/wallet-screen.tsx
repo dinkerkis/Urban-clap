@@ -1,3 +1,4 @@
+import { colors, fontSizes } from '../../theme';
 import { useState } from 'react';
 import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -36,7 +37,7 @@ function Chevron({ expanded }: { expanded: boolean }) {
         marginTop: 3,
         borderRightWidth: 1.4,
         borderBottomWidth: 1.4,
-        borderColor: '#777178',
+        borderColor: colors.neutralTone46,
         transform: [{ rotate: expanded ? '225deg' : '45deg' }],
       }}
     />
@@ -49,7 +50,7 @@ export function WalletScreen({ onBack }: WalletScreenProps) {
   const headerHeight = Math.max(insets.top, 16) + 58;
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+    <View style={{ flex: 1, backgroundColor: colors.white }}>
       <View
         style={{
           position: 'absolute',
@@ -60,7 +61,7 @@ export function WalletScreen({ onBack }: WalletScreenProps) {
           paddingTop: Math.max(insets.top, 16) + 6,
           paddingHorizontal: 20,
           paddingBottom: 8,
-          backgroundColor: 'rgba(255, 255, 255, 0.88)',
+          backgroundColor: colors.whiteAlpha88,
         }}
       >
         <View style={{ height: 44, flexDirection: 'row', alignItems: 'center' }}>
@@ -76,14 +77,14 @@ export function WalletScreen({ onBack }: WalletScreenProps) {
               justifyContent: 'center',
               borderRadius: 17,
               borderWidth: 1,
-              borderColor: '#E4E0E6',
-              backgroundColor: 'transparent',
+              borderColor: colors.mauveTone89,
+              backgroundColor: colors.transparent,
               opacity: pressed ? 0.65 : 1,
             })}
           >
-            <BackIcon color="#241A30" />
+            <BackIcon color={colors.violetTone15} />
           </Pressable>
-          <Text style={{ marginLeft: 13, fontSize: 18, lineHeight: 24, fontWeight: '700', color: '#1F1A22' }}>UC Wallet</Text>
+          <Text style={{ marginLeft: 13, fontSize: fontSizes.size18, lineHeight: 24, fontWeight: '700', color: colors.mauveTone12_2 }}>UC Wallet</Text>
           <Pressable
             accessibilityRole="button"
             onPress={() => Alert.alert('Help', 'Wallet support will be available soon.')}
@@ -95,11 +96,11 @@ export function WalletScreen({ onBack }: WalletScreenProps) {
               justifyContent: 'center',
               borderRadius: 9,
               borderWidth: 1,
-              borderColor: '#E4E0E6',
+              borderColor: colors.mauveTone89,
               opacity: pressed ? 0.6 : 1,
             })}
           >
-            <Text style={{ fontSize: 15, fontWeight: '600', color: '#272229' }}>Help</Text>
+            <Text style={{ fontSize: fontSizes.size15, fontWeight: '600', color: colors.mauveTone15 }}>Help</Text>
           </Pressable>
         </View>
       </View>
@@ -107,30 +108,30 @@ export function WalletScreen({ onBack }: WalletScreenProps) {
       <ScrollView
         contentInsetAdjustmentBehavior="never"
         showsVerticalScrollIndicator={false}
-        style={{ flex: 1, backgroundColor: '#FFFFFF' }}
+        style={{ flex: 1, backgroundColor: colors.white }}
         contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: Math.max(insets.bottom, 20) + 28 }}
       >
         <View style={{ paddingHorizontal: 20 }}>
         <View style={{ paddingTop: 26, paddingBottom: 30, gap: 7 }}>
-          <Text style={{ fontSize: 14, color: '#777078' }}>UC Cash</Text>
-          <Text style={{ fontSize: 36, lineHeight: 43, fontWeight: '700', color: '#171319' }}>₹0</Text>
-          <Text style={{ fontSize: 13, lineHeight: 19, color: '#777078' }}>Formerly UC Credits. Applicable on all services</Text>
+          <Text style={{ fontSize: fontSizes.size14, color: colors.neutralTone45 }}>UC Cash</Text>
+          <Text style={{ fontSize: fontSizes.size36, lineHeight: 43, fontWeight: '700', color: colors.mauveTone9 }}>₹0</Text>
+          <Text style={{ fontSize: fontSizes.size13, lineHeight: 19, color: colors.neutralTone45 }}>Formerly UC Credits. Applicable on all services</Text>
         </View>
         </View>
 
-        <View style={{ height: 8, backgroundColor: '#F6F5F7' }} />
+        <View style={{ height: 8, backgroundColor: colors.violetTone96_6 }} />
 
         <View style={{ paddingHorizontal: 20, paddingTop: 22, paddingBottom: 10 }}>
-        <Text style={{ fontSize: 21, lineHeight: 27, fontWeight: '700', color: '#1D1820' }}>Wallet activity</Text>
+        <Text style={{ fontSize: fontSizes.size21, lineHeight: 27, fontWeight: '700', color: colors.mauveTone11 }}>Wallet activity</Text>
         <View style={{ height: 68, alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ fontSize: 15, color: '#777078', transform: [{ translateY: 8 }] }}>No wallet activity yet.</Text>
+          <Text style={{ fontSize: fontSizes.size15, color: colors.neutralTone45, transform: [{ translateY: 8 }] }}>No wallet activity yet.</Text>
         </View>
         </View>
 
-        <View style={{ height: 8, backgroundColor: '#F6F5F7' }} />
+        <View style={{ height: 8, backgroundColor: colors.violetTone96_6 }} />
 
         <View style={{ paddingHorizontal: 20, paddingTop: 26 }}>
-        <Text style={{ paddingBottom: 12, fontSize: 21, lineHeight: 27, fontWeight: '700', color: '#1D1820' }}>Have a question?</Text>
+        <Text style={{ paddingBottom: 12, fontSize: fontSizes.size21, lineHeight: 27, fontWeight: '700', color: colors.mauveTone11 }}>Have a question?</Text>
         {FAQS.map((faq, index) => {
           const expanded = expandedIndex === index;
           return (
@@ -142,16 +143,16 @@ export function WalletScreen({ onBack }: WalletScreenProps) {
               style={({ pressed }) => ({
                 paddingVertical: 18,
                 borderBottomWidth: index === FAQS.length - 1 ? 0 : 1,
-                borderBottomColor: '#EEEAEF',
+                borderBottomColor: colors.mauveTone93,
                 opacity: pressed ? 0.7 : 1,
               })}
             >
               <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 16 }}>
-                <Text style={{ flex: 1, fontSize: 15, lineHeight: 21, fontWeight: '500', color: '#000000' }}>{faq.question}</Text>
+                <Text style={{ flex: 1, fontSize: fontSizes.size15, lineHeight: 21, fontWeight: '500', color: colors.black }}>{faq.question}</Text>
                 <Chevron expanded={expanded} />
               </View>
               {expanded ? (
-                <Text style={{ paddingTop: 12, paddingRight: 25, fontSize: 15, lineHeight: 23, color: '#777078' }}>{faq.answer}</Text>
+                <Text style={{ paddingTop: 12, paddingRight: 25, fontSize: fontSizes.size15, lineHeight: 23, color: colors.neutralTone45 }}>{faq.answer}</Text>
               ) : null}
             </Pressable>
           );

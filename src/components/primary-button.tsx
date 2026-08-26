@@ -1,9 +1,8 @@
+import { colors, typography } from '../theme';
 import { Pressable, Text } from 'react-native';
 
 import { LoadingDots } from './loading-dots';
 
-import { colors } from '../theme/colors';
-import { typography } from '../theme/typography';
 
 type Props = {
   disabled?: boolean;
@@ -34,12 +33,12 @@ export function PrimaryButton({ disabled = false, label, loading = false, onPres
       })}
     >
       {loading ? (
-        <LoadingDots color="#FFFFFF" gap={6} size={5} />
+        <LoadingDots color={colors.white} gap={6} size={5} />
       ) : (
         <Text
           style={{
             ...typography.button,
-            color: disabled ? colors.disabledText : '#FFFFFF',
+            color: disabled ? colors.disabledText : colors.white,
           }}
         >
           {label}

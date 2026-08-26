@@ -1,3 +1,4 @@
+import { colors } from '../theme';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { ServiceItem } from '../data/service-catalog';
@@ -40,7 +41,7 @@ function mapCartItem(cartItem: CartItem, knownItem?: ServiceItem): ServiceItem {
     rating: knownItem?.rating || 0,
     reviews: knownItem?.reviews || '',
     icon: '',
-    tint: knownItem?.tint || '#F1F2FF',
+    tint: knownItem?.tint || colors.blueTone97_2,
     imageUrl: cartItem.variant?.image
       ? getCategoryImageUrl(cartItem.variant.image)
       : getCategoryImageUrl(cartItem.snapshot?.mainImage) || knownItem?.imageUrl,

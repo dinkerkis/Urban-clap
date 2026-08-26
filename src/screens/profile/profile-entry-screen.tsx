@@ -1,3 +1,4 @@
+import { colors } from '../../theme';
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
@@ -43,7 +44,7 @@ export function ProfileEntryScreen(props: ProfileEntryScreenProps) {
         exiting={FadeOut.duration(140)}
         accessibilityLabel="Loading profile"
         accessibilityRole="progressbar"
-        style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF' }}
+        style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.white }}
       >
         <LoadingDots />
       </Animated.View>
@@ -51,7 +52,7 @@ export function ProfileEntryScreen(props: ProfileEntryScreenProps) {
   }
 
   return (
-    <Animated.View entering={FadeIn.duration(220)} style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+    <Animated.View entering={FadeIn.duration(220)} style={{ flex: 1, backgroundColor: colors.white }}>
       <ProfileScreen {...props} />
     </Animated.View>
   );

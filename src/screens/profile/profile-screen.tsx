@@ -1,3 +1,4 @@
+import { colors, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
 import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -51,7 +52,7 @@ function ChevronRight() {
         height: 7,
         borderTopWidth: 1.4,
         borderRightWidth: 1.4,
-        borderColor: '#2E2932',
+        borderColor: colors.violetTone18,
         transform: [{ rotate: '45deg' }],
       }}
     />
@@ -86,7 +87,7 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
     <ScrollView
       contentInsetAdjustmentBehavior="never"
       showsVerticalScrollIndicator={false}
-      style={{ flex: 1, backgroundColor: '#FFFFFF' }}
+      style={{ flex: 1, backgroundColor: colors.white }}
       contentContainerStyle={{ paddingBottom: Math.max(insets.bottom, 20) + 24 }}
     >
       <View style={{ paddingTop: Math.max(insets.top, 18) + 8, paddingHorizontal: 20, gap: 18 }}>
@@ -103,12 +104,12 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
               justifyContent: 'center',
               borderRadius: 17,
               borderWidth: 1,
-              borderColor: '#E4E0E6',
-              backgroundColor: 'transparent',
+              borderColor: colors.mauveTone89,
+              backgroundColor: colors.transparent,
               opacity: pressed ? 0.65 : 1,
             })}
           >
-            <BackIcon color="#241A30" />
+            <BackIcon color={colors.violetTone15} />
           </Pressable>
 
           {!isProfileIncomplete ? (
@@ -129,21 +130,21 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
             <View style={{ flex: 1, gap: 7 }}>
               {isProfileIncomplete ? (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                  <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: '#D83C50' }} />
-                  <Text style={{ fontSize: 12, lineHeight: 16, fontWeight: '600', color: '#C22C41' }}>Incomplete profile</Text>
+                  <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: colors.redTone54 }} />
+                  <Text style={{ fontSize: fontSizes.size12, lineHeight: 16, fontWeight: '600', color: colors.redTone47 }}>Incomplete profile</Text>
                 </View>
               ) : null}
-              <Text selectable style={{ fontSize: 29, lineHeight: 35, fontWeight: '700', color: '#19151D' }}>
+              <Text selectable style={{ fontSize: fontSizes.size29, lineHeight: 35, fontWeight: '700', color: colors.violetTone10 }}>
                 {displayName}
               </Text>
               {displayPhone ? (
-                <Text selectable style={{ fontSize: 14, lineHeight: 19, color: '#706A73' }}>{displayPhone}</Text>
+                <Text selectable style={{ fontSize: fontSizes.size14, lineHeight: 19, color: colors.mauveTone43_2 }}>{displayPhone}</Text>
               ) : null}
               {displayEmail ? (
-                <Text selectable style={{ fontSize: 14, lineHeight: 19, color: '#706A73' }}>{displayEmail}</Text>
+                <Text selectable style={{ fontSize: fontSizes.size14, lineHeight: 19, color: colors.mauveTone43_2 }}>{displayEmail}</Text>
               ) : null}
               {!displayPhone && !displayEmail ? (
-                <Text style={{ fontSize: 14, lineHeight: 20, color: '#706A73' }}>Add your contact details to complete your profile</Text>
+                <Text style={{ fontSize: fontSizes.size14, lineHeight: 20, color: colors.mauveTone43_2 }}>Add your contact details to complete your profile</Text>
               ) : null}
             </View>
 
@@ -157,11 +158,11 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
                   borderRadius: 9,
                   borderCurve: 'continuous',
                   borderWidth: 1,
-                  borderColor: '#A9A3AD',
+                  borderColor: colors.mauveTone66_2,
                   opacity: pressed ? 0.6 : 1,
                 })}
               >
-                <Text style={{ fontSize: 13, fontWeight: '600', color: '#2D2830' }}>Complete</Text>
+                <Text style={{ fontSize: fontSizes.size13, fontWeight: '600', color: colors.mauveTone17_2 }}>Complete</Text>
               </Pressable>
             ) : null}
           </View>
@@ -181,18 +182,18 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
                 borderRadius: 14,
                 borderCurve: 'continuous',
                 borderWidth: 1,
-                borderColor: '#E8E4EA',
-                backgroundColor: pressed ? '#F8F6FA' : '#FFFFFF',
+                borderColor: colors.mauveTone91,
+                backgroundColor: pressed ? colors.violetTone97_4 : colors.white,
               })}
             >
               <Image source={action.imageSource} contentFit="contain" style={{ width: 24, height: 24 }} />
-              <Text style={{ fontSize: 15, lineHeight: 21, fontWeight: '600', color: '#252027' }}>{action.label}</Text>
+              <Text style={{ fontSize: fontSizes.size15, lineHeight: 21, fontWeight: '600', color: colors.mauveTone14_3 }}>{action.label}</Text>
             </Pressable>
           ))}
         </View>
       </View>
 
-      <View style={{ height: 8, marginTop: 22, backgroundColor: '#F6F5F7' }} />
+      <View style={{ height: 8, marginTop: 22, backgroundColor: colors.violetTone96_6 }} />
 
       <View style={{ paddingHorizontal: 20, paddingVertical: 6 }}>
         {menuItems.map((item) => (
@@ -211,14 +212,14 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
           >
             <View style={{ width: 24, alignItems: 'center' }}>
               {item.isAbout ? (
-                <View style={{ width: 16, height: 16, alignItems: 'center', justifyContent: 'center', borderWidth: 1.2, borderColor: '#4E4752', borderRadius: 4, borderCurve: 'continuous' }}>
-                  <Text style={{ fontSize: 7, lineHeight: 9, fontWeight: '800', color: '#4E4752' }}>UC</Text>
+                <View style={{ width: 16, height: 16, alignItems: 'center', justifyContent: 'center', borderWidth: 1.2, borderColor: colors.mauveTone30_2, borderRadius: 4, borderCurve: 'continuous' }}>
+                  <Text style={{ fontSize: fontSizes.size7, lineHeight: 9, fontWeight: '800', color: colors.mauveTone30_2 }}>UC</Text>
                 </View>
               ) : item.imageSource ? (
                 <Image source={item.imageSource} contentFit="contain" style={{ width: 16, height: 16 }} />
               ) : null}
             </View>
-            <Text style={{ flex: 1, fontSize: 15, lineHeight: 21, fontWeight: '400', color: '#332E35' }}>{item.label}</Text>
+            <Text style={{ flex: 1, fontSize: fontSizes.size15, lineHeight: 21, fontWeight: '400', color: colors.mauveTone19_4 }}>{item.label}</Text>
             <ChevronRight />
           </Pressable>
         ))}
@@ -234,12 +235,12 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
           overflow: 'hidden',
           borderRadius: 16,
           borderCurve: 'continuous',
-          backgroundColor: '#F7F2FF',
+          backgroundColor: colors.violetTone97_2,
         }}
       >
         <View style={{ maxWidth: '72%', gap: 8 }}>
-          <Text selectable style={{ fontSize: 17, lineHeight: 23, fontWeight: '700', color: '#251D2E' }}>Refer & earn ₹50</Text>
-          <Text style={{ fontSize: 14, lineHeight: 21, color: '#625A69' }}>Get ₹50 when your friend completes their first booking</Text>
+          <Text selectable style={{ fontSize: fontSizes.size17, lineHeight: 23, fontWeight: '700', color: colors.violetTone15_2 }}>Refer & earn ₹50</Text>
+          <Text style={{ fontSize: fontSizes.size14, lineHeight: 21, color: colors.violetTone38_2 }}>Get ₹50 when your friend completes their first booking</Text>
           <Pressable
             accessibilityRole="button"
             onPress={() => showComingSoon('Refer & earn')}
@@ -250,14 +251,14 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
               paddingVertical: 9,
               borderRadius: 8,
               borderCurve: 'continuous',
-              backgroundColor: '#6138DB',
+              backgroundColor: colors.violetTone54,
               opacity: pressed ? 0.72 : 1,
             })}
           >
-            <Text style={{ fontSize: 13, fontWeight: '700', color: '#FFFFFF' }}>Refer now</Text>
+            <Text style={{ fontSize: fontSizes.size13, fontWeight: '700', color: colors.white }}>Refer now</Text>
           </Pressable>
         </View>
-        <Text style={{ position: 'absolute', right: 18, top: 45, fontSize: 56 }}>🎁</Text>
+        <Text style={{ position: 'absolute', right: 18, top: 45, fontSize: fontSizes.size56 }}>🎁</Text>
       </View>
 
       <Pressable
@@ -275,14 +276,14 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
           borderRadius: 13,
           borderCurve: 'continuous',
           borderWidth: 1,
-          borderColor: '#ECE7EE',
-          backgroundColor: pressed ? '#FFF4F5' : '#FFFFFF',
+          borderColor: colors.violetTone92,
+          backgroundColor: pressed ? colors.redTone98 : colors.white,
         })}
       >
-        <Text style={{ fontSize: 16, fontWeight: '600', color: '#B42738' }}>Logout</Text>
+        <Text style={{ fontSize: fontSizes.size16, fontWeight: '600', color: colors.redTone43 }}>Logout</Text>
       </Pressable>
 
-      <Text selectable style={{ paddingTop: 18, textAlign: 'center', fontSize: 11, color: '#B4AFB6' }}>Version 1.0.0</Text>
+      <Text selectable style={{ paddingTop: 18, textAlign: 'center', fontSize: fontSizes.size11, color: colors.mauveTone70 }}>Version 1.0.0</Text>
     </ScrollView>
   );
 }

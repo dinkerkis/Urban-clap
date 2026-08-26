@@ -1,3 +1,4 @@
+import { colors, fontSizes } from '../theme';
 import { Pressable, Text, View } from 'react-native';
 
 import { BackIcon } from './back-icon';
@@ -18,9 +19,9 @@ export function DashboardScreenHeader({ title, subtitle, onBack }: DashboardScre
         flexDirection: 'row',
         alignItems: 'center',
         gap: 13,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: colors.white,
         borderBottomWidth: 1,
-        borderBottomColor: '#F0EDF3',
+        borderBottomColor: colors.violetTone94_3,
       }}
     >
       {onBack && (
@@ -35,19 +36,19 @@ export function DashboardScreenHeader({ title, subtitle, onBack }: DashboardScre
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: 20,
-            backgroundColor: '#F3F0F8',
+            backgroundColor: colors.violetTone96_3,
             opacity: pressed ? 0.65 : 1,
           })}
         >
-          <BackIcon color="#241A30" />
+          <BackIcon color={colors.violetTone15} />
         </Pressable>
       )}
       <View style={{ flex: 1, gap: 2 }}>
-        <Text selectable style={{ fontSize: 21, lineHeight: 27, fontWeight: '600', color: '#1E1725' }}>
+        <Text selectable style={{ fontSize: fontSizes.size21, lineHeight: 27, fontWeight: '600', color: colors.violetTone12 }}>
           {title}
         </Text>
         {subtitle && (
-          <Text selectable style={{ fontSize: 12, lineHeight: 17, color: '#77717D' }}>
+          <Text selectable style={{ fontSize: fontSizes.size12, lineHeight: 17, color: colors.violetTone47 }}>
             {subtitle}
           </Text>
         )}

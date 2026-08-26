@@ -1,3 +1,4 @@
+import { colors, fontSizes } from '../theme';
 import { Image } from 'expo-image';
 import { Pressable, Text, View } from 'react-native';
 
@@ -24,10 +25,10 @@ export function ServiceCard({ item, quantity = 0, onAdd, onPress, onRemove }: Se
         padding: 12,
         borderRadius: 22,
         borderCurve: 'continuous',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: colors.white,
         borderWidth: 1,
-        borderColor: '#ECE9EF',
-        boxShadow: '0 4px 18px rgba(40, 26, 58, 0.06)',
+        borderColor: colors.violetTone93,
+        boxShadow: `0 4px 18px ${colors.violetTone16Alpha6}`,
         opacity: pressed && onPress ? 0.72 : 1,
       })}
     >
@@ -54,20 +55,20 @@ export function ServiceCard({ item, quantity = 0, onAdd, onPress, onRemove }: Se
             }}
             style={{ position: 'absolute', inset: 0, borderRadius: 18 }}
           />
-        ) : <Text style={{ fontSize: 10, color: '#8A8490' }}>No image</Text>}
+        ) : <Text style={{ fontSize: fontSizes.size10, color: colors.violetTone54_2 }}>No image</Text>}
       </View>
 
       <View style={{ flex: 1, gap: 5 }}>
-        <Text selectable numberOfLines={2} style={{ fontSize: 15, lineHeight: 20, fontWeight: '600', color: '#211A28' }}>
+        <Text selectable numberOfLines={2} style={{ fontSize: fontSizes.size15, lineHeight: 20, fontWeight: '600', color: colors.violetTone13 }}>
           {item.title}
         </Text>
-        <Text selectable numberOfLines={2} style={{ fontSize: 11, lineHeight: 16, color: '#77717D' }}>
+        <Text selectable numberOfLines={2} style={{ fontSize: fontSizes.size11, lineHeight: 16, color: colors.violetTone47 }}>
           {item.description}
         </Text>
         {item.rating > 0 || item.duration ? (
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-            {item.rating > 0 ? <Text style={{ fontSize: 11, color: '#F19A2A' }}>★</Text> : null}
-            <Text selectable style={{ fontSize: 10, fontWeight: '700', color: '#514A58' }}>
+            {item.rating > 0 ? <Text style={{ fontSize: fontSizes.size11, color: colors.orangeTone55 }}>★</Text> : null}
+            <Text selectable style={{ fontSize: fontSizes.size10, fontWeight: '700', color: colors.violetTone32 }}>
               {item.rating > 0 ? `${item.rating} (${item.reviews})` : ''}
               {item.rating > 0 && item.duration ? ' · ' : ''}
               {item.duration}
@@ -75,23 +76,23 @@ export function ServiceCard({ item, quantity = 0, onAdd, onPress, onRemove }: Se
           </View>
         ) : null}
         {item.selectedVariantLabel ? (
-          <View style={{ alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 5, borderRadius: 8, backgroundColor: '#F3EFFB' }}>
-            <Text selectable style={{ fontSize: 9, fontWeight: '700', color: '#625A68' }}>{item.selectedVariantLabel}</Text>
+          <View style={{ alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 5, borderRadius: 8, backgroundColor: colors.violetTone96_2 }}>
+            <Text selectable style={{ fontSize: fontSizes.size9, fontWeight: '700', color: colors.violetTone38 }}>{item.selectedVariantLabel}</Text>
           </View>
         ) : item.variants?.length ? (
-          <View style={{ alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 5, borderRadius: 8, backgroundColor: '#F3EFFB' }}>
-            <Text selectable style={{ fontSize: 9, fontWeight: '700', color: '#625A68' }}>
+          <View style={{ alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 5, borderRadius: 8, backgroundColor: colors.violetTone96_2 }}>
+            <Text selectable style={{ fontSize: fontSizes.size9, fontWeight: '700', color: colors.violetTone38 }}>
               {item.variantLabel || 'Choose an option'} · {item.variants.length} options
             </Text>
           </View>
         ) : null}
         <View style={{ minHeight: 34, flexDirection: 'row', alignItems: 'flex-end', gap: 7 }}>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'baseline', gap: 5 }}>
-            <Text selectable style={{ fontSize: 16, fontWeight: '600', color: '#211A28', fontVariant: ['tabular-nums'] }}>
+            <Text selectable style={{ fontSize: fontSizes.size16, fontWeight: '600', color: colors.violetTone13, fontVariant: ['tabular-nums'] }}>
               {item.variants?.length ? 'From ' : ''}₹{item.price}
             </Text>
             {item.originalPrice > item.price ? (
-              <Text selectable style={{ fontSize: 10, color: '#99939D', textDecorationLine: 'line-through', fontVariant: ['tabular-nums'] }}>
+              <Text selectable style={{ fontSize: fontSizes.size10, color: colors.mauveTone60, textDecorationLine: 'line-through', fontVariant: ['tabular-nums'] }}>
                 ₹{item.originalPrice}
               </Text>
             ) : null}
@@ -111,14 +112,14 @@ export function ServiceCard({ item, quantity = 0, onAdd, onPress, onRemove }: Se
                 justifyContent: 'center',
                 borderRadius: 11,
                 borderWidth: 1.5,
-                borderColor: '#6E45E2',
-                backgroundColor: pressed ? '#EEE7FF' : '#FAF8FF',
+                borderColor: colors.violetTone58,
+                backgroundColor: pressed ? colors.violetTone95 : colors.violetTone99,
               })}
             >
-              <Text style={{ fontSize: 12, fontWeight: '600', color: '#6E45E2' }}>{item.variants?.length && onPress ? 'OPTIONS' : 'ADD'}</Text>
+              <Text style={{ fontSize: fontSizes.size12, fontWeight: '600', color: colors.violetTone58 }}>{item.variants?.length && onPress ? 'OPTIONS' : 'ADD'}</Text>
             </Pressable>
           ) : (
-            <View style={{ height: 34, flexDirection: 'row', alignItems: 'center', borderRadius: 11, backgroundColor: '#6E45E2', overflow: 'hidden' }}>
+            <View style={{ height: 34, flexDirection: 'row', alignItems: 'center', borderRadius: 11, backgroundColor: colors.violetTone58, overflow: 'hidden' }}>
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel={`Remove one ${item.title}`}
@@ -128,9 +129,9 @@ export function ServiceCard({ item, quantity = 0, onAdd, onPress, onRemove }: Se
                 }}
                 style={({ pressed }) => ({ width: 30, height: 34, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.6 : 1 })}
               >
-                <Text style={{ fontSize: 18, color: '#FFFFFF' }}>−</Text>
+                <Text style={{ fontSize: fontSizes.size18, color: colors.white }}>−</Text>
               </Pressable>
-              <Text style={{ minWidth: 22, textAlign: 'center', fontSize: 12, fontWeight: '600', color: '#FFFFFF', fontVariant: ['tabular-nums'] }}>
+              <Text style={{ minWidth: 22, textAlign: 'center', fontSize: fontSizes.size12, fontWeight: '600', color: colors.white, fontVariant: ['tabular-nums'] }}>
                 {quantity}
               </Text>
               <Pressable
@@ -142,7 +143,7 @@ export function ServiceCard({ item, quantity = 0, onAdd, onPress, onRemove }: Se
                 }}
                 style={({ pressed }) => ({ width: 30, height: 34, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.6 : 1 })}
               >
-                <Text style={{ fontSize: 18, color: '#FFFFFF' }}>+</Text>
+                <Text style={{ fontSize: fontSizes.size18, color: colors.white }}>+</Text>
               </Pressable>
             </View>
           )}

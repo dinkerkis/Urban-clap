@@ -1,3 +1,4 @@
+import { colors, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
 import { useEffect, useRef, useState } from 'react';
 import { Alert, Keyboard, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
@@ -14,10 +15,10 @@ import { addAddress, buildAddressFromCurrentLocation, deleteAddress, formatAddre
 import { fetchPlaceDetails, type PlaceSuggestion } from '../../services/places-api';
 import { getRecentLocations, saveRecentLocation, type RecentLocation } from '../../services/recent-locations-storage';
 
-const PURPLE = '#6E45E2';
-const TEXT = '#1F1A22';
-const MUTED = '#777078';
-const BORDER = '#E7E3E9';
+const PURPLE = colors.violetTone58;
+const TEXT = colors.mauveTone12_2;
+const MUTED = colors.neutralTone45;
+const BORDER = colors.mauveTone90;
 
 export function formatContactPhone(value?: string): string {
   const trimmed = value?.trim();
@@ -39,11 +40,11 @@ type Props = {
 };
 
 function CloseButton({ onPress }: { onPress: () => void }) {
-  return <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={onPress} style={({ pressed }) => ({ position: 'absolute', right: 18, top: -42, zIndex: 5, width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: '#FFFFFF', opacity: pressed ? 0.65 : 1 })}><Text style={{ fontSize: 20, lineHeight: 22, fontWeight: '300', color: TEXT }}>×</Text></Pressable>;
+  return <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={onPress} style={({ pressed }) => ({ position: 'absolute', right: 18, top: -42, zIndex: 5, width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: colors.white, opacity: pressed ? 0.65 : 1 })}><Text style={{ fontSize: fontSizes.size20, lineHeight: 22, fontWeight: '300', color: TEXT }}>×</Text></Pressable>;
 }
 
 function SearchIcon() {
-  return <Image source={require('../../../assets/search.png')} contentFit="contain" tintColor="#6B6572" style={{ width: 18, height: 18 }} />;
+  return <Image source={require('../../../assets/search.png')} contentFit="contain" tintColor={colors.violetTone42} style={{ width: 18, height: 18 }} />;
 }
 
 function TargetIcon() {
@@ -61,13 +62,13 @@ function TargetIcon() {
 
 function GoogleMark() {
   return (
-    <Text style={{ marginLeft: -2, fontSize: 12, fontWeight: '700', letterSpacing: -0.3 }}>
-      <Text style={{ color: '#4285F4' }}>G</Text>
-      <Text style={{ color: '#EA4335' }}>o</Text>
-      <Text style={{ color: '#FBBC05' }}>o</Text>
-      <Text style={{ color: '#4285F4' }}>g</Text>
-      <Text style={{ color: '#34A853' }}>l</Text>
-      <Text style={{ color: '#EA4335' }}>e</Text>
+    <Text style={{ marginLeft: -2, fontSize: fontSizes.size12, fontWeight: '700', letterSpacing: -0.3 }}>
+      <Text style={{ color: colors.blueTone61 }}>G</Text>
+      <Text style={{ color: colors.redTone56 }}>o</Text>
+      <Text style={{ color: colors.yellowTone50 }}>o</Text>
+      <Text style={{ color: colors.blueTone61 }}>g</Text>
+      <Text style={{ color: colors.greenTone43 }}>l</Text>
+      <Text style={{ color: colors.redTone56 }}>e</Text>
     </Text>
   );
 }
@@ -146,13 +147,13 @@ export function LocationSearchSheet({ onClose, onSelect }: { addresses: ReturnTy
   };
 
   return <View style={{ flex: 1 }}>
-    <Pressable onPress={onClose} style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.72)' }} />
+    <Pressable onPress={onClose} style={{ position: 'absolute', inset: 0, backgroundColor: colors.blackAlpha72 }} />
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'height' : undefined} style={{ flex: 1, justifyContent: 'flex-end' }}>
-      <View style={{ height: '82%', paddingTop: 24, paddingHorizontal: 18, paddingBottom: 0, borderTopLeftRadius: 16, borderTopRightRadius: 16, borderBottomLeftRadius: 0, borderBottomRightRadius: 0, backgroundColor: '#FFFFFF' }}>
-        <View pointerEvents="none" style={{ position: 'absolute', right: 0, bottom: -28, left: 0, height: 28, backgroundColor: '#FFFFFF' }} />
+      <View style={{ height: '82%', paddingTop: 24, paddingHorizontal: 18, paddingBottom: 0, borderTopLeftRadius: 16, borderTopRightRadius: 16, borderBottomLeftRadius: 0, borderBottomRightRadius: 0, backgroundColor: colors.white }}>
+        <View pointerEvents="none" style={{ position: 'absolute', right: 0, bottom: -28, left: 0, height: 28, backgroundColor: colors.white }} />
         <CloseButton onPress={onClose} />
-        <View style={{ height: 48, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 15, borderWidth: 1, borderColor: '#DDD9DE', borderRadius: 8 }}>
-          <SearchIcon /><TextInput value={query} onChangeText={setQuery} placeholder="Search for your location/society/apartment" placeholderTextColor="#AAA4AC" style={{ flex: 1, height: 46, marginLeft: 13, fontSize: 15, color: TEXT }} />
+        <View style={{ height: 48, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 15, borderWidth: 1, borderColor: colors.mauveTone86, borderRadius: 8 }}>
+          <SearchIcon /><TextInput value={query} onChangeText={setQuery} placeholder="Search for your location/society/apartment" placeholderTextColor={colors.mauveTone66_3} style={{ flex: 1, height: 46, marginLeft: 13, fontSize: fontSizes.size15, color: TEXT }} />
         </View>
         <Pressable
           accessibilityRole="button"
@@ -163,7 +164,7 @@ export function LocationSearchSheet({ onClose, onSelect }: { addresses: ReturnTy
             flexDirection: 'row',
             alignItems: 'center',
             gap: 12,
-            backgroundColor: pressed ? '#F8F7F9' : '#FFFFFF',
+            backgroundColor: pressed ? colors.violetTone97_5 : colors.white,
             opacity: locating ? 0.7 : 1,
           })}
         >
@@ -172,44 +173,44 @@ export function LocationSearchSheet({ onClose, onSelect }: { addresses: ReturnTy
               <LoadingDots gap={5} size={5} />
             </View>
           ) : <TargetIcon />}
-          <Text style={{ fontSize: 15, fontWeight: '600', color: PURPLE }}>Use current location</Text>
+          <Text style={{ fontSize: fontSizes.size15, fontWeight: '600', color: PURPLE }}>Use current location</Text>
         </Pressable>
-        <View style={{ height: 8, marginHorizontal: -18, backgroundColor: '#F6F5F7' }} />
+        <View style={{ height: 8, marginHorizontal: -18, backgroundColor: colors.violetTone96_6 }} />
         <ScrollView keyboardDismissMode="interactive" keyboardShouldPersistTaps="handled" style={{ flex: 1, marginHorizontal: -18 }} contentContainerStyle={{ paddingHorizontal: 18, paddingBottom: 12 }}>
-          {!isSearchActive ? <Text style={{ marginTop: 23, marginBottom: 8, fontSize: 16, lineHeight: 22, fontWeight: '700', color: TEXT }}>Recents</Text> : null}
+          {!isSearchActive ? <Text style={{ marginTop: 23, marginBottom: 8, fontSize: fontSizes.size16, lineHeight: 22, fontWeight: '700', color: TEXT }}>Recents</Text> : null}
           {isSearchActive ? (
             isSearching && suggestions.length === 0 ? (
-              <View style={{ minHeight: 72, alignItems: 'center', justifyContent: 'center', backgroundColor: 'transparent' }}><LoadingDots /></View>
+              <View style={{ minHeight: 72, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.transparent }}><LoadingDots /></View>
             ) : searchError ? (
-              <Text style={{ paddingVertical: 16, fontSize: 13, color: MUTED }}>{searchError}</Text>
+              <Text style={{ paddingVertical: 16, fontSize: fontSizes.size13, color: MUTED }}>{searchError}</Text>
             ) : suggestions.length === 0 ? (
-              <Text style={{ paddingVertical: 16, fontSize: 13, color: MUTED }}>No locations found.</Text>
+              <Text style={{ paddingVertical: 16, fontSize: fontSizes.size13, color: MUTED }}>No locations found.</Text>
             ) : suggestions.map((suggestion) => (
-              <Pressable key={suggestion.placeId} disabled={selectingPlace} onPress={() => void selectSuggestion(suggestion)} style={({ pressed }) => ({ minHeight: 76, flexDirection: 'row', paddingVertical: 13, opacity: pressed || selectingPlace ? 0.55 : 1, borderBottomWidth: 1, borderBottomColor: '#F1EEF2' })}>
+              <Pressable key={suggestion.placeId} disabled={selectingPlace} onPress={() => void selectSuggestion(suggestion)} style={({ pressed }) => ({ minHeight: 76, flexDirection: 'row', paddingVertical: 13, opacity: pressed || selectingPlace ? 0.55 : 1, borderBottomWidth: 1, borderBottomColor: colors.mauveTone94_2 })}>
                 <View style={{ width: 28, paddingTop: 3 }}>
-                  <Image source={require('../../../assets/location.png')} contentFit="contain" tintColor="#58515B" style={{ width: 17, height: 17 }} />
+                  <Image source={require('../../../assets/location.png')} contentFit="contain" tintColor={colors.mauveTone34} style={{ width: 17, height: 17 }} />
                 </View>
-                <View style={{ flex: 1 }}><Text style={{ fontSize: 15, lineHeight: 21, fontWeight: '600', color: TEXT }}>{suggestion.title}</Text><Text style={{ marginTop: 3, fontSize: 13, lineHeight: 19, color: MUTED }}>{suggestion.subtitle}</Text></View>
+                <View style={{ flex: 1 }}><Text style={{ fontSize: fontSizes.size15, lineHeight: 21, fontWeight: '600', color: TEXT }}>{suggestion.title}</Text><Text style={{ marginTop: 3, fontSize: fontSizes.size13, lineHeight: 19, color: MUTED }}>{suggestion.subtitle}</Text></View>
               </Pressable>
             ))
           ) : recentLocations.length === 0 ? (
-            <Text style={{ paddingVertical: 16, fontSize: 13, color: MUTED }}>No recent locations yet.</Text>
+            <Text style={{ paddingVertical: 16, fontSize: fontSizes.size13, color: MUTED }}>No recent locations yet.</Text>
           ) : (
             <>
               {displayedRecents.map((place, index) => (
-                <Pressable key={place.placeId} disabled={selectingPlace} onPress={() => void selectRecent(place)} style={({ pressed }) => ({ minHeight: 76, flexDirection: 'row', paddingVertical: 13, opacity: pressed || selectingPlace ? 0.55 : 1, borderBottomWidth: index < displayedRecents.length - 1 ? 1 : 0, borderBottomColor: '#F1EEF2' })}>
+                <Pressable key={place.placeId} disabled={selectingPlace} onPress={() => void selectRecent(place)} style={({ pressed }) => ({ minHeight: 76, flexDirection: 'row', paddingVertical: 13, opacity: pressed || selectingPlace ? 0.55 : 1, borderBottomWidth: index < displayedRecents.length - 1 ? 1 : 0, borderBottomColor: colors.mauveTone94_2 })}>
                   <View style={{ width: 28, paddingTop: 3 }}>
-                    <Image source={require('../../../assets/recent.png')} contentFit="contain" tintColor="#58515B" style={{ width: 17, height: 17 }} />
+                    <Image source={require('../../../assets/recent.png')} contentFit="contain" tintColor={colors.mauveTone34} style={{ width: 17, height: 17 }} />
                   </View>
-                  <View style={{ flex: 1 }}><Text style={{ fontSize: 15, lineHeight: 21, fontWeight: '600', color: TEXT }}>{place.title}</Text><Text style={{ marginTop: 3, fontSize: 13, lineHeight: 19, color: MUTED }}>{place.subtitle}</Text></View>
+                  <View style={{ flex: 1 }}><Text style={{ fontSize: fontSizes.size15, lineHeight: 21, fontWeight: '600', color: TEXT }}>{place.title}</Text><Text style={{ marginTop: 3, fontSize: fontSizes.size13, lineHeight: 19, color: MUTED }}>{place.subtitle}</Text></View>
                 </Pressable>
               ))}
               {!showAllRecents && recentLocations.length > 2 ? (
                 <>
                   <Pressable accessibilityRole="button" onPress={() => setShowAllRecents(true)} style={({ pressed }) => ({ alignSelf: 'flex-start', paddingTop: 4, paddingBottom: 12, opacity: pressed ? 0.55 : 1 })}>
-                    <Text style={{ fontSize: 15, fontWeight: '600', color: PURPLE }}>View more</Text>
+                    <Text style={{ fontSize: fontSizes.size15, fontWeight: '600', color: PURPLE }}>View more</Text>
                   </Pressable>
-                  <View style={{ height: 8, marginHorizontal: -18, alignSelf: 'stretch', backgroundColor: '#F6F5F7' }} />
+                  <View style={{ height: 8, marginHorizontal: -18, alignSelf: 'stretch', backgroundColor: colors.violetTone96_6 }} />
                 </>
               ) : null}
             </>
@@ -224,13 +225,13 @@ export function LocationSearchSheet({ onClose, onSelect }: { addresses: ReturnTy
             flexDirection: 'row',
             justifyContent: 'center',
             gap: 4,
-            backgroundColor: '#FFFFFF',
+            backgroundColor: colors.white,
             borderTopWidth: 1,
-            borderTopColor: '#EDECEE',
-            boxShadow: '0 -3px 10px rgba(23, 20, 25, 0.06)',
+            borderTopColor: colors.violetTone93_2,
+            boxShadow: `0 -3px 10px ${colors.mauveTone9Alpha6}`,
           }}
         >
-          <Text style={{ fontSize: 11, color: '#9A959C' }}>powered by</Text>
+          <Text style={{ fontSize: fontSizes.size11, color: colors.neutralTone60 }}>powered by</Text>
           <GoogleMark />
         </View>
       </View>
@@ -254,7 +255,7 @@ function MapPreview({ latitude, longitude, onPinChange }: { latitude: number; lo
     mapRef.current?.animateToRegion(region);
     onPinChange(region.latitude, region.longitude);
   };
-  return <View style={{ height: 300, overflow: 'hidden', backgroundColor: '#E5E9E2' }}>
+  return <View style={{ height: 300, overflow: 'hidden', backgroundColor: colors.greenTone90 }}>
     <MapView
       ref={mapRef}
       initialRegion={initialRegion}
@@ -268,17 +269,17 @@ function MapPreview({ latitude, longitude, onPinChange }: { latitude: number; lo
     />
     <View pointerEvents="none" style={{ position: 'absolute', alignSelf: 'center', top: '50%', alignItems: 'center', marginTop: -46 }}>
       <View style={{ marginBottom: 4, alignItems: 'center' }}>
-        <View style={{ paddingHorizontal: 12, paddingVertical: 10, borderRadius: 6, backgroundColor: '#211B22' }}>
-          <Text style={{ fontSize: 13, lineHeight: 12, fontWeight: '600', color: '#FFFFFF' }}>Place the pin accurately on map</Text>
+        <View style={{ paddingHorizontal: 12, paddingVertical: 10, borderRadius: 6, backgroundColor: colors.mauveTone12_3 }}>
+          <Text style={{ fontSize: fontSizes.size13, lineHeight: 12, fontWeight: '600', color: colors.white }}>Place the pin accurately on map</Text>
         </View>
-        <View style={{ width: 0, height: 0, borderLeftWidth: 6, borderRightWidth: 6, borderTopWidth: 7, borderLeftColor: 'transparent', borderRightColor: 'transparent', borderTopColor: '#211B22' }} />
+        <View style={{ width: 0, height: 0, borderLeftWidth: 6, borderRightWidth: 6, borderTopWidth: 7, borderLeftColor: colors.transparent, borderRightColor: colors.transparent, borderTopColor: colors.mauveTone12_3 }} />
       </View>
       <View style={{ width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: PURPLE }}>
-        <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#FFFFFF' }} />
+        <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: colors.white }} />
       </View>
       <View style={{ width: 2, height: 14, backgroundColor: PURPLE }} />
     </View>
-    <Pressable accessibilityRole="button" accessibilityLabel="Use current location" onPress={() => void goToCurrentLocation()} style={({ pressed }) => ({ position: 'absolute', right: 12, bottom: 12, width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: '#FFFFFF', opacity: pressed ? 0.7 : 1, shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 4 })}>
+    <Pressable accessibilityRole="button" accessibilityLabel="Use current location" onPress={() => void goToCurrentLocation()} style={({ pressed }) => ({ position: 'absolute', right: 12, bottom: 12, width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: colors.white, opacity: pressed ? 0.7 : 1, shadowColor: colors.black, shadowOpacity: 0.18, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 4 })}>
       {locating ? <LoadingDots color={TEXT} gap={4} size={4} /> : <View style={{ width: 18, height: 18, alignItems: 'center', justifyContent: 'center' }}><View style={{ width: 14, height: 14, borderWidth: 1.6, borderColor: TEXT, borderRadius: 7 }} /><View style={{ position: 'absolute', width: 5, height: 5, borderRadius: 3, backgroundColor: TEXT }} /><View style={{ position: 'absolute', top: 0, width: 1.5, height: 3, backgroundColor: TEXT }} /><View style={{ position: 'absolute', bottom: 0, width: 1.5, height: 3, backgroundColor: TEXT }} /><View style={{ position: 'absolute', left: 0, width: 3, height: 1.5, backgroundColor: TEXT }} /><View style={{ position: 'absolute', right: 0, width: 3, height: 1.5, backgroundColor: TEXT }} /></View>}
     </Pressable>
   </View>;
@@ -304,18 +305,18 @@ export function ContactDetailsModal({ initialName, initialPhone, onClose, onSave
 
   return <Modal animationType="fade" transparent onRequestClose={onClose} visible>
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'height' : undefined} style={{ flex: 1, justifyContent: 'flex-end' }}>
-      <Pressable onPress={onClose} style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.72)' }} />
-      <View style={{ paddingHorizontal: 18, paddingTop: 24, paddingBottom: keyboardVisible ? 14 : Math.max(insets.bottom, 14) + 12, borderTopLeftRadius: 16, borderTopRightRadius: 16, backgroundColor: '#FFFFFF' }}>
-        <View pointerEvents="none" style={{ position: 'absolute', right: 0, bottom: -36, left: 0, height: 36, backgroundColor: '#FFFFFF' }} />
+      <Pressable onPress={onClose} style={{ position: 'absolute', inset: 0, backgroundColor: colors.blackAlpha72 }} />
+      <View style={{ paddingHorizontal: 18, paddingTop: 24, paddingBottom: keyboardVisible ? 14 : Math.max(insets.bottom, 14) + 12, borderTopLeftRadius: 16, borderTopRightRadius: 16, backgroundColor: colors.white }}>
+        <View pointerEvents="none" style={{ position: 'absolute', right: 0, bottom: -36, left: 0, height: 36, backgroundColor: colors.white }} />
         <CloseButton onPress={onClose} />
-        <Text style={{ fontSize: 20, lineHeight: 27, fontWeight: '700', color: TEXT }}>Where should we send this booking&apos;s updates?</Text>
+        <Text style={{ fontSize: fontSizes.size20, lineHeight: 27, fontWeight: '700', color: TEXT }}>Where should we send this booking&apos;s updates?</Text>
         <View style={{ height: 50, marginTop: 22, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: BORDER, borderRadius: 8 }}>
-          <Text style={{ width: 64, textAlign: 'center', fontSize: 15, color: '#4E4850' }}>+91</Text>
+          <Text style={{ width: 64, textAlign: 'center', fontSize: fontSizes.size15, color: colors.mauveTone30_3 }}>+91</Text>
           <View style={{ width: 1, height: 28, backgroundColor: BORDER }} />
-          <TextInput autoFocus keyboardType="number-pad" maxLength={10} value={contactPhone} onChangeText={(value) => setContactPhone(value.replace(/\D/g, '').slice(0, 10))} placeholder="Phone number" placeholderTextColor="#AAA4AC" style={{ flex: 1, height: 48, paddingHorizontal: 13, fontSize: 15, color: TEXT }} />
+          <TextInput autoFocus keyboardType="number-pad" maxLength={10} value={contactPhone} onChangeText={(value) => setContactPhone(value.replace(/\D/g, '').slice(0, 10))} placeholder="Phone number" placeholderTextColor={colors.mauveTone66_3} style={{ flex: 1, height: 48, paddingHorizontal: 13, fontSize: fontSizes.size15, color: TEXT }} />
         </View>
-        <TextInput autoCapitalize="words" value={contactName} onChangeText={setContactName} placeholder="Name" placeholderTextColor="#AAA4AC" style={{ height: 50, marginTop: 12, paddingHorizontal: 13, borderWidth: 1, borderColor: BORDER, borderRadius: 8, fontSize: 15, color: TEXT }} />
-        <Pressable disabled={!isValid} onPress={() => onSave(contactName.trim(), `+91 ${contactPhone}`)} style={({ pressed }) => ({ height: 48, marginTop: 24, alignItems: 'center', justifyContent: 'center', borderRadius: 8, backgroundColor: isValid ? PURPLE : '#D9D5DD', opacity: pressed ? 0.7 : 1 })}><Text style={{ fontSize: 15, fontWeight: '700', color: '#FFFFFF' }}>Save details</Text></Pressable>
+        <TextInput autoCapitalize="words" value={contactName} onChangeText={setContactName} placeholder="Name" placeholderTextColor={colors.mauveTone66_3} style={{ height: 50, marginTop: 12, paddingHorizontal: 13, borderWidth: 1, borderColor: BORDER, borderRadius: 8, fontSize: fontSizes.size15, color: TEXT }} />
+        <Pressable disabled={!isValid} onPress={() => onSave(contactName.trim(), `+91 ${contactPhone}`)} style={({ pressed }) => ({ height: 48, marginTop: 24, alignItems: 'center', justifyContent: 'center', borderRadius: 8, backgroundColor: isValid ? PURPLE : colors.violetTone85_2, opacity: pressed ? 0.7 : 1 })}><Text style={{ fontSize: fontSizes.size15, fontWeight: '700', color: colors.white }}>Save details</Text></Pressable>
       </View>
     </KeyboardAvoidingView>
   </Modal>;
@@ -399,17 +400,17 @@ export function AddressDetailsSheet({ authToken, name, phone, place, onChange, o
     } catch (error) { Alert.alert('Could not save address', error instanceof Error ? error.message : 'Please try again.'); }
     finally { setSaving(false); }
   };
-  return <View style={{ flex: 1, justifyContent: 'flex-end' }}><Pressable onPress={onClose} style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.72)' }} />
-    <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} style={({ pressed }) => ({ position: 'absolute', right: 18, top: '4.5%', zIndex: 5, width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: '#FFFFFF', opacity: pressed ? 0.65 : 1 })}><Text style={{ fontSize: 20, lineHeight: 22, fontWeight: '300', color: TEXT }}>×</Text></Pressable>
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ height: '91%' }}><View style={{ flex: 1, overflow: 'hidden', borderTopLeftRadius: 16, borderTopRightRadius: 16, backgroundColor: '#FFFFFF' }}>
+  return <View style={{ flex: 1, justifyContent: 'flex-end' }}><Pressable onPress={onClose} style={{ position: 'absolute', inset: 0, backgroundColor: colors.blackAlpha72 }} />
+    <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} style={({ pressed }) => ({ position: 'absolute', right: 18, top: '4.5%', zIndex: 5, width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: colors.white, opacity: pressed ? 0.65 : 1 })}><Text style={{ fontSize: fontSizes.size20, lineHeight: 22, fontWeight: '300', color: TEXT }}>×</Text></Pressable>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ height: '91%' }}><View style={{ flex: 1, overflow: 'hidden', borderTopLeftRadius: 16, borderTopRightRadius: 16, backgroundColor: colors.white }}>
       <MapPreview latitude={pinLocation.latitude} longitude={pinLocation.longitude} onPinChange={updateAddressFromPin} /><ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingHorizontal: 18, paddingBottom: Math.max(insets.bottom, 14) + 14 }}>
-        <View style={{ width: 34, height: 4, alignSelf: 'center', marginTop: 9, borderRadius: 2, backgroundColor: '#BEB8C0' }} />
-        <View style={{ minHeight: 89, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: BORDER }}><View style={{ flex: 1 }}><Text style={{ fontSize: 16, fontWeight: '700', color: TEXT }}>{resolvedPlace.title}</Text><Text style={{ marginTop: 5, fontSize: 13, lineHeight: 19, color: MUTED }}>{lookingUpAddress ? 'Updating address...' : resolvedPlace.subtitle}</Text></View><Pressable onPress={onChange} style={{ paddingHorizontal: 14, paddingVertical: 8, borderWidth: 1, borderColor: PURPLE, borderRadius: 8 }}><Text style={{ fontSize: 13, fontWeight: '600', color: PURPLE }}>Change</Text></Pressable></View>
-        <TextInput value={houseNo} onChangeText={setHouseNo} placeholder="House/Flat Number" placeholderTextColor="#B2ACB4" style={{ height: 50, marginTop: 16, paddingHorizontal: 13, borderWidth: 1, borderColor: BORDER, borderRadius: 8, fontSize: 14, color: TEXT }} />
-        <TextInput value={landmark} onChangeText={setLandmark} placeholder="Landmark (Optional)" placeholderTextColor="#B2ACB4" style={{ height: 50, marginTop: 11, paddingHorizontal: 13, borderWidth: 1, borderColor: BORDER, borderRadius: 8, fontSize: 14, color: TEXT }} />
-        <Text style={{ marginTop: 18, fontSize: 13, color: TEXT }}>Save as</Text><View style={{ marginTop: 9, flexDirection: 'row', gap: 10 }}>{(['Home', 'Other'] as const).map((item) => <Pressable key={item} onPress={() => setLabel(item)} style={{ paddingHorizontal: 19, height: 38, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: PURPLE, borderRadius: 7, backgroundColor: label === item ? PURPLE : '#FFFFFF' }}><Text style={{ fontSize: 14, fontWeight: '600', color: label === item ? '#FFFFFF' : PURPLE }}>{item}</Text></Pressable>)}</View>
-        <View style={{ height: 60, marginTop: 14, flexDirection: 'row', alignItems: 'center', borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#F0EDF1' }}><Image source={require('../../../assets/voice_calls.png')} contentFit="contain" tintColor={TEXT} style={{ width: 18, height: 18 }} /><Text style={{ flex: 1, marginLeft: 13, fontSize: 14, color: TEXT }}>{contactName}, {contactPhone || 'Phone number'}</Text><Pressable accessibilityRole="button" accessibilityLabel="Edit contact details" hitSlop={10} onPress={() => setContactEditorVisible(true)} style={({ pressed }) => ({ width: 38, height: 38, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.55 : 1 })}><EditIcon size={16} /></Pressable></View>
-        <Pressable disabled={!houseNo.trim() || saving} onPress={() => void save()} style={({ pressed }) => ({ height: 48, marginTop: 18, alignItems: 'center', justifyContent: 'center', borderRadius: 8, backgroundColor: houseNo.trim() ? PURPLE : '#D9D5DD', opacity: pressed ? 0.7 : 1 })}>{saving ? <LoadingDots color="#FFFFFF" gap={6} size={5} /> : <Text style={{ fontSize: 15, fontWeight: '700', color: '#FFFFFF' }}>{saveLabel}</Text>}</Pressable>
+        <View style={{ width: 34, height: 4, alignSelf: 'center', marginTop: 9, borderRadius: 2, backgroundColor: colors.mauveTone74 }} />
+        <View style={{ minHeight: 89, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: BORDER }}><View style={{ flex: 1 }}><Text style={{ fontSize: fontSizes.size16, fontWeight: '700', color: TEXT }}>{resolvedPlace.title}</Text><Text style={{ marginTop: 5, fontSize: fontSizes.size13, lineHeight: 19, color: MUTED }}>{lookingUpAddress ? 'Updating address...' : resolvedPlace.subtitle}</Text></View><Pressable onPress={onChange} style={{ paddingHorizontal: 14, paddingVertical: 8, borderWidth: 1, borderColor: PURPLE, borderRadius: 8 }}><Text style={{ fontSize: fontSizes.size13, fontWeight: '600', color: PURPLE }}>Change</Text></Pressable></View>
+        <TextInput value={houseNo} onChangeText={setHouseNo} placeholder="House/Flat Number" placeholderTextColor={colors.mauveTone69} style={{ height: 50, marginTop: 16, paddingHorizontal: 13, borderWidth: 1, borderColor: BORDER, borderRadius: 8, fontSize: fontSizes.size14, color: TEXT }} />
+        <TextInput value={landmark} onChangeText={setLandmark} placeholder="Landmark (Optional)" placeholderTextColor={colors.mauveTone69} style={{ height: 50, marginTop: 11, paddingHorizontal: 13, borderWidth: 1, borderColor: BORDER, borderRadius: 8, fontSize: fontSizes.size14, color: TEXT }} />
+        <Text style={{ marginTop: 18, fontSize: fontSizes.size13, color: TEXT }}>Save as</Text><View style={{ marginTop: 9, flexDirection: 'row', gap: 10 }}>{(['Home', 'Other'] as const).map((item) => <Pressable key={item} onPress={() => setLabel(item)} style={{ paddingHorizontal: 19, height: 38, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: PURPLE, borderRadius: 7, backgroundColor: label === item ? PURPLE : colors.white }}><Text style={{ fontSize: fontSizes.size14, fontWeight: '600', color: label === item ? colors.white : PURPLE }}>{item}</Text></Pressable>)}</View>
+        <View style={{ height: 60, marginTop: 14, flexDirection: 'row', alignItems: 'center', borderTopWidth: 1, borderBottomWidth: 1, borderColor: colors.mauveTone94 }}><Image source={require('../../../assets/voice_calls.png')} contentFit="contain" tintColor={TEXT} style={{ width: 18, height: 18 }} /><Text style={{ flex: 1, marginLeft: 13, fontSize: fontSizes.size14, color: TEXT }}>{contactName}, {contactPhone || 'Phone number'}</Text><Pressable accessibilityRole="button" accessibilityLabel="Edit contact details" hitSlop={10} onPress={() => setContactEditorVisible(true)} style={({ pressed }) => ({ width: 38, height: 38, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.55 : 1 })}><EditIcon size={16} /></Pressable></View>
+        <Pressable disabled={!houseNo.trim() || saving} onPress={() => void save()} style={({ pressed }) => ({ height: 48, marginTop: 18, alignItems: 'center', justifyContent: 'center', borderRadius: 8, backgroundColor: houseNo.trim() ? PURPLE : colors.violetTone85_2, opacity: pressed ? 0.7 : 1 })}>{saving ? <LoadingDots color={colors.white} gap={6} size={5} /> : <Text style={{ fontSize: fontSizes.size15, fontWeight: '700', color: colors.white }}>{saveLabel}</Text>}</Pressable>
       </ScrollView></View></KeyboardAvoidingView>
     {contactEditorVisible ? <ContactDetailsModal initialName={contactName} initialPhone={contactPhone} onClose={() => setContactEditorVisible(false)} onSave={(nextName, nextPhone) => { setContactName(nextName); setContactPhone(nextPhone); setContactEditorVisible(false); }} /> : null}
   </View>;
@@ -445,13 +446,13 @@ export function ManageAddressesScreen({ authToken, name, phone, onBack }: Props)
       },
     ]);
   };
-  return <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
-    <View style={{ position: 'absolute', zIndex: 10, top: 0, left: 0, right: 0, paddingTop: Math.max(insets.top, 16) + 6, paddingHorizontal: 20, paddingBottom: 8, backgroundColor: 'rgba(255,255,255,0.88)' }}><View style={{ height: 44, flexDirection: 'row', alignItems: 'center' }}><Pressable hitSlop={10} onPress={onBack} style={({ pressed }) => ({ width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 17, borderWidth: 1, borderColor: '#E4E0E6', backgroundColor: 'transparent', opacity: pressed ? 0.65 : 1 })}><BackIcon color="#241A30" /></Pressable><Text style={{ marginLeft: 13, fontSize: 18, fontWeight: '700', color: TEXT }}>Manage Addresses</Text></View></View>
-    <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} style={{ flex: 1, backgroundColor: '#FFFFFF' }} contentContainerStyle={{ paddingTop: headerHeight, paddingHorizontal: 20, paddingBottom: 40 }}><Pressable onPress={() => { setSelectedPlace(null); setSheet('search'); }} style={{ height: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#F1EEF2' }}><Text style={{ width: 28, fontSize: 23, fontWeight: '300', color: PURPLE }}>+</Text><Text style={{ fontSize: 15, fontWeight: '600', color: PURPLE }}>Add another address</Text></Pressable>
-      {addressState.isLoading ? <View style={{ marginTop: 34, alignItems: 'center', backgroundColor: 'transparent' }}><LoadingDots /></View> : null}
-      {addressState.errorMessage ? <Pressable onPress={addressState.retry}><Text style={{ marginTop: 28, textAlign: 'center', fontSize: 14, color: MUTED }}>{addressState.errorMessage}{'\n'}Tap to retry</Text></Pressable> : null}
-      {addressState.addresses.map((address) => <View key={address._id} style={{ minHeight: 120, paddingTop: 22, paddingBottom: 12, zIndex: menuId === address._id ? 10 : 0, elevation: menuId === address._id ? 10 : 0, borderBottomWidth: 1, borderBottomColor: '#F5F2F6' }}><Text style={{ fontSize: 16, fontWeight: '700', color: TEXT }}>{formatAddressLabel(address.label)}</Text><Text style={{ marginTop: 6, paddingRight: 34, fontSize: 13, lineHeight: 20, color: '#514B53' }}>{formatSavedAddress(address)}</Text><Text style={{ marginTop: 5, fontSize: 13, color: '#514B53' }}>{address.contactName?.trim() || name || 'User'}, {formatContactPhone(address.contactPhone || phone)}</Text><Pressable accessibilityRole="button" accessibilityLabel="Address options" hitSlop={10} pressRetentionOffset={14} onPress={() => setMenuId((current) => current === address._id ? null : address._id)} style={({ pressed }) => ({ position: 'absolute', zIndex: 12, right: -7, top: 9, width: 48, height: 48, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.5 : 1 })}><Image source={require('../../../assets/more.png')} contentFit="contain" tintColor={TEXT} style={{ width: 14, height: 19 }} /></Pressable>{menuId === address._id ? <View style={{ position: 'absolute', right: 0, top: 52, zIndex: 11, width: 128, paddingVertical: 4, borderRadius: 3, backgroundColor: '#FFFFFF', shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 8, elevation: 12 }}><Pressable onPress={() => { setMenuId(null); selectPlace({ addressId: address._id, title: formatAddressLabel(address.label), subtitle: formatSavedAddress(address), addressLine1: address.addressLine1, addressLine2: address.addressLine2, city: address.city, state: address.state, country: address.country, pincode: address.pincode, houseNo: address.houseNo, landmark: address.landmark, contactName: address.contactName, contactPhone: address.contactPhone, addressType: address.addressType, instructions: address.instructions, label: address.label?.toLowerCase() as AddAddressPayload['label'], latitude: address.location?.coordinates?.[1] ?? 30.7033, longitude: address.location?.coordinates?.[0] ?? 76.7176 }); }} style={{ padding: 14 }}><Text style={{ fontSize: 14, color: TEXT }}>Edit</Text></Pressable><Pressable disabled={deletingId === address._id} onPress={() => confirmDelete(address._id)} style={{ padding: 14 }}><Text style={{ fontSize: 14, color: TEXT }}>{deletingId === address._id ? 'Deleting...' : 'Delete'}</Text></Pressable></View> : null}</View>)}
-      {!addressState.isLoading && !addressState.errorMessage && addressState.addresses.length === 0 ? <Text style={{ marginTop: 38, textAlign: 'center', fontSize: 14, color: MUTED }}>No saved addresses yet.</Text> : null}
+  return <View style={{ flex: 1, backgroundColor: colors.white }}>
+    <View style={{ position: 'absolute', zIndex: 10, top: 0, left: 0, right: 0, paddingTop: Math.max(insets.top, 16) + 6, paddingHorizontal: 20, paddingBottom: 8, backgroundColor: colors.whiteAlpha88 }}><View style={{ height: 44, flexDirection: 'row', alignItems: 'center' }}><Pressable hitSlop={10} onPress={onBack} style={({ pressed }) => ({ width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 17, borderWidth: 1, borderColor: colors.mauveTone89, backgroundColor: colors.transparent, opacity: pressed ? 0.65 : 1 })}><BackIcon color={colors.violetTone15} /></Pressable><Text style={{ marginLeft: 13, fontSize: fontSizes.size18, fontWeight: '700', color: TEXT }}>Manage Addresses</Text></View></View>
+    <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} style={{ flex: 1, backgroundColor: colors.white }} contentContainerStyle={{ paddingTop: headerHeight, paddingHorizontal: 20, paddingBottom: 40 }}><Pressable onPress={() => { setSelectedPlace(null); setSheet('search'); }} style={{ height: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: colors.mauveTone94_2 }}><Text style={{ width: 28, fontSize: fontSizes.size23, fontWeight: '300', color: PURPLE }}>+</Text><Text style={{ fontSize: fontSizes.size15, fontWeight: '600', color: PURPLE }}>Add another address</Text></Pressable>
+      {addressState.isLoading ? <View style={{ marginTop: 34, alignItems: 'center', backgroundColor: colors.transparent }}><LoadingDots /></View> : null}
+      {addressState.errorMessage ? <Pressable onPress={addressState.retry}><Text style={{ marginTop: 28, textAlign: 'center', fontSize: fontSizes.size14, color: MUTED }}>{addressState.errorMessage}{'\n'}Tap to retry</Text></Pressable> : null}
+      {addressState.addresses.map((address) => <View key={address._id} style={{ minHeight: 120, paddingTop: 22, paddingBottom: 12, zIndex: menuId === address._id ? 10 : 0, elevation: menuId === address._id ? 10 : 0, borderBottomWidth: 1, borderBottomColor: colors.purpleTone96 }}><Text style={{ fontSize: fontSizes.size16, fontWeight: '700', color: TEXT }}>{formatAddressLabel(address.label)}</Text><Text style={{ marginTop: 6, paddingRight: 34, fontSize: fontSizes.size13, lineHeight: 20, color: colors.mauveTone31 }}>{formatSavedAddress(address)}</Text><Text style={{ marginTop: 5, fontSize: fontSizes.size13, color: colors.mauveTone31 }}>{address.contactName?.trim() || name || 'User'}, {formatContactPhone(address.contactPhone || phone)}</Text><Pressable accessibilityRole="button" accessibilityLabel="Address options" hitSlop={10} pressRetentionOffset={14} onPress={() => setMenuId((current) => current === address._id ? null : address._id)} style={({ pressed }) => ({ position: 'absolute', zIndex: 12, right: -7, top: 9, width: 48, height: 48, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.5 : 1 })}><Image source={require('../../../assets/more.png')} contentFit="contain" tintColor={TEXT} style={{ width: 14, height: 19 }} /></Pressable>{menuId === address._id ? <View style={{ position: 'absolute', right: 0, top: 52, zIndex: 11, width: 128, paddingVertical: 4, borderRadius: 3, backgroundColor: colors.white, shadowColor: colors.black, shadowOpacity: 0.15, shadowRadius: 8, elevation: 12 }}><Pressable onPress={() => { setMenuId(null); selectPlace({ addressId: address._id, title: formatAddressLabel(address.label), subtitle: formatSavedAddress(address), addressLine1: address.addressLine1, addressLine2: address.addressLine2, city: address.city, state: address.state, country: address.country, pincode: address.pincode, houseNo: address.houseNo, landmark: address.landmark, contactName: address.contactName, contactPhone: address.contactPhone, addressType: address.addressType, instructions: address.instructions, label: address.label?.toLowerCase() as AddAddressPayload['label'], latitude: address.location?.coordinates?.[1] ?? 30.7033, longitude: address.location?.coordinates?.[0] ?? 76.7176 }); }} style={{ padding: 14 }}><Text style={{ fontSize: fontSizes.size14, color: TEXT }}>Edit</Text></Pressable><Pressable disabled={deletingId === address._id} onPress={() => confirmDelete(address._id)} style={{ padding: 14 }}><Text style={{ fontSize: fontSizes.size14, color: TEXT }}>{deletingId === address._id ? 'Deleting...' : 'Delete'}</Text></Pressable></View> : null}</View>)}
+      {!addressState.isLoading && !addressState.errorMessage && addressState.addresses.length === 0 ? <Text style={{ marginTop: 38, textAlign: 'center', fontSize: fontSizes.size14, color: MUTED }}>No saved addresses yet.</Text> : null}
     </ScrollView>
     <Modal animationType="fade" transparent visible={sheet === 'search'} onRequestClose={() => setSheet(null)}><LocationSearchSheet addresses={addressState.addresses} onClose={() => setSheet(null)} onSelect={(place) => selectPlace(selectedPlace?.addressId ? { ...place, addressId: selectedPlace.addressId, contactName: selectedPlace.contactName, contactPhone: selectedPlace.contactPhone, houseNo: selectedPlace.houseNo, landmark: selectedPlace.landmark, label: selectedPlace.label, addressType: selectedPlace.addressType, instructions: selectedPlace.instructions } : place)} /></Modal>
     <Modal animationType="fade" transparent visible={sheet === 'details' && Boolean(selectedPlace)} onRequestClose={() => setSheet(null)}>{selectedPlace ? <AddressDetailsSheet authToken={authToken} name={name} phone={phone} place={selectedPlace} onChange={() => setSheet('search')} onClose={() => setSheet(null)} onSaved={() => { setSheet(null); setSelectedPlace(null); addressState.retry(); }} /> : null}</Modal>

@@ -1,7 +1,7 @@
+import { colors } from '../theme';
 import { Image } from 'expo-image';
 import { View } from 'react-native';
 
-import { colors } from '../theme/colors';
 
 export function PhoneMessageIcon() {
   return (
@@ -20,7 +20,7 @@ export function PhoneMessageIcon() {
           height: 18,
           borderRadius: 3,
           borderCurve: 'continuous',
-          backgroundColor: '#B9C9ED',
+          backgroundColor: colors.blueTone83,
         }}
       >
         <View
@@ -30,7 +30,7 @@ export function PhoneMessageIcon() {
             bottom: -2,
             width: 6,
             height: 6,
-            backgroundColor: '#B9C9ED',
+            backgroundColor: colors.blueTone83,
             transform: [{ rotate: '45deg' }],
           }}
         />

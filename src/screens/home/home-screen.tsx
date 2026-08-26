@@ -1,3 +1,4 @@
+import { colors, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, TextInput, useWindowDimensions, View } from 'react-native';
@@ -20,7 +21,7 @@ function formatCategoryLabel(title: string) {
 }
 
 function LocationPinIcon() {
-  return <Image source={require('../../../assets/pin.png')} contentFit="contain" tintColor="#FFFFFF" style={{ width: 18, height: 18 }} />;
+  return <Image source={require('../../../assets/pin.png')} contentFit="contain" tintColor={colors.white} style={{ width: 18, height: 18 }} />;
 }
 
 function ChevronDownIcon() {
@@ -33,7 +34,7 @@ function ChevronDownIcon() {
           marginTop: -3,
           borderRightWidth: 1.7,
           borderBottomWidth: 1.7,
-          borderColor: '#FFFFFF',
+          borderColor: colors.white,
           transform: [{ rotate: '45deg' }],
         }}
       />
@@ -46,7 +47,7 @@ function SearchIcon() {
     <Image
       source={require('../../../assets/search.png')}
       contentFit="contain"
-      tintColor="#6B6572"
+      tintColor={colors.violetTone42}
       style={{ width: 18, height: 18 }}
     />
   );
@@ -71,7 +72,7 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
   const [searchSuggestionIndex, setSearchSuggestionIndex] = useState(0);
   const [displayedSuggestion, setDisplayedSuggestion] = useState('');
   const [isDeletingSuggestion, setIsDeletingSuggestion] = useState(false);
-  const [headerColor, setHeaderColor] = useState(DEFAULT_OFFER_HEADER_COLOR);
+  const [headerColor, setHeaderColor] = useState<string>(DEFAULT_OFFER_HEADER_COLOR);
   const currentLocation = useCurrentLocation();
   const { width } = useWindowDimensions();
   const categoryWidth = Math.max(92, Math.floor((width - 32 - 24) / 3));
@@ -129,7 +130,7 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
       contentInsetAdjustmentBehavior="never"
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
-      style={{ flex: 1, backgroundColor: '#FAF9FB' }}
+      style={{ flex: 1, backgroundColor: colors.violetTone98_2 }}
       contentContainerStyle={{ paddingBottom: 126 + insets.bottom }}
     >
       <View
@@ -151,10 +152,10 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
           >
             <LocationPinIcon />
             <View style={{ flex: 1, gap: 2 }}>
-              <Text style={{ fontSize: 14, lineHeight: 19, fontWeight: '700', color: 'rgba(255, 255, 255, 0.90)' }}>{locationHeading}</Text>
+              <Text style={{ fontSize: fontSizes.size14, lineHeight: 19, fontWeight: '700', color: colors.whiteAlpha90 }}>{locationHeading}</Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                {!locationSubtitle && currentLocation.status === 'loading' && <LoadingDots color="#FFFFFF" gap={5} size={5} />}
-                <Text selectable numberOfLines={1} ellipsizeMode="tail" style={{ flexShrink: 1, fontSize: 12, lineHeight: 17, fontWeight: '500', color: 'rgba(255, 255, 255, 0.90)' }}>
+                {!locationSubtitle && currentLocation.status === 'loading' && <LoadingDots color={colors.white} gap={5} size={5} />}
+                <Text selectable numberOfLines={1} ellipsizeMode="tail" style={{ flexShrink: 1, fontSize: fontSizes.size12, lineHeight: 17, fontWeight: '500', color: colors.whiteAlpha90 }}>
                   {locationLine}
                 </Text>
                 <ChevronDownIcon />
@@ -165,20 +166,20 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
             accessibilityRole="button"
             accessibilityLabel="Open account options"
             onPress={onProfilePress}
-            style={({ pressed }) => ({ width: 35, height: 35, alignItems: 'center', justifyContent: 'center', borderRadius: 6, backgroundColor: '#FFFFFF', opacity: pressed ? 0.7 : 1 })}
+            style={({ pressed }) => ({ width: 35, height: 35, alignItems: 'center', justifyContent: 'center', borderRadius: 6, backgroundColor: colors.white, opacity: pressed ? 0.7 : 1 })}
           >
             <Image source={require('../../../assets/profile.png')} contentFit="contain" style={{ width: 16, height: 16 }} />
           </Pressable>
         </View>
 
-        <View style={{ height: 40, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, borderRadius: 10, borderCurve: 'continuous', backgroundColor: '#FFFFFF' }}>
+        <View style={{ height: 40, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, borderRadius: 10, borderCurve: 'continuous', backgroundColor: colors.white }}>
           <SearchIcon />
           <View style={{ flex: 1, height: 40, justifyContent: 'center' }}>
             {!search ? (
               <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={{ fontSize: 13, color: '#918A97' }}>Search for '</Text>
+                <Text style={{ fontSize: fontSizes.size13, color: colors.violetTone57 }}>Search for '</Text>
                 <View style={{ height: 20, flex: 1, overflow: 'hidden', justifyContent: 'center' }}>
-                  <Text numberOfLines={1} style={{ fontSize: 13, color: '#918A97' }}>
+                  <Text numberOfLines={1} style={{ fontSize: fontSizes.size13, color: colors.violetTone57 }}>
                     {`${displayedSuggestion}'`}
                   </Text>
                 </View>
@@ -189,7 +190,7 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
               onChangeText={setSearch}
               accessibilityLabel="Search for services"
               returnKeyType="search"
-              style={{ flex: 1, minHeight: 40, paddingVertical: 6, fontSize: 13, color: '#241D2B' }}
+              style={{ flex: 1, minHeight: 40, paddingVertical: 6, fontSize: fontSizes.size13, color: colors.violetTone14 }}
             />
           </View>
         </View>
@@ -200,21 +201,21 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
       <View style={{ paddingHorizontal: 20, paddingTop: 16, gap: 25 }}>
         <View style={{ gap: 15 }}>
           {normalizedSearch ? (
-            <Text selectable style={{ fontSize: 19, lineHeight: 25, fontWeight: '600', color: '#211A28' }}>
+            <Text selectable style={{ fontSize: fontSizes.size19, lineHeight: 25, fontWeight: '600', color: colors.violetTone13 }}>
               Search results
             </Text>
           ) : null}
           {isLoading ? (
             <View style={{ minHeight: 150, alignItems: 'center', justifyContent: 'center', gap: 10 }}>
               <LoadingDots />
-              <Text style={{ fontSize: 12, color: '#77717D' }}>Loading categories...</Text>
+              <Text style={{ fontSize: fontSizes.size12, color: colors.violetTone47 }}>Loading categories...</Text>
             </View>
           ) : errorMessage ? (
             <View style={{ minHeight: 150, alignItems: 'center', justifyContent: 'center', gap: 9, paddingHorizontal: 24 }}>
-              <Text style={{ fontSize: 28 }}>⚠️</Text>
-              <Text selectable style={{ textAlign: 'center', fontSize: 12, lineHeight: 17, color: '#77717D' }}>{errorMessage}</Text>
-              <Pressable accessibilityRole="button" onPress={onRetry} style={{ paddingHorizontal: 18, paddingVertical: 9, borderRadius: 999, backgroundColor: '#6E45E2' }}>
-                <Text style={{ fontSize: 12, fontWeight: '600', color: '#FFFFFF' }}>Try again</Text>
+              <Text style={{ fontSize: fontSizes.size28 }}>⚠️</Text>
+              <Text selectable style={{ textAlign: 'center', fontSize: fontSizes.size12, lineHeight: 17, color: colors.violetTone47 }}>{errorMessage}</Text>
+              <Pressable accessibilityRole="button" onPress={onRetry} style={{ paddingHorizontal: 18, paddingVertical: 9, borderRadius: 999, backgroundColor: colors.violetTone58 }}>
+                <Text style={{ fontSize: fontSizes.size12, fontWeight: '600', color: colors.white }}>Try again</Text>
               </Pressable>
             </View>
           ) : visibleCategories.length > 0 ? (
@@ -226,8 +227,8 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
                   onPress={() => onCategoryPress(category)}
                   style={({ pressed }) => ({ width: categoryWidth, alignItems: 'center', gap: 6, opacity: pressed ? 0.62 : 1 })}
                 >
-                  <View style={{ width: categoryWidth, height: 64, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderRadius: 12, borderCurve: 'continuous', backgroundColor: '#F1F1F1' }}>
-                    <Text style={{ fontSize: 22 }}>{category.icon}</Text>
+                  <View style={{ width: categoryWidth, height: 64, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderRadius: 12, borderCurve: 'continuous', backgroundColor: colors.neutralTone95 }}>
+                    <Text style={{ fontSize: fontSizes.size22 }}>{category.icon}</Text>
                     {category.imageUrl ? (
                       <Image
                         source={category.imageUrl}
@@ -244,10 +245,10 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
                       minHeight: 34,
                       paddingHorizontal: 0,
                       textAlign: 'center',
-                      fontSize: 13,
+                      fontSize: fontSizes.size13,
                       lineHeight: 17,
                       fontWeight: '400',
-                      color: '#2B2433',
+                      color: colors.violetTone17,
                     }}
                   >
                     {formatCategoryLabel(category.title)}
@@ -257,19 +258,19 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
             </View>
           ) : (
             <View style={{ paddingVertical: 24, alignItems: 'center', gap: 7 }}>
-              <Text style={{ fontSize: 28 }}>🔎</Text>
-              <Text selectable style={{ fontSize: 14, fontWeight: '700', color: '#514A58' }}>No service found</Text>
-              <Text style={{ fontSize: 11, color: '#8B8590' }}>Try searching for cleaning, salon or repairs.</Text>
+              <Text style={{ fontSize: fontSizes.size28 }}>🔎</Text>
+              <Text selectable style={{ fontSize: fontSizes.size14, fontWeight: '700', color: colors.violetTone32 }}>No service found</Text>
+              <Text style={{ fontSize: fontSizes.size11, color: colors.violetTone54_3 }}>Try searching for cleaning, salon or repairs.</Text>
             </View>
           )}
         </View>
 
         {!normalizedSearch && (
-          <View style={{ padding: 18, flexDirection: 'row', gap: 14, alignItems: 'center', borderRadius: 22, borderCurve: 'continuous', backgroundColor: '#EAF7F1' }}>
-            <View style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: '#FFFFFF' }}><Text style={{ fontSize: 23 }}>🛡️</Text></View>
+          <View style={{ padding: 18, flexDirection: 'row', gap: 14, alignItems: 'center', borderRadius: 22, borderCurve: 'continuous', backgroundColor: colors.greenTone94_2 }}>
+            <View style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: colors.white }}><Text style={{ fontSize: fontSizes.size23 }}>🛡️</Text></View>
             <View style={{ flex: 1, gap: 3 }}>
-              <Text selectable style={{ fontSize: 14, fontWeight: '600', color: '#244A3A' }}>Safe & verified professionals</Text>
-              <Text style={{ fontSize: 11, lineHeight: 16, color: '#567065' }}>Background checked experts with transparent pricing.</Text>
+              <Text selectable style={{ fontSize: fontSizes.size14, fontWeight: '600', color: colors.greenTone22 }}>Safe & verified professionals</Text>
+              <Text style={{ fontSize: fontSizes.size11, lineHeight: 16, color: colors.slateTone39 }}>Background checked experts with transparent pricing.</Text>
             </View>
           </View>
         )}

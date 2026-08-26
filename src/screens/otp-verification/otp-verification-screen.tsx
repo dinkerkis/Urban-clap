@@ -1,3 +1,4 @@
+import { colors, fontSizes, typography } from '../../theme';
 import { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Pressable, ScrollView, Text, View } from 'react-native';
 
@@ -11,8 +12,6 @@ import {
   requestLoginOtp,
   verifyLoginOtp,
 } from '../../services/auth-api';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
 
 type Props = {
   callingCode: string;
@@ -113,7 +112,7 @@ export function OtpVerificationScreen({ callingCode, onBack, onVerified, phoneNu
           ) : null}
 
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 9 }}>
-            <Text style={{ fontSize: 18, color: colors.text }}>◷</Text>
+            <Text style={{ fontSize: fontSizes.size18, color: colors.text }}>◷</Text>
             {seconds > 0 ? (
               <Text style={{ ...typography.body, color: colors.text, fontVariant: ['tabular-nums'] }}>
                 00:{String(seconds).padStart(2, '0')}

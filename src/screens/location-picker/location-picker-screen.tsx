@@ -1,3 +1,4 @@
+import { colors, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
 import { useEffect, useMemo, useState } from 'react';
 import { Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
@@ -21,35 +22,35 @@ type LocationPickerScreenProps = {
 function TargetIcon() {
   return (
     <View style={{ width: 22, height: 22, alignItems: 'center', justifyContent: 'center' }}>
-      <View style={{ width: 18, height: 18, borderRadius: 9, borderWidth: 1.7, borderColor: '#6E45E2' }} />
-      <View style={{ position: 'absolute', width: 7, height: 7, borderRadius: 3.5, backgroundColor: '#6E45E2' }} />
-      <View style={{ position: 'absolute', top: 0, width: 1.6, height: 4, backgroundColor: '#6E45E2' }} />
-      <View style={{ position: 'absolute', bottom: 0, width: 1.6, height: 4, backgroundColor: '#6E45E2' }} />
-      <View style={{ position: 'absolute', left: 0, width: 4, height: 1.6, backgroundColor: '#6E45E2' }} />
-      <View style={{ position: 'absolute', right: 0, width: 4, height: 1.6, backgroundColor: '#6E45E2' }} />
+      <View style={{ width: 18, height: 18, borderRadius: 9, borderWidth: 1.7, borderColor: colors.violetTone58 }} />
+      <View style={{ position: 'absolute', width: 7, height: 7, borderRadius: 3.5, backgroundColor: colors.violetTone58 }} />
+      <View style={{ position: 'absolute', top: 0, width: 1.6, height: 4, backgroundColor: colors.violetTone58 }} />
+      <View style={{ position: 'absolute', bottom: 0, width: 1.6, height: 4, backgroundColor: colors.violetTone58 }} />
+      <View style={{ position: 'absolute', left: 0, width: 4, height: 1.6, backgroundColor: colors.violetTone58 }} />
+      <View style={{ position: 'absolute', right: 0, width: 4, height: 1.6, backgroundColor: colors.violetTone58 }} />
     </View>
   );
 }
 
 function HomeOutlineIcon() {
-  return <Image source={require('../../../assets/home.png')} contentFit="contain" tintColor="#3F3A42" style={{ width: 17, height: 17 }} />;
+  return <Image source={require('../../../assets/home.png')} contentFit="contain" tintColor={colors.mauveTone24_2} style={{ width: 17, height: 17 }} />;
 }
 
 function WorkOutlineIcon() {
   return (
     <View style={{ width: 22, height: 20, alignItems: 'center', justifyContent: 'flex-end' }}>
-      <View style={{ width: 8, height: 4, borderWidth: 1.4, borderBottomWidth: 0, borderColor: '#3F3A42', borderTopLeftRadius: 2, borderTopRightRadius: 2 }} />
-      <View style={{ width: 18, height: 12, borderWidth: 1.4, borderColor: '#3F3A42', borderRadius: 2 }} />
+      <View style={{ width: 8, height: 4, borderWidth: 1.4, borderBottomWidth: 0, borderColor: colors.mauveTone24_2, borderTopLeftRadius: 2, borderTopRightRadius: 2 }} />
+      <View style={{ width: 18, height: 12, borderWidth: 1.4, borderColor: colors.mauveTone24_2, borderRadius: 2 }} />
     </View>
   );
 }
 
 function OtherPinIcon() {
-  return <Image source={require('../../../assets/location.png')} contentFit="contain" tintColor="#3F3A42" style={{ width: 18, height: 18 }} />;
+  return <Image source={require('../../../assets/location.png')} contentFit="contain" tintColor={colors.mauveTone24_2} style={{ width: 18, height: 18 }} />;
 }
 
 function RecentIcon() {
-  return <Image source={require('../../../assets/recent.png')} contentFit="contain" tintColor="#3F3A42" style={{ width: 17, height: 17 }} />;
+  return <Image source={require('../../../assets/recent.png')} contentFit="contain" tintColor={colors.mauveTone24_2} style={{ width: 17, height: 17 }} />;
 }
 
 function AddressIcon({ label }: { label?: string | null }) {
@@ -61,13 +62,13 @@ function AddressIcon({ label }: { label?: string | null }) {
 
 function GoogleMark() {
   return (
-    <Text style={{ fontSize: 12, fontWeight: '700', letterSpacing: -0.3, marginLeft:-2 }}>
-      <Text style={{ color: '#4285F4' }}>G</Text>
-      <Text style={{ color: '#EA4335' }}>o</Text>
-      <Text style={{ color: '#FBBC05' }}>o</Text>
-      <Text style={{ color: '#4285F4' }}>g</Text>
-      <Text style={{ color: '#34A853' }}>l</Text>
-      <Text style={{ color: '#EA4335' }}>e</Text>
+    <Text style={{ fontSize: fontSizes.size12, fontWeight: '700', letterSpacing: -0.3, marginLeft:-2 }}>
+      <Text style={{ color: colors.blueTone61 }}>G</Text>
+      <Text style={{ color: colors.redTone56 }}>o</Text>
+      <Text style={{ color: colors.yellowTone50 }}>o</Text>
+      <Text style={{ color: colors.blueTone61 }}>g</Text>
+      <Text style={{ color: colors.greenTone43 }}>l</Text>
+      <Text style={{ color: colors.redTone56 }}>e</Text>
     </Text>
   );
 }
@@ -139,9 +140,9 @@ export function LocationPickerScreen({ authToken, onBack, onSelectAddress, onUse
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+    <View style={{ flex: 1, backgroundColor: colors.white }}>
       <View style={{ paddingTop: insets.top + 10, paddingHorizontal: 16, paddingBottom: 12 }}>
-        <View style={{ height: 46, flexDirection: 'row', alignItems: 'center', paddingLeft: 4, paddingRight: 12, borderRadius: 10, borderWidth: 1, borderColor: '#E4E1E5', backgroundColor: '#FFFFFF' }}>
+        <View style={{ height: 46, flexDirection: 'row', alignItems: 'center', paddingLeft: 4, paddingRight: 12, borderRadius: 10, borderWidth: 1, borderColor: colors.mauveTone89_2, backgroundColor: colors.white }}>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Go back"
@@ -155,8 +156,8 @@ export function LocationPickerScreen({ authToken, onBack, onSelectAddress, onUse
             value={search}
             onChangeText={setSearch}
             placeholder="Search for your location/society/apartment"
-            placeholderTextColor="#C9C4CB"
-            style={{ flex: 1, minWidth: 0, height: '100%', fontSize: 14, fontWeight: '600', color: '#171419' }}
+            placeholderTextColor={colors.mauveTone78}
+            style={{ flex: 1, minWidth: 0, height: '100%', fontSize: fontSizes.size14, fontWeight: '600', color: colors.mauveTone9_2 }}
           />
         </View>
       </View>
@@ -166,13 +167,13 @@ export function LocationPickerScreen({ authToken, onBack, onSelectAddress, onUse
           accessibilityRole="button"
           onPress={handleCurrentLocation}
           disabled={isSelecting}
-          style={({ pressed }) => ({ minHeight: 54, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: pressed ? '#F8F7F9' : '#FFFFFF', opacity: isSelecting ? 0.7 : 1 })}
+          style={({ pressed }) => ({ minHeight: 54, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: pressed ? colors.violetTone97_5 : colors.white, opacity: isSelecting ? 0.7 : 1 })}
         >
           <TargetIcon />
-          <Text style={{ fontSize: 15, fontWeight: '600', color: '#6E45E2' }}>Use current location</Text>
+          <Text style={{ fontSize: fontSizes.size15, fontWeight: '600', color: colors.violetTone58 }}>Use current location</Text>
         </Pressable>
 
-        <View style={{ height: 8, backgroundColor: '#F6F5F7' }} />
+        <View style={{ height: 8, backgroundColor: colors.violetTone96_6 }} />
 
         {isSearchActive ? (
           <>
@@ -181,9 +182,9 @@ export function LocationPickerScreen({ authToken, onBack, onSelectAddress, onUse
                 <LoadingDots />
               </View>
             ) : searchError ? (
-              <Text selectable style={{ paddingHorizontal: 20, paddingVertical: 18, fontSize: 13, color: '#77717D' }}>{searchError}</Text>
+              <Text selectable style={{ paddingHorizontal: 20, paddingVertical: 18, fontSize: fontSizes.size13, color: colors.violetTone47 }}>{searchError}</Text>
             ) : suggestions.length === 0 ? (
-              <Text selectable style={{ paddingHorizontal: 20, paddingVertical: 18, fontSize: 13, color: '#77717D' }}>No locations found.</Text>
+              <Text selectable style={{ paddingHorizontal: 20, paddingVertical: 18, fontSize: fontSizes.size13, color: colors.violetTone47 }}>No locations found.</Text>
             ) : (
               suggestions.map((suggestion, index) => (
                 <View key={suggestion.placeId}>
@@ -191,38 +192,38 @@ export function LocationPickerScreen({ authToken, onBack, onSelectAddress, onUse
                     accessibilityRole="button"
                     disabled={isSelecting}
                     onPress={() => void handleSelectSuggestion(suggestion)}
-                    style={({ pressed }) => ({ paddingHorizontal: 20, paddingVertical: 16, flexDirection: 'row', alignItems: 'flex-start', gap: 14, backgroundColor: pressed ? '#F8F7F9' : '#FFFFFF', opacity: isSelecting ? 0.7 : 1 })}
+                    style={({ pressed }) => ({ paddingHorizontal: 20, paddingVertical: 16, flexDirection: 'row', alignItems: 'flex-start', gap: 14, backgroundColor: pressed ? colors.violetTone97_5 : colors.white, opacity: isSelecting ? 0.7 : 1 })}
                   >
                     <View style={{ width: 22, marginTop: 2, alignItems: 'center' }}>
                       <OtherPinIcon />
                     </View>
                     <View style={{ flex: 1, gap: 4 }}>
-                      <Text style={{ fontSize: 16, fontWeight: '600', color: '#171419' }}>{suggestion.title}</Text>
-                      {suggestion.subtitle ? <Text selectable style={{ fontSize: 13, lineHeight: 19, color: '#625D64' }}>{suggestion.subtitle}</Text> : null}
+                      <Text style={{ fontSize: fontSizes.size16, fontWeight: '600', color: colors.mauveTone9_2 }}>{suggestion.title}</Text>
+                      {suggestion.subtitle ? <Text selectable style={{ fontSize: fontSizes.size13, lineHeight: 19, color: colors.mauveTone38_2 }}>{suggestion.subtitle}</Text> : null}
                     </View>
                   </Pressable>
-                  {index < suggestions.length - 1 ? <View style={{ height: 1, marginLeft: 56, backgroundColor: '#EDECEE' }} /> : null}
+                  {index < suggestions.length - 1 ? <View style={{ height: 1, marginLeft: 56, backgroundColor: colors.violetTone93_2 }} /> : null}
                 </View>
               ))
             )}
           </>
         ) : (
           <>
-            <Text style={{ paddingHorizontal: 20, paddingTop: 22, paddingBottom: 8, fontSize: 16, fontWeight: '700', color: '#171419' }}>Saved</Text>
+            <Text style={{ paddingHorizontal: 20, paddingTop: 22, paddingBottom: 8, fontSize: fontSizes.size16, fontWeight: '700', color: colors.mauveTone9_2 }}>Saved</Text>
             {isLoading ? (
               <View style={{ minHeight: 120, alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                 <LoadingDots />
-                <Text style={{ fontSize: 13, color: '#625D64' }}>Loading addresses...</Text>
+                <Text style={{ fontSize: fontSizes.size13, color: colors.mauveTone38_2 }}>Loading addresses...</Text>
               </View>
             ) : errorMessage ? (
               <View style={{ minHeight: 120, alignItems: 'center', justifyContent: 'center', gap: 10, paddingHorizontal: 24 }}>
-                <Text selectable style={{ textAlign: 'center', fontSize: 13, lineHeight: 19, color: '#625D64' }}>{errorMessage}</Text>
-                <Pressable onPress={retry} style={{ paddingHorizontal: 18, paddingVertical: 9, borderRadius: 999, backgroundColor: '#6E45E2' }}>
-                  <Text style={{ fontSize: 13, fontWeight: '600', color: '#FFFFFF' }}>Try again</Text>
+                <Text selectable style={{ textAlign: 'center', fontSize: fontSizes.size13, lineHeight: 19, color: colors.mauveTone38_2 }}>{errorMessage}</Text>
+                <Pressable onPress={retry} style={{ paddingHorizontal: 18, paddingVertical: 9, borderRadius: 999, backgroundColor: colors.violetTone58 }}>
+                  <Text style={{ fontSize: fontSizes.size13, fontWeight: '600', color: colors.white }}>Try again</Text>
                 </Pressable>
               </View>
             ) : visibleAddresses.length === 0 ? (
-              <Text selectable style={{ paddingHorizontal: 20, paddingVertical: 18, fontSize: 13, color: '#77717D' }}>No saved addresses yet.</Text>
+              <Text selectable style={{ paddingHorizontal: 20, paddingVertical: 18, fontSize: fontSizes.size13, color: colors.violetTone47 }}>No saved addresses yet.</Text>
             ) : (
               displayedAddresses.map((address, index) => (
                 <View key={address._id}>
@@ -230,17 +231,17 @@ export function LocationPickerScreen({ authToken, onBack, onSelectAddress, onUse
                     accessibilityRole="button"
                     onPress={() => void handleSelectAddress(address)}
                     disabled={isSelecting}
-                    style={({ pressed }) => ({ paddingHorizontal: 20, paddingVertical: 16, flexDirection: 'row', alignItems: 'flex-start', gap: 14, backgroundColor: pressed ? '#F8F7F9' : '#FFFFFF' })}
+                    style={({ pressed }) => ({ paddingHorizontal: 20, paddingVertical: 16, flexDirection: 'row', alignItems: 'flex-start', gap: 14, backgroundColor: pressed ? colors.violetTone97_5 : colors.white })}
                   >
                     <View style={{ width: 22, marginTop: 2, alignItems: 'center' }}>
                       <AddressIcon label={address.label} />
                     </View>
                     <View style={{ flex: 1, gap: 4 }}>
-                      <Text style={{ fontSize: 15, fontWeight: '700', color: '#171419' }}>{formatAddressLabel(address.label)}</Text>
-                      <Text selectable style={{ fontSize: 13, lineHeight: 19, color: '#625D64' }}>{formatSavedAddress(address)}</Text>
+                      <Text style={{ fontSize: fontSizes.size15, fontWeight: '700', color: colors.mauveTone9_2 }}>{formatAddressLabel(address.label)}</Text>
+                      <Text selectable style={{ fontSize: fontSizes.size13, lineHeight: 19, color: colors.mauveTone38_2 }}>{formatSavedAddress(address)}</Text>
                     </View>
                   </Pressable>
-                  {index < displayedAddresses.length - 1 ? <View style={{ height: 1, marginLeft: 56, backgroundColor: '#EDECEE' }} /> : null}
+                  {index < displayedAddresses.length - 1 ? <View style={{ height: 1, marginLeft: 56, backgroundColor: colors.violetTone93_2 }} /> : null}
                 </View>
               ))
             )}
@@ -248,39 +249,39 @@ export function LocationPickerScreen({ authToken, onBack, onSelectAddress, onUse
             {!showAllSaved && visibleAddresses.length > 2 ? (
               <>
                 <Pressable accessibilityRole="button" onPress={() => setShowAllSaved(true)} style={({ pressed }) => ({ alignSelf: 'flex-start', paddingHorizontal: 20, paddingTop: 4, paddingBottom: 10, opacity: pressed ? 0.55 : 1 })}>
-                  <Text style={{ fontSize: 14, fontWeight: '600', color: '#6E45E2' }}>View more</Text>
+                  <Text style={{ fontSize: fontSizes.size14, fontWeight: '600', color: colors.violetTone58 }}>View more</Text>
                 </Pressable>
-                <View style={{ width: '100%', height: 8, alignSelf: 'stretch', backgroundColor: '#F6F5F7' }} />
+                <View style={{ width: '100%', height: 8, alignSelf: 'stretch', backgroundColor: colors.violetTone96_6 }} />
               </>
             ) : null}
 
             {recentLocations.length > 0 ? (
               <>
-                <Text style={{ paddingHorizontal: 20, paddingTop: 28, paddingBottom: 8, fontSize: 16, fontWeight: '700', color: '#171419' }}>Recents</Text>
+                <Text style={{ paddingHorizontal: 20, paddingTop: 28, paddingBottom: 8, fontSize: fontSizes.size16, fontWeight: '700', color: colors.mauveTone9_2 }}>Recents</Text>
                 {displayedRecents.map((location, index) => (
                   <View key={location.placeId}>
                     <Pressable
                       accessibilityRole="button"
                       onPress={() => onSelectAddress(location.title, location.subtitle)}
-                      style={({ pressed }) => ({ paddingHorizontal: 20, paddingVertical: 16, flexDirection: 'row', alignItems: 'flex-start', gap: 14, backgroundColor: pressed ? '#F8F7F9' : '#FFFFFF' })}
+                      style={({ pressed }) => ({ paddingHorizontal: 20, paddingVertical: 16, flexDirection: 'row', alignItems: 'flex-start', gap: 14, backgroundColor: pressed ? colors.violetTone97_5 : colors.white })}
                     >
                       <View style={{ width: 22, marginTop: 2, alignItems: 'center' }}>
                         <RecentIcon />
                       </View>
                       <View style={{ flex: 1, gap: 4 }}>
-                        <Text style={{ fontSize: 15, fontWeight: '700', color: '#171419' }}>{location.title}</Text>
-                        {location.subtitle ? <Text selectable style={{ fontSize: 13, lineHeight: 19, color: '#625D64' }}>{location.subtitle}</Text> : null}
+                        <Text style={{ fontSize: fontSizes.size15, fontWeight: '700', color: colors.mauveTone9_2 }}>{location.title}</Text>
+                        {location.subtitle ? <Text selectable style={{ fontSize: fontSizes.size13, lineHeight: 19, color: colors.mauveTone38_2 }}>{location.subtitle}</Text> : null}
                       </View>
                     </Pressable>
-                    {index < displayedRecents.length - 1 ? <View style={{ height: 1, marginLeft: 56, backgroundColor: '#EDECEE' }} /> : null}
+                    {index < displayedRecents.length - 1 ? <View style={{ height: 1, marginLeft: 56, backgroundColor: colors.violetTone93_2 }} /> : null}
                   </View>
                 ))}
                 {!showAllRecents && recentLocations.length > 2 ? (
                   <>
                     <Pressable accessibilityRole="button" onPress={() => setShowAllRecents(true)} style={({ pressed }) => ({ alignSelf: 'flex-start', paddingHorizontal: 20, paddingTop: 4, paddingBottom: 10, opacity: pressed ? 0.55 : 1 })}>
-                      <Text style={{ fontSize: 14, fontWeight: '600', color: '#6E45E2' }}>View more</Text>
+                      <Text style={{ fontSize: fontSizes.size14, fontWeight: '600', color: colors.violetTone58 }}>View more</Text>
                     </Pressable>
-                    <View style={{ width: '100%', height: 8, alignSelf: 'stretch', backgroundColor: '#F6F5F7' }} />
+                    <View style={{ width: '100%', height: 8, alignSelf: 'stretch', backgroundColor: colors.violetTone96_6 }} />
                   </>
                 ) : null}
               </>
@@ -297,13 +298,13 @@ export function LocationPickerScreen({ authToken, onBack, onSelectAddress, onUse
           flexDirection: 'row',
           justifyContent: 'center',
           gap: 4,
-          backgroundColor: '#FFFFFF',
+          backgroundColor: colors.white,
           borderTopWidth: 1,
-          borderTopColor: '#EDECEE',
-          boxShadow: '0 -3px 10px rgba(23, 20, 25, 0.06)',
+          borderTopColor: colors.violetTone93_2,
+          boxShadow: `0 -3px 10px ${colors.mauveTone9Alpha6}`,
         }}
       >
-        <Text style={{ fontSize: 11, color: '#9A959C' }}>powered by</Text>
+        <Text style={{ fontSize: fontSizes.size11, color: colors.neutralTone60 }}>powered by</Text>
         <GoogleMark />
       </View>
     </View>

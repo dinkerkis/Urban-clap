@@ -1,3 +1,4 @@
+import { colors, fontSizes } from '../../theme';
 import { useEffect, useState } from 'react';
 import {
   Alert,
@@ -35,7 +36,7 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PROFILE_COUNTRIES = ['IN', 'AE', 'SA', 'SG'].map((id) => countries.find((country) => country.id === id)).filter((country): country is Country => Boolean(country));
 
 function FieldLabel({ children }: { children: string }) {
-  return <Text style={{ fontSize: 13, lineHeight: 19, fontWeight: '600', color: '#29232D' }}>{children}</Text>;
+  return <Text style={{ fontSize: fontSizes.size13, lineHeight: 19, fontWeight: '600', color: colors.mauveTone16 }}>{children}</Text>;
 }
 
 function inputStyle(hasError = false) {
@@ -43,12 +44,12 @@ function inputStyle(hasError = false) {
     minHeight: 44,
     paddingHorizontal: 13,
     borderWidth: 1,
-    borderColor: hasError ? '#D53A4D' : '#E2DEE5',
+    borderColor: hasError ? colors.redTone53 : colors.violetTone88_2,
     borderRadius: 10,
     borderCurve: 'continuous' as const,
-    backgroundColor: '#FFFFFF',
-    fontSize: 14,
-    color: '#241F27',
+    backgroundColor: colors.white,
+    fontSize: fontSizes.size14,
+    color: colors.mauveTone14_2,
   };
 }
 
@@ -64,7 +65,7 @@ function ProfilePickerModal({ children, onClose, title, visible }: ProfilePicker
 
   return (
     <Modal visible={visible} transparent animationType="none" statusBarTranslucent onRequestClose={onClose}>
-      <Animated.View entering={FadeIn.duration(180)} exiting={FadeOut.duration(150)} style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(12, 10, 14, 0.76)' }}>
+      <Animated.View entering={FadeIn.duration(180)} exiting={FadeOut.duration(150)} style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: colors.violetTone5Alpha76 }}>
         <Pressable accessibilityLabel={`Close ${title}`} onPress={onClose} style={{ position: 'absolute', inset: 0 }} />
         <Pressable
           accessibilityRole="button"
@@ -79,12 +80,12 @@ function ProfilePickerModal({ children, onClose, title, visible }: ProfilePicker
             marginRight: 22,
             marginBottom: 8,
             borderRadius: 18,
-            backgroundColor: '#FFFFFF',
+            backgroundColor: colors.white,
             opacity: pressed ? 0.65 : 1,
-            boxShadow: '0 7px 22px rgba(0, 0, 0, 0.18)',
+            boxShadow: `0 7px 22px ${colors.blackAlpha18}`,
           })}
         >
-          <Text style={{ fontSize: 22, lineHeight: 24, fontWeight: '300', color: '#28222C' }}>×</Text>
+          <Text style={{ fontSize: fontSizes.size22, lineHeight: 24, fontWeight: '300', color: colors.mauveTone15_2 }}>×</Text>
         </Pressable>
         <Animated.View
           entering={SlideInDown.duration(250)}
@@ -96,10 +97,10 @@ function ProfilePickerModal({ children, onClose, title, visible }: ProfilePicker
             borderTopLeftRadius: 18,
             borderTopRightRadius: 18,
             borderCurve: 'continuous',
-            backgroundColor: '#FFFFFF',
+            backgroundColor: colors.white,
           }}
         >
-          <Text selectable style={{ paddingBottom: 12, fontSize: 20, lineHeight: 27, fontWeight: '700', color: '#171319' }}>{title}</Text>
+          <Text selectable style={{ paddingBottom: 12, fontSize: fontSizes.size20, lineHeight: 27, fontWeight: '700', color: colors.mauveTone9 }}>{title}</Text>
           {children}
         </Animated.View>
       </Animated.View>
@@ -142,7 +143,7 @@ function VerifyEmailModal({ email, visible, onClose, onVerified }: VerifyEmailMo
   return (
     <Modal visible={visible} transparent animationType="none" statusBarTranslucent onRequestClose={onClose}>
       <KeyboardAvoidingView behavior={process.env.EXPO_OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-        <Animated.View entering={FadeIn.duration(180)} exiting={FadeOut.duration(150)} style={{ flex: 1, backgroundColor: 'rgba(16, 13, 18, 0.72)' }}>
+        <Animated.View entering={FadeIn.duration(180)} exiting={FadeOut.duration(150)} style={{ flex: 1, backgroundColor: colors.violetTone6Alpha72 }}>
           <Pressable accessibilityLabel="Close email verification" onPress={onClose} style={{ flex: 1 }} />
 
           <Animated.View
@@ -156,7 +157,7 @@ function VerifyEmailModal({ email, visible, onClose, onVerified }: VerifyEmailMo
               borderTopLeftRadius: 18,
               borderTopRightRadius: 18,
               borderCurve: 'continuous',
-              backgroundColor: '#FFFFFF',
+              backgroundColor: colors.white,
             }}
           >
             <Pressable
@@ -172,24 +173,24 @@ function VerifyEmailModal({ email, visible, onClose, onVerified }: VerifyEmailMo
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: 18,
-                backgroundColor: '#FFFFFF',
+                backgroundColor: colors.white,
                 opacity: pressed ? 0.65 : 1,
               })}
             >
-              <Text style={{ fontSize: 22, lineHeight: 24, fontWeight: '300', color: '#28222C' }}>×</Text>
+              <Text style={{ fontSize: fontSizes.size22, lineHeight: 24, fontWeight: '300', color: colors.mauveTone15_2 }}>×</Text>
             </Pressable>
 
-            <Text selectable style={{ fontSize: 27, lineHeight: 34, fontWeight: '700', color: '#171319' }}>Verify your email</Text>
-            <Text selectable style={{ fontSize: 15, lineHeight: 21, color: '#777078' }}>We sent a 6-digit code to {email}.</Text>
+            <Text selectable style={{ fontSize: fontSizes.size27, lineHeight: 34, fontWeight: '700', color: colors.mauveTone9 }}>Verify your email</Text>
+            <Text selectable style={{ fontSize: fontSizes.size15, lineHeight: 21, color: colors.neutralTone45 }}>We sent a 6-digit code to {email}.</Text>
             <TextInput
               accessibilityLabel="6-digit verification code"
               keyboardType="number-pad"
               maxLength={6}
               placeholder="6-digit code"
-              placeholderTextColor="#A9A3AC"
+              placeholderTextColor={colors.mauveTone66}
               value={otp}
               onChangeText={(value) => setOtp(value.replace(/\D/g, ''))}
-              style={[inputStyle(), { fontSize: 18, fontVariant: ['tabular-nums'], letterSpacing: 2 }]}
+              style={[inputStyle(), { fontSize: fontSizes.size18, fontVariant: ['tabular-nums'], letterSpacing: 2 }]}
             />
 
             <Pressable
@@ -202,11 +203,11 @@ function VerifyEmailModal({ email, visible, onClose, onVerified }: VerifyEmailMo
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: 10,
-                backgroundColor: '#5935DD',
+                backgroundColor: colors.blueTone54,
                 opacity: pressed ? 0.72 : 1,
               })}
             >
-              <Text style={{ fontSize: 16, fontWeight: '700', color: '#FFFFFF' }}>Verify</Text>
+              <Text style={{ fontSize: fontSizes.size16, fontWeight: '700', color: colors.white }}>Verify</Text>
             </Pressable>
 
             <Pressable
@@ -218,7 +219,7 @@ function VerifyEmailModal({ email, visible, onClose, onVerified }: VerifyEmailMo
               }}
               style={{ alignSelf: 'flex-start', paddingVertical: 4 }}
             >
-              <Text style={{ fontSize: 14, color: seconds > 0 ? '#AAA4AD' : '#5935DD' }}>
+              <Text style={{ fontSize: fontSizes.size14, color: seconds > 0 ? colors.mauveTone66_4 : colors.blueTone54 }}>
                 {seconds > 0 ? `Resend OTP in ${seconds}s` : 'Resend OTP'}
               </Text>
             </Pressable>
@@ -282,7 +283,7 @@ export function ProfileDetailsScreen({ email, name, phone, onBack, onVerified }:
   };
 
   return (
-    <KeyboardAvoidingView behavior={process.env.EXPO_OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+    <KeyboardAvoidingView behavior={process.env.EXPO_OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: colors.white }}>
       <ScrollView
         contentInsetAdjustmentBehavior="never"
         keyboardShouldPersistTaps="handled"
@@ -291,10 +292,10 @@ export function ProfileDetailsScreen({ email, name, phone, onBack, onVerified }:
         contentContainerStyle={{ paddingTop: Math.max(insets.top, 18) + 8, paddingHorizontal: 20, paddingBottom: 20, gap: 18 }}
       >
         <View style={{ minHeight: 45, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <Pressable accessibilityRole="button" accessibilityLabel="Go back" onPress={onBack} hitSlop={10} style={({ pressed }) => ({ width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 17, borderWidth: 0.7, borderColor: '#E4E0E6', backgroundColor: 'transparent', opacity: pressed ? 0.65 : 1 })}>
-            <BackIcon color="#241A30" />
+          <Pressable accessibilityRole="button" accessibilityLabel="Go back" onPress={onBack} hitSlop={10} style={({ pressed }) => ({ width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 17, borderWidth: 0.7, borderColor: colors.mauveTone89, backgroundColor: colors.transparent, opacity: pressed ? 0.65 : 1 })}>
+            <BackIcon color={colors.violetTone15} />
           </Pressable>
-          <Text selectable style={{ fontSize: 18, lineHeight: 25, fontWeight: '700', color: '#1D1820' }}>Profile details</Text>
+          <Text selectable style={{ fontSize: fontSizes.size18, lineHeight: 25, fontWeight: '700', color: colors.mauveTone11 }}>Profile details</Text>
         </View>
 
         <View style={{ gap: 8 }}>
@@ -306,9 +307,9 @@ export function ProfileDetailsScreen({ email, name, phone, onBack, onVerified }:
                 Keyboard.dismiss();
                 setIsTitlePickerOpen(true);
               }}
-              style={({ pressed }) => ({ width: 65, minHeight: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, borderWidth: 1, borderRightWidth: 0, borderColor: errors.name ? '#D53A4D' : '#E2DEE5', borderTopLeftRadius: 10, borderBottomLeftRadius: 10, opacity: pressed ? 0.65 : 1 })}
+              style={({ pressed }) => ({ width: 65, minHeight: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, borderWidth: 1, borderRightWidth: 0, borderColor: errors.name ? colors.redTone53 : colors.violetTone88_2, borderTopLeftRadius: 10, borderBottomLeftRadius: 10, opacity: pressed ? 0.65 : 1 })}
             >
-              <Text style={{ fontSize: 14, fontWeight: '600', color: '#241F27' }}>{TITLE_OPTIONS[titleIndex]}</Text>
+              <Text style={{ fontSize: fontSizes.size14, fontWeight: '600', color: colors.mauveTone14_2 }}>{TITLE_OPTIONS[titleIndex]}</Text>
               <View
                 accessibilityElementsHidden
                 importantForAccessibility="no"
@@ -317,18 +318,18 @@ export function ProfileDetailsScreen({ email, name, phone, onBack, onVerified }:
                   height: 7,
                   borderRightWidth: 1.7,
                   borderBottomWidth: 1.7,
-                  borderColor: '#241F27',
+                  borderColor: colors.mauveTone14_2,
                   transform: [{ rotate: '45deg' }, { translateY: -2 }],
                 }}
               />
             </Pressable>
-            <TextInput value={fullName} onChangeText={setFullName} autoCapitalize="words" placeholder="Enter your name" placeholderTextColor="#A9A3AC" style={[inputStyle(Boolean(errors.name)), { flex: 1, borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }]} />
+            <TextInput value={fullName} onChangeText={setFullName} autoCapitalize="words" placeholder="Enter your name" placeholderTextColor={colors.mauveTone66} style={[inputStyle(Boolean(errors.name)), { flex: 1, borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }]} />
           </View>
         </View>
 
         <View style={{ gap: 8 }}>
           <FieldLabel>Email address</FieldLabel>
-          <TextInput value={emailAddress} onChangeText={setEmailAddress} autoCapitalize="none" autoCorrect={false} keyboardType="email-address" placeholder="Enter your email" placeholderTextColor="#A9A3AC" style={inputStyle(Boolean(errors.email))} />
+          <TextInput value={emailAddress} onChangeText={setEmailAddress} autoCapitalize="none" autoCorrect={false} keyboardType="email-address" placeholder="Enter your email" placeholderTextColor={colors.mauveTone66} style={inputStyle(Boolean(errors.email))} />
         </View>
 
         <View style={{ gap: 8 }}>
@@ -340,10 +341,10 @@ export function ProfileDetailsScreen({ email, name, phone, onBack, onVerified }:
               alignItems: 'center',
               overflow: 'hidden',
               borderWidth: 1,
-              borderColor: errors.phone ? '#D53A4D' : '#E2DEE5',
+              borderColor: errors.phone ? colors.redTone53 : colors.violetTone88_2,
               borderRadius: 10,
               borderCurve: 'continuous',
-              backgroundColor: '#FFFFFF',
+              backgroundColor: colors.white,
             }}
           >
             <Pressable
@@ -355,8 +356,8 @@ export function ProfileDetailsScreen({ email, name, phone, onBack, onVerified }:
               }}
               style={({ pressed }) => ({ height: '100%', width: countrySelectorWidth, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: pressed ? 0.62 : 1 })}
             >
-              <Text style={{ fontSize: 17 }}>{country.flag}</Text>
-              <Text selectable style={{ fontSize: 14, fontWeight: '600', color: '#241F27' }}>{country.callingCode}</Text>
+              <Text style={{ fontSize: fontSizes.size17 }}>{country.flag}</Text>
+              <Text selectable style={{ fontSize: fontSizes.size14, fontWeight: '600', color: colors.mauveTone14_2 }}>{country.callingCode}</Text>
               <View
                 accessibilityElementsHidden
                 importantForAccessibility="no"
@@ -365,12 +366,12 @@ export function ProfileDetailsScreen({ email, name, phone, onBack, onVerified }:
                   height: 7,
                   borderRightWidth: 1.7,
                   borderBottomWidth: 1.7,
-                  borderColor: '#241F27',
+                  borderColor: colors.mauveTone14_2,
                   transform: [{ rotate: '45deg' }, { translateY: -2 }],
                 }}
               />
             </Pressable>
-            <View style={{ width: 1, height: '100%', backgroundColor: '#E2DEE5' }} />
+            <View style={{ width: 1, height: '100%', backgroundColor: colors.violetTone88_2 }} />
             <TextInput
               value={phoneNumber}
               onChangeText={(value) => {
@@ -381,27 +382,27 @@ export function ProfileDetailsScreen({ email, name, phone, onBack, onVerified }:
               keyboardType="phone-pad"
               maxLength={country.phoneLength}
               placeholder="Enter Phone Number"
-              placeholderTextColor="#A9A3AC"
+              placeholderTextColor={colors.mauveTone66}
               textContentType="telephoneNumber"
-              style={{ flex: 1, alignSelf: 'stretch', paddingHorizontal: 13, paddingVertical: 0, fontSize: 14, color: '#241F27', fontVariant: ['tabular-nums'] }}
+              style={{ flex: 1, alignSelf: 'stretch', paddingHorizontal: 13, paddingVertical: 0, fontSize: fontSizes.size14, color: colors.mauveTone14_2, fontVariant: ['tabular-nums'] }}
             />
           </View>
         </View>
 
         <View style={{ gap: 8 }}>
           <FieldLabel>Date of birth</FieldLabel>
-          <TextInput value={dateOfBirth} onChangeText={setDateOfBirth} keyboardType="numbers-and-punctuation" maxLength={10} placeholder="DD-MM-YYYY" placeholderTextColor="#A9A3AC" style={inputStyle()} />
+          <TextInput value={dateOfBirth} onChangeText={setDateOfBirth} keyboardType="numbers-and-punctuation" maxLength={10} placeholder="DD-MM-YYYY" placeholderTextColor={colors.mauveTone66} style={inputStyle()} />
         </View>
 
         <View style={{ gap: 8 }}>
           <FieldLabel>Anniversary</FieldLabel>
-          <TextInput value={anniversary} onChangeText={setAnniversary} keyboardType="numbers-and-punctuation" maxLength={10} placeholder="DD-MM-YYYY" placeholderTextColor="#A9A3AC" style={inputStyle()} />
+          <TextInput value={anniversary} onChangeText={setAnniversary} keyboardType="numbers-and-punctuation" maxLength={10} placeholder="DD-MM-YYYY" placeholderTextColor={colors.mauveTone66} style={inputStyle()} />
         </View>
       </ScrollView>
 
-      <View style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: keyboardVisible ? 6 : Math.max(insets.bottom, 14), backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: '#EDECEE', boxShadow: '0 -3px 10px rgba(23, 20, 25, 0.06)' }}>
-        <Pressable accessibilityRole="button" onPress={submit} style={({ pressed }) => ({ minHeight: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 9, borderCurve: 'continuous', backgroundColor: '#5432DB', opacity: pressed ? 0.72 : 1 })}>
-          <Text style={{ fontSize: 15, fontWeight: '700', color: '#FFFFFF' }}>Complete</Text>
+      <View style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: keyboardVisible ? 6 : Math.max(insets.bottom, 14), backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.violetTone93_2, boxShadow: `0 -3px 10px ${colors.mauveTone9Alpha6}` }}>
+        <Pressable accessibilityRole="button" onPress={submit} style={({ pressed }) => ({ minHeight: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 9, borderCurve: 'continuous', backgroundColor: colors.blueTone53, opacity: pressed ? 0.72 : 1 })}>
+          <Text style={{ fontSize: fontSizes.size15, fontWeight: '700', color: colors.white }}>Complete</Text>
         </Pressable>
       </View>
 
@@ -416,9 +417,9 @@ export function ProfileDetailsScreen({ email, name, phone, onBack, onVerified }:
               setTitleIndex(index);
               setIsTitlePickerOpen(false);
             }}
-            style={({ pressed }) => ({ minHeight: 58, justifyContent: 'center', borderBottomWidth: 1, borderBottomColor: '#EEEAEF', opacity: pressed ? 0.55 : 1 })}
+            style={({ pressed }) => ({ minHeight: 58, justifyContent: 'center', borderBottomWidth: 1, borderBottomColor: colors.mauveTone93, opacity: pressed ? 0.55 : 1 })}
           >
-            <Text style={{ fontSize: 15, color: '#000000' }}>{title}</Text>
+            <Text style={{ fontSize: fontSizes.size15, color: colors.black }}>{title}</Text>
           </Pressable>
         ))}
       </ProfilePickerModal>
@@ -438,11 +439,11 @@ export function ProfileDetailsScreen({ email, name, phone, onBack, onVerified }:
               setErrors((current) => ({ ...current, phone: false }));
               setIsCountryPickerOpen(false);
             }}
-            style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: 11, borderBottomWidth: 1, borderBottomColor: '#EEEAEF', opacity: pressed ? 0.55 : 1 })}
+            style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: 11, borderBottomWidth: 1, borderBottomColor: colors.mauveTone93, opacity: pressed ? 0.55 : 1 })}
           >
-            <Text style={{ fontSize: 19 }}>{nextCountry.flag}</Text>
-            <Text style={{ flex: 1, fontSize: 15, color: '#000000' }}>{nextCountry.name}</Text>
-            <Text selectable style={{ fontSize: 16, color: '#AAA4AD' }}>{nextCountry.callingCode}</Text>
+            <Text style={{ fontSize: fontSizes.size19 }}>{nextCountry.flag}</Text>
+            <Text style={{ flex: 1, fontSize: fontSizes.size15, color: colors.black }}>{nextCountry.name}</Text>
+            <Text selectable style={{ fontSize: fontSizes.size16, color: colors.mauveTone66_4 }}>{nextCountry.callingCode}</Text>
           </Pressable>
         ))}
       </ProfilePickerModal>

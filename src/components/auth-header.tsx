@@ -1,7 +1,7 @@
+import { colors } from '../theme';
 import { Pressable, View } from 'react-native';
 
 import { BackIcon } from './back-icon';
-import { colors } from '../theme/colors';
 
 type Props = { onPress: () => void };
 

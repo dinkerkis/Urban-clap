@@ -1,3 +1,4 @@
+import { colors } from '../theme';
 import { useCallback, useEffect, useState } from 'react';
 
 import type { ServiceItem } from '../data/service-catalog';
@@ -68,7 +69,7 @@ export function useCategoryProducts(categoryId: string) {
             rating: product.rating?.average ?? 0,
             reviews: formatReviewCount(product.rating?.count),
             icon: '',
-            tint: ['#FFF0EA', '#F1F2FF', '#E9F8F1'][productIndex % 3],
+            tint: [colors.orangeTone96, colors.blueTone97_2, colors.greenTone94][productIndex % 3],
             imageUrl: resolveProductImage(product.mainImage),
             includes: product.includes,
             images: Array.from(

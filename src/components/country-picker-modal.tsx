@@ -1,8 +1,7 @@
+import { colors, fontSizes, typography } from '../theme';
 import { Modal, Pressable, Text, View } from 'react-native';
 
 import { countries, type Country } from '../config/countries';
-import { colors } from '../theme/colors';
-import { typography } from '../theme/typography';
 
 type Props = {
   onClose: () => void;
@@ -25,7 +24,7 @@ export function CountryPickerModal({ onClose, onSelect, selectedCountry, visible
         <Pressable
           accessibilityLabel="Close country selection"
           onPress={onClose}
-          style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(9, 12, 18, 0.66)' }}
+          style={{ position: 'absolute', inset: 0, backgroundColor: colors.blueTone5Alpha66 }}
         />
 
         <Pressable
@@ -42,12 +41,12 @@ export function CountryPickerModal({ onClose, onSelect, selectedCountry, visible
             marginRight: 24,
             marginBottom: 16,
             borderRadius: 22,
-            backgroundColor: '#FFFFFF',
+            backgroundColor: colors.white,
             opacity: pressed ? 0.7 : 1,
-            boxShadow: '0 8px 26px rgba(0, 0, 0, 0.18)',
+            boxShadow: `0 8px 26px ${colors.blackAlpha18}`,
           })}
         >
-          <Text style={{ fontSize: 21, lineHeight: 24, fontWeight: '300', color: colors.text }}>×</Text>
+          <Text style={{ fontSize: fontSizes.size21, lineHeight: 24, fontWeight: '300', color: colors.text }}>×</Text>
         </Pressable>
 
         <View
@@ -59,7 +58,7 @@ export function CountryPickerModal({ onClose, onSelect, selectedCountry, visible
             borderTopRightRadius: 28,
             borderCurve: 'continuous',
             backgroundColor: colors.surface,
-            boxShadow: '0 -12px 36px rgba(0, 0, 0, 0.12)',
+            boxShadow: `0 -12px 36px ${colors.blackAlpha12}`,
           }}
         >
           <Text style={{ ...typography.title, paddingBottom: 14, color: colors.text }}>Select your country</Text>
@@ -79,7 +78,7 @@ export function CountryPickerModal({ onClose, onSelect, selectedCountry, visible
                   opacity: pressed ? 0.55 : 1,
                 })}
               >
-                <Text style={{ fontSize: 21 }}>{country.flag}</Text>
+                <Text style={{ fontSize: fontSizes.size21 }}>{country.flag}</Text>
                 <Text style={{ flex: 1, ...typography.body, color: colors.text }}>
                   {country.name} ({country.callingCode})
                 </Text>
@@ -90,7 +89,7 @@ export function CountryPickerModal({ onClose, onSelect, selectedCountry, visible
                     alignItems: 'center',
                     justifyContent: 'center',
                     borderWidth: 2,
-                    borderColor: selected ? colors.primary : '#777980',
+                    borderColor: selected ? colors.primary : colors.slateTone48,
                     borderRadius: 11,
                   }}
                 >

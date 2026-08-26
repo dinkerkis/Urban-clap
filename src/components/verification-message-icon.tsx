@@ -1,6 +1,6 @@
+import { colors } from '../theme';
 import { View } from 'react-native';
 
-import { colors } from '../theme/colors';
 
 export function VerificationMessageIcon() {
   return (
@@ -41,7 +41,7 @@ export function VerificationMessageIcon() {
         }}
       >
         {[0, 1, 2].map((dot) => (
-          <View key={dot} style={{ width: 3.5, height: 3.5, borderRadius: 2, backgroundColor: '#FFFFFF' }} />
+          <View key={dot} style={{ width: 3.5, height: 3.5, borderRadius: 2, backgroundColor: colors.white }} />
         ))}
         <View
           style={{

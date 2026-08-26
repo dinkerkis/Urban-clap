@@ -1,3 +1,4 @@
+import { colors, fontSizes } from '../theme';
 import { useEffect, useRef, useState } from 'react';
 import { Image } from 'expo-image';
 import type { LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
@@ -12,10 +13,10 @@ const offers = [
     title: 'Get additional 25% off on your first booking',
     subtitle: 'Book now  →',
     image: require('../../assets/offer-salon-transparent.png'),
-    headerColor: '#8662E8',
-    titleColor: '#FFFFFF',
-    eyebrowColor: '#FFFFFF',
-    subtitleColor: 'rgba(255, 255, 255, 0.88)',
+    headerColor: colors.violetTone65,
+    titleColor: colors.white,
+    eyebrowColor: colors.white,
+    subtitleColor: colors.whiteAlpha88,
   },
   {
     id: 'ac-care',
@@ -23,10 +24,10 @@ const offers = [
     title: '25% off on your first AC servicing',
     subtitle: 'Get up to ₹100 off',
     image: require('../../assets/offer-ac-service-transparent.png'),
-    headerColor: '#079DE2',
-    titleColor: '#FFFFFF',
-    eyebrowColor: '#FFFFFF',
-    subtitleColor: 'rgba(255, 255, 255, 0.88)',
+    headerColor: colors.cyanTone46,
+    titleColor: colors.white,
+    eyebrowColor: colors.white,
+    subtitleColor: colors.whiteAlpha88,
   },
   {
     id: 'water-care',
@@ -34,10 +35,10 @@ const offers = [
     title: 'Pure water, made effortless',
     subtitle: 'Explore smart purification  →',
     image: require('../../assets/offer-water-purifier-transparent.png'),
-    headerColor: '#060A13',
-    titleColor: '#FFFFFF',
-    eyebrowColor: '#87AFFF',
-    subtitleColor: 'rgba(255, 255, 255, 0.82)',
+    headerColor: colors.blueTone5,
+    titleColor: colors.white,
+    eyebrowColor: colors.blueTone76,
+    subtitleColor: colors.whiteAlpha82,
   },
 ];
 
@@ -132,14 +133,14 @@ export function OfferCarousel({ embeddedOnPurple = false, onHeaderColorChange }:
                 paddingVertical: 17,
                 borderRadius: embeddedOnPurple ? 0 : 24,
                 borderCurve: 'continuous',
-                backgroundColor: 'transparent',
+                backgroundColor: colors.transparent,
               }}
             >
               <Image source={offer.image} contentFit="contain" contentPosition="right center" style={{ position: 'absolute', inset: 0 }} />
               <View style={{ width: '54%', minHeight: 128, justifyContent: 'center', gap: 7 }}>
-                <Text style={{ fontSize: 10, lineHeight: 13, fontWeight: '600', letterSpacing: 0.8, color: offer.eyebrowColor }}>{offer.eyebrow}</Text>
-                <Text selectable style={{ fontSize: 19, lineHeight: 24, fontWeight: '600', color: offer.titleColor }}>{offer.title}</Text>
-                <Text selectable style={{ fontSize: 11, lineHeight: 16, fontWeight: '600', color: offer.subtitleColor }}>{offer.subtitle}</Text>
+                <Text style={{ fontSize: fontSizes.size10, lineHeight: 13, fontWeight: '600', letterSpacing: 0.8, color: offer.eyebrowColor }}>{offer.eyebrow}</Text>
+                <Text selectable style={{ fontSize: fontSizes.size19, lineHeight: 24, fontWeight: '600', color: offer.titleColor }}>{offer.title}</Text>
+                <Text selectable style={{ fontSize: fontSizes.size11, lineHeight: 16, fontWeight: '600', color: offer.subtitleColor }}>{offer.subtitle}</Text>
               </View>
             </View>
           </View>
@@ -161,8 +162,8 @@ export function OfferCarousel({ embeddedOnPurple = false, onHeaderColorChange }:
                 height: 7,
                 borderRadius: 999,
                 backgroundColor: embeddedOnPurple
-                  ? active ? '#FFFFFF' : 'rgba(255, 255, 255, 0.38)'
-                  : active ? '#6E45E2' : '#D6D1DC',
+                  ? active ? colors.white : colors.whiteAlpha38
+                  : active ? colors.violetTone58 : colors.violetTone84_2,
                 opacity: pressed ? 0.6 : 1,
               })}
             />

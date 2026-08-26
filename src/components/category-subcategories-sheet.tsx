@@ -1,3 +1,4 @@
+import { colors, fontSizes } from '../theme';
 import { Image } from 'expo-image';
 import { Modal, Pressable, Text, useWindowDimensions, View } from 'react-native';
 import Animated, { Easing, FadeIn, SlideInDown } from 'react-native-reanimated';
@@ -33,7 +34,7 @@ export function CategorySubcategoriesSheet({ category, onClose, onSubcategoryPre
         <Pressable
           accessibilityLabel="Close category"
           onPress={onClose}
-          style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.46)' }}
+          style={{ position: 'absolute', inset: 0, backgroundColor: colors.blackAlpha46 }}
         />
 
         {category ? (
@@ -50,11 +51,11 @@ export function CategorySubcategoriesSheet({ category, onClose, onSubcategoryPre
                   alignItems: 'center',
                   justifyContent: 'center',
                   borderRadius: 18,
-                  backgroundColor: '#F2F2F2',
+                  backgroundColor: colors.neutralTone95_2,
                   opacity: pressed ? 0.7 : 1,
                 })}
               >
-                <Text style={{ fontSize: 22, lineHeight: 24, fontWeight: '400', color: '#1A1A1A', marginTop: -1 }}>×</Text>
+                <Text style={{ fontSize: fontSizes.size22, lineHeight: 24, fontWeight: '400', color: colors.neutralTone10, marginTop: -1 }}>×</Text>
               </Pressable>
             </Animated.View>
 
@@ -66,10 +67,10 @@ export function CategorySubcategoriesSheet({ category, onClose, onSubcategoryPre
                 borderTopLeftRadius: 16,
                 borderTopRightRadius: 16,
                 borderCurve: 'continuous',
-                backgroundColor: '#FFFFFF',
+                backgroundColor: colors.white,
               }}
             >
-              <Text selectable style={{ marginBottom: 22, fontSize: 22, lineHeight: 28, fontWeight: '700', color: '#111111' }}>
+              <Text selectable style={{ marginBottom: 22, fontSize: fontSizes.size22, lineHeight: 28, fontWeight: '700', color: colors.neutralTone7 }}>
                 {category.title}
               </Text>
 
@@ -92,7 +93,7 @@ export function CategorySubcategoriesSheet({ category, onClose, onSubcategoryPre
                           overflow: 'hidden',
                           borderRadius: 14,
                           borderCurve: 'continuous',
-                          backgroundColor: '#F3F3F3',
+                          backgroundColor: colors.neutralTone95_3,
                         }}
                       >
                         {subcategory.imageUrl ? (
@@ -103,7 +104,7 @@ export function CategorySubcategoriesSheet({ category, onClose, onSubcategoryPre
                             style={{ position: 'absolute', inset: 10 }}
                           />
                         ) : (
-                          <Text style={{ fontSize: 22 }}>{subcategory.icon || '•'}</Text>
+                          <Text style={{ fontSize: fontSizes.size22 }}>{subcategory.icon || '•'}</Text>
                         )}
                       </View>
                       <Text
@@ -112,10 +113,10 @@ export function CategorySubcategoriesSheet({ category, onClose, onSubcategoryPre
                           width: itemWidth,
                           minHeight: 36,
                           textAlign: 'center',
-                          fontSize: 12,
+                          fontSize: fontSizes.size12,
                           lineHeight: 16,
                           fontWeight: '400',
-                          color: '#2B2433',
+                          color: colors.violetTone17,
                         }}
                       >
                         {subcategory.title}
@@ -124,7 +125,7 @@ export function CategorySubcategoriesSheet({ category, onClose, onSubcategoryPre
                   ))}
                 </View>
               ) : (
-                <Text style={{ paddingBottom: 12, fontSize: 14, lineHeight: 20, color: '#625D64' }}>
+                <Text style={{ paddingBottom: 12, fontSize: fontSizes.size14, lineHeight: 20, color: colors.mauveTone38_2 }}>
                   No services available yet.
                 </Text>
               )}

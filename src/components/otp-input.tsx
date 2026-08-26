@@ -1,8 +1,8 @@
+import { colors, fontSizes } from '../theme';
 import { useRef } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
 
 import { OTP_LENGTH } from '../config/auth';
-import { colors } from '../theme/colors';
 
 type Props = {
   error: boolean;
@@ -38,7 +38,7 @@ export function OtpInput({ error, onChange, value }: Props) {
                 backgroundColor: error ? colors.dangerSoft : colors.surface,
               }}
             >
-              <Text style={{ fontSize: 20, color: colors.text, fontVariant: ['tabular-nums'] }}>
+              <Text style={{ fontSize: fontSizes.size20, color: colors.text, fontVariant: ['tabular-nums'] }}>
                 {value[index] ?? ''}
               </Text>
             </View>

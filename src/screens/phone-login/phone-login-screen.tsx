@@ -1,3 +1,4 @@
+import { colors, fontSizes, typography } from '../../theme';
 import { useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -7,8 +8,6 @@ import { PhoneMessageIcon } from '../../components/phone-message-icon';
 import { PrimaryButton } from '../../components/primary-button';
 import { defaultCountry, type Country } from '../../config/countries';
 import { getApiErrorMessage, requestLoginOtp } from '../../services/auth-api';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
 
 type Props = {
   onContinue: (value: { callingCode: string; phoneNumber: string }) => void;
@@ -98,7 +97,7 @@ export function PhoneLoginScreen({ onContinue }: Props) {
                   }}
                   style={{ height: '100%', minWidth: 122, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 }}
                 >
-                  <Text style={{ fontSize: 17 }}>{country.flag}</Text>
+                  <Text style={{ fontSize: fontSizes.size17 }}>{country.flag}</Text>
                   <Text selectable style={{ ...typography.input, fontWeight: '600', color: colors.text }}>{country.callingCode}</Text>
                   <View
                     accessibilityElementsHidden
@@ -154,7 +153,7 @@ export function PhoneLoginScreen({ onContinue }: Props) {
           backgroundColor: colors.background,
         }}
       >
-        <Text style={{ fontSize: 12, lineHeight: 18, textAlign: 'center', color: colors.textSecondary }}>
+        <Text style={{ fontSize: fontSizes.size12, lineHeight: 18, textAlign: 'center', color: colors.textSecondary }}>
           By continuing, you agree to our <Text style={{ color: colors.primary, textDecorationLine: 'underline' }}>T&amp;C</Text> and{' '}
           <Text style={{ color: colors.primary, textDecorationLine: 'underline' }}>Privacy</Text> policy
         </Text>

@@ -1,3 +1,4 @@
+import { colors } from '../theme';
 import { getCategoryImageUrl, type ApiCategory } from '../services/categories-api';
 
 export type ServiceItem = {
@@ -47,7 +48,7 @@ export type ServiceCategory = {
   subcategories: ServiceSubcategory[];
 };
 
-const CATEGORY_TINTS = ['#E9F8F1', '#EBF3FF', '#FFF0EA', '#F1F2FF', '#FFF8DE', '#EAF7FB'];
+const CATEGORY_TINTS = [colors.greenTone94, colors.blueTone96, colors.orangeTone96, colors.blueTone97_2, colors.yellowTone94, colors.cyanTone95];
 
 export function mapApiCategories(categories: ApiCategory[]): ServiceCategory[] {
   return categories.map((category, categoryIndex) => ({

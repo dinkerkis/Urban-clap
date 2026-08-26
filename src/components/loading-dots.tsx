@@ -1,3 +1,4 @@
+import { colors } from '../theme';
 import { useEffect } from 'react';
 import { View } from 'react-native';
 import Animated, {
@@ -11,7 +12,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-export function LoadingDots({ color = '#6E45E2', gap = 9, size = 7 }: { color?: string; gap?: number; size?: number }) {
+export function LoadingDots({ color = colors.violetTone58, gap = 9, size = 7 }: { color?: string; gap?: number; size?: number }) {
   const d1 = useSharedValue(0.25);
   const d2 = useSharedValue(0.25);
   const d3 = useSharedValue(0.25);

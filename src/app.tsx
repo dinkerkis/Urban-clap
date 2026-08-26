@@ -1,3 +1,4 @@
+import { colors } from './theme';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
@@ -13,7 +14,6 @@ import { CustomSplashScreen } from './screens/splash';
 import type { AuthSession } from './services/auth-api';
 import type { CompletedProfile } from './screens/profile';
 import { clearAuthSession, getStoredAuthSession, saveAuthSession } from './services/auth-session-storage';
-import { colors } from './theme/colors';
 
 type Screen = 'loading' | 'location-bootstrap' | 'phone' | 'otp' | 'dashboard';
 
@@ -52,7 +52,7 @@ export default function App() {
 
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-      <View style={{ flex: 1, backgroundColor: screen === 'loading' || screen === 'dashboard' ? '#6E45E2' : colors.background }}>
+      <View style={{ flex: 1, backgroundColor: screen === 'loading' || screen === 'dashboard' ? colors.violetTone58 : colors.background }}>
         <StatusBar style={screen === 'loading' || screen === 'dashboard' ? 'light' : 'dark'} />
         {screen === 'loading' && <CustomSplashScreen />}
         {screen === 'location-bootstrap' && (

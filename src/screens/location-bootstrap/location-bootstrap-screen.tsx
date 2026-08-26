@@ -1,3 +1,4 @@
+import { colors, fontSizes } from '../../theme';
 import { useEffect, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 import Animated, {
@@ -17,8 +18,8 @@ import { LoadingDots } from '../../components/loading-dots';
 import { fetchCurrentLocation, formatLocationDisplay, type LocationDisplay } from '../../hooks/use-current-location';
 import { saveCurrentLocationAddress } from '../../hooks/use-save-current-location-address';
 
-const FETCH_PIN = '#1A4FBF';
-const CONFIRM_GREEN = '#1AA05A';
+const FETCH_PIN = colors.blueTone43;
+const CONFIRM_GREEN = colors.greenTone36;
 const MIN_FETCH_MS = 1_400;
 const DOTS_MS = 800;
 const CONFIRM_MS = 1_800;
@@ -60,7 +61,7 @@ function PulseRing({ delay, progress }: { delay: number; progress: SharedValue<n
           width: 120,
           height: 120,
           borderRadius: 60,
-          backgroundColor: 'rgba(26, 79, 191, 0.12)',
+          backgroundColor: colors.blueTone43Alpha12,
         },
         style,
       ]}
@@ -89,7 +90,7 @@ function FetchingPin() {
             backgroundColor: FETCH_PIN,
           }}
         >
-          <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#FFFFFF' }} />
+          <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: colors.white }} />
         </View>
         <View style={{ width: 2.5, height: 11, marginTop: 1, borderRadius: 1, backgroundColor: FETCH_PIN }} />
       </View>
@@ -117,7 +118,7 @@ function ConfirmPin() {
             marginTop: -1,
             borderLeftWidth: 1.8,
             borderBottomWidth: 1.8,
-            borderColor: '#FFFFFF',
+            borderColor: colors.white,
             transform: [{ rotate: '-45deg' }],
           }}
         />
@@ -177,7 +178,7 @@ export function LocationBootstrapScreen({ authToken, onComplete }: LocationBoots
             : `Delivering service at ${display?.title ?? 'your area'}`
       }
       accessibilityRole="progressbar"
-      style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF' }}
+      style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.white }}
     >
       {phase === 'fetching' ? (
         <Animated.View
@@ -187,7 +188,7 @@ export function LocationBootstrapScreen({ authToken, onComplete }: LocationBoots
           style={{ alignItems: 'center', transform: [{ translateY: -36 }] }}
         >
           <FetchingPin />
-          <Text style={{ marginTop: 2, fontSize: 15, lineHeight: 21, fontWeight: '400', color: '#2F2F2F' }}>
+          <Text style={{ marginTop: 2, fontSize: fontSizes.size15, lineHeight: 21, fontWeight: '400', color: colors.neutralTone18 }}>
             Fetching your location...
           </Text>
         </Animated.View>
@@ -212,12 +213,12 @@ export function LocationBootstrapScreen({ authToken, onComplete }: LocationBoots
           style={{ alignItems: 'center', paddingHorizontal: 36, transform: [{ translateY: -20 }] }}
         >
           <ConfirmPin />
-          <Text style={{ marginTop: 14, fontSize: 13, lineHeight: 18, fontWeight: '400', color: CONFIRM_GREEN }}>
+          <Text style={{ marginTop: 14, fontSize: fontSizes.size13, lineHeight: 18, fontWeight: '400', color: CONFIRM_GREEN }}>
             Delivering service at
           </Text>
           <Text
             selectable
-            style={{ marginTop: 6, fontSize: 22, lineHeight: 28, fontWeight: '700', color: '#111111', textAlign: 'center' }}
+            style={{ marginTop: 6, fontSize: fontSizes.size22, lineHeight: 28, fontWeight: '700', color: colors.neutralTone7, textAlign: 'center' }}
           >
             {display.title}
           </Text>
@@ -227,10 +228,10 @@ export function LocationBootstrapScreen({ authToken, onComplete }: LocationBoots
               style={{
                 marginTop: 8,
                 maxWidth: 300,
-                fontSize: 14,
+                fontSize: fontSizes.size14,
                 lineHeight: 20,
                 fontWeight: '400',
-                color: '#2A2A2A',
+                color: colors.neutralTone16,
                 textAlign: 'center',
               }}
             >
