@@ -5,6 +5,8 @@ export {
   GettingStartedArticleScreen,
   GettingStartedHelpScreen,
   HelpSupportScreen,
+  MembershipArticleScreen,
+  MembershipHelpScreen,
   MyPlansScreen,
   MyRatingScreen,
   NativeDevicesScreen,
@@ -12,5 +14,8 @@ export {
   PaymentCreditsHelpScreen,
   PassesMembershipScreen,
   ProfileMyBookingsScreen,
+  SafetyArticleScreen,
+  WarrantyArticleScreen,
+  WarrantyHelpScreen,
 } from './profile-options-screens';
-export type { GettingStartedArticleKey, PaymentCreditsArticleKey } from './profile-options-screens';
+export type { GettingStartedArticleKey, MembershipArticleKey, PaymentCreditsArticleKey, WarrantyArticleKey } from './profile-options-screens';

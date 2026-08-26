@@ -21,10 +21,11 @@ import { LocationPickerScreen } from '../location-picker';
 import { ManageAddressesScreen } from '../manage-addresses';
 import { NativeScreen } from '../native';
 import type { NativeCartSelection } from '../native/native-product-detail-modal';
+import type { HomeSpotlight } from '../../services/home-spotlights-api';
 import { PaymentMethodsScreen } from '../payment-methods';
 import { ProfileDetailsScreen, ProfileEntryScreen, type CompletedProfile } from '../profile';
 import { ProductDetailScreen } from '../product-detail';
-import { AccountArticleScreen, AccountHelpScreen, ChangePhoneHelpScreen, GettingStartedArticleScreen, GettingStartedHelpScreen, HelpSupportScreen, MyPlansScreen, MyRatingScreen, NativeDevicesScreen, PassesMembershipScreen, PaymentCreditsArticleScreen, PaymentCreditsHelpScreen, ProfileMyBookingsScreen, type GettingStartedArticleKey, type PaymentCreditsArticleKey } from '../profile-options';
+import { AccountArticleScreen, AccountHelpScreen, ChangePhoneHelpScreen, GettingStartedArticleScreen, GettingStartedHelpScreen, HelpSupportScreen, MembershipArticleScreen, MembershipHelpScreen, MyPlansScreen, MyRatingScreen, NativeDevicesScreen, PassesMembershipScreen, PaymentCreditsArticleScreen, PaymentCreditsHelpScreen, ProfileMyBookingsScreen, SafetyArticleScreen, WarrantyArticleScreen, WarrantyHelpScreen, type GettingStartedArticleKey, type MembershipArticleKey, type PaymentCreditsArticleKey, type WarrantyArticleKey } from '../profile-options';
 import { RewardsScreen } from '../rewards';
 import { ServiceListScreen } from '../service-list';
 import { PrivacyCenterScreen, SettingsScreen } from '../settings';
@@ -58,6 +59,11 @@ type DashboardPage =
   | { type: 'help-getting-started-article'; article: GettingStartedArticleKey; from?: 'my-bookings' | 'profile' }
   | { type: 'help-payment-credits'; from?: 'my-bookings' | 'profile' }
   | { type: 'help-payment-credits-article'; article: PaymentCreditsArticleKey; from?: 'my-bookings' | 'profile' }
+  | { type: 'help-membership'; from?: 'my-bookings' | 'profile' }
+  | { type: 'help-membership-article'; article: MembershipArticleKey; from?: 'my-bookings' | 'profile' }
+  | { type: 'help-safety-article'; from?: 'my-bookings' | 'profile' }
+  | { type: 'help-warranty'; from?: 'my-bookings' | 'profile' }
+  | { type: 'help-warranty-article'; article: WarrantyArticleKey; from?: 'my-bookings' | 'profile' }
   | { type: 'help-phone-article'; from?: 'my-bookings' | 'profile' }
   | { type: 'help-address-article'; from?: 'my-bookings' | 'profile' }
   | { type: 'help-email-article'; from?: 'my-bookings' | 'profile' }
@@ -151,6 +157,27 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
     setSheetCategory(category);
   };
 
+  const openSpotlight = (spotlight: HomeSpotlight) => {
+    if (spotlight.redirectType === 'native') {
+      changeTab('native');
+      return;
+    }
+
+    const category = categories.find((item) => item.id === spotlight.redirectId)
+      ?? categories.find((item) => item.subcategories.some((subcategory) => subcategory.id === spotlight.redirectId));
+    if (!category) {
+      changeTab('categories');
+      return;
+    }
+
+    const subcategory = category.subcategories.find((item) => item.id === spotlight.redirectId);
+    if (subcategory && !isFullPageCategory(category)) {
+      setPage({ type: 'services', category, subcategory });
+      return;
+    }
+    openCategory(category);
+  };
+
   let content;
 
   if (page.type === 'location') {
@@ -168,7 +195,7 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
         }}
       />
     );
-  } else if (page.type === 'profile' || page.type === 'profile-details' || page.type === 'about' || page.type === 'wallet' || page.type === 'my-bookings' || page.type === 'native-devices' || page.type === 'help-support' || page.type === 'help-account' || page.type === 'help-getting-started' || page.type === 'help-getting-started-article' || page.type === 'help-payment-credits' || page.type === 'help-payment-credits-article' || page.type === 'help-phone-article' || page.type === 'help-address-article' || page.type === 'help-email-article' || page.type === 'help-payment-article' || page.type === 'my-plans' || page.type === 'passes-membership' || page.type === 'payment-methods' || page.type === 'manage-addresses' || page.type === 'my-rating' || page.type === 'settings' || page.type === 'privacy-center') {
+  } else if (page.type === 'profile' || page.type === 'profile-details' || page.type === 'about' || page.type === 'wallet' || page.type === 'my-bookings' || page.type === 'native-devices' || page.type === 'help-support' || page.type === 'help-account' || page.type === 'help-getting-started' || page.type === 'help-getting-started-article' || page.type === 'help-payment-credits' || page.type === 'help-payment-credits-article' || page.type === 'help-membership' || page.type === 'help-membership-article' || page.type === 'help-safety-article' || page.type === 'help-warranty' || page.type === 'help-warranty-article' || page.type === 'help-phone-article' || page.type === 'help-address-article' || page.type === 'help-email-article' || page.type === 'help-payment-article' || page.type === 'my-plans' || page.type === 'passes-membership' || page.type === 'payment-methods' || page.type === 'manage-addresses' || page.type === 'my-rating' || page.type === 'settings' || page.type === 'privacy-center') {
     content = (
       <Animated.View entering={STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ flex: 1, backgroundColor: colors.white }}>
         <ProfileEntryScreen
@@ -337,6 +364,7 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
         locationTitle={selectedLocation?.title}
         onCategoryPress={openCategory}
         onLocationPress={() => setPage({ type: 'location' })}
+        onSpotlightPress={openSpotlight}
         onSeeAllCategories={() => changeTab('categories')}
         onProfilePress={() => setPage({ type: 'profile' })}
         onRetry={retryCategories}
@@ -355,6 +383,7 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
           style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}
         >
           <ProfileDetailsScreen
+            authToken={authToken}
             email={email}
             name={name}
             phone={phone}
@@ -413,7 +442,10 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
             onBack={() => { setProfileTransition('pop'); setPage({ type: page.from === 'my-bookings' ? 'my-bookings' : 'profile' }); }}
             onAccount={() => { setProfileTransition('push'); setPage({ type: 'help-account', from: page.from }); }}
             onGettingStarted={() => { setProfileTransition('push'); setPage({ type: 'help-getting-started', from: page.from }); }}
+            onMembership={() => { setProfileTransition('push'); setPage({ type: 'help-membership', from: page.from }); }}
             onPaymentCredits={() => { setProfileTransition('push'); setPage({ type: 'help-payment-credits', from: page.from }); }}
+            onSafety={() => { setProfileTransition('push'); setPage({ type: 'help-safety-article', from: page.from }); }}
+            onWarranty={() => { setProfileTransition('push'); setPage({ type: 'help-warranty', from: page.from }); }}
           />
         </Animated.View>
       ) : null}
@@ -459,6 +491,45 @@ export function DashboardScreen({ authToken, email, name, phone, profilePicture,
             onBack={() => { setProfileTransition('pop'); setPage({ type: 'help-payment-credits', from: page.from }); }}
             onSavedPayments={() => { setProfileTransition('push'); setPage({ type: 'payment-methods', from: 'help-payment-credits-article', helpArticle: page.article, helpFrom: page.from }); }}
             onWallet={() => { setProfileTransition('push'); setPage({ type: 'wallet', from: 'help-payment-credits-article', helpArticle: page.article, helpFrom: page.from }); }}
+          />
+        </Animated.View>
+      ) : null}
+      {page.type === 'help-membership' ? (
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}>
+          <MembershipHelpScreen
+            onBack={() => { setProfileTransition('pop'); setPage({ type: 'help-support', from: page.from }); }}
+            onTopic={(article) => { setProfileTransition('push'); setPage({ type: 'help-membership-article', article, from: page.from }); }}
+          />
+        </Animated.View>
+      ) : null}
+      {page.type === 'help-membership-article' ? (
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}>
+          <MembershipArticleScreen
+            article={page.article}
+            onBack={() => { setProfileTransition('pop'); setPage({ type: 'help-membership', from: page.from }); }}
+          />
+        </Animated.View>
+      ) : null}
+      {page.type === 'help-safety-article' ? (
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}>
+          <SafetyArticleScreen
+            onBack={() => { setProfileTransition('pop'); setPage({ type: 'help-support', from: page.from }); }}
+          />
+        </Animated.View>
+      ) : null}
+      {page.type === 'help-warranty' ? (
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}>
+          <WarrantyHelpScreen
+            onBack={() => { setProfileTransition('pop'); setPage({ type: 'help-support', from: page.from }); }}
+            onTopic={(article) => { setProfileTransition('push'); setPage({ type: 'help-warranty-article', article, from: page.from }); }}
+          />
+        </Animated.View>
+      ) : null}
+      {page.type === 'help-warranty-article' ? (
+        <Animated.View entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN} exiting={STACK_SLIDE_OUT} style={{ position: 'absolute', inset: 0, backgroundColor: colors.white }}>
+          <WarrantyArticleScreen
+            article={page.article}
+            onBack={() => { setProfileTransition('pop'); setPage({ type: 'help-warranty', from: page.from }); }}
           />
         </Animated.View>
       ) : null}

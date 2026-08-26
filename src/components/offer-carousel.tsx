@@ -1,175 +1,321 @@
-import { colors, fontSizes } from '../theme';
-import { useEffect, useRef, useState } from 'react';
 import { Image } from 'expo-image';
-import type { LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import type { LayoutChangeEvent } from 'react-native';
+import { Platform, Pressable, Text, View } from 'react-native';
+import Animated, {
+  Easing,
+  FadeInDown,
+  FadeOutUp,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 
-const AUTO_SCROLL_INTERVAL_MS = 4_000;
+import { colors, fontSizes } from '../theme';
+import type { BannerHeadingColor, PromotionalBannerSlide } from '../services/home-promotional-banner-api';
 
-const offers = [
-  {
-    id: 'salon',
-    eyebrow: 'SALON AT HOME',
-    title: 'Get additional 25% off on your first booking',
-    subtitle: 'Book now  →',
-    image: require('../../assets/offer-salon-transparent.png'),
-    headerColor: colors.violetTone65,
-    titleColor: colors.white,
-    eyebrowColor: colors.white,
-    subtitleColor: colors.whiteAlpha88,
-  },
-  {
-    id: 'ac-care',
-    eyebrow: 'AC SERVICE',
-    title: '25% off on your first AC servicing',
-    subtitle: 'Get up to ₹100 off',
-    image: require('../../assets/offer-ac-service-transparent.png'),
-    headerColor: colors.cyanTone46,
-    titleColor: colors.white,
-    eyebrowColor: colors.white,
-    subtitleColor: colors.whiteAlpha88,
-  },
-  {
-    id: 'water-care',
-    eyebrow: 'SMART WATER CARE',
-    title: 'Pure water, made effortless',
-    subtitle: 'Explore smart purification  →',
-    image: require('../../assets/offer-water-purifier-transparent.png'),
-    headerColor: colors.blueTone5,
-    titleColor: colors.white,
-    eyebrowColor: colors.blueTone76,
-    subtitleColor: colors.whiteAlpha82,
-  },
-];
+const AUTO_SCROLL_INTERVAL_MS = 4_500;
+const IMAGE_TRANSITION_MS = 950;
+const DISPLAY_SERIF = Platform.select({ ios: 'Georgia', android: 'serif', default: 'Georgia' });
+const TEXT_IN = FadeInDown.delay(380).duration(520).withInitialValues({
+  opacity: 0,
+  transform: [{ translateY: 10 }],
+});
+const TEXT_OUT = FadeOutUp.duration(220);
 
-export const DEFAULT_OFFER_HEADER_COLOR = offers[0].headerColor;
+export const DEFAULT_OFFER_HEADER_COLOR = colors.violetTone65;
 
 type OfferCarouselProps = {
   embeddedOnPurple?: boolean;
-  onHeaderColorChange?: (color: string) => void;
+  slides: PromotionalBannerSlide[];
 };
 
-export function OfferCarousel({ embeddedOnPurple = false, onHeaderColorChange }: OfferCarouselProps) {
-  const scrollRef = useRef<ScrollView>(null);
-  const activeIndexRef = useRef(0);
-  const isDraggingRef = useRef(false);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [pageWidth, setPageWidth] = useState(0);
+function headingColor(color?: BannerHeadingColor): string {
+  if (color?.type === 'solid') return color.color;
+  if (color?.type === 'gradient') return color.gradient.endColor || color.gradient.startColor;
+  return colors.white;
+}
 
-  const selectPage = (index: number, animated = true) => {
-    if (!pageWidth) return;
+/** "HAPPY RAKSHA BANDHAN" → small HAPPY + stacked RAKSHA / BANDHAN (reference layout). */
+function parseStackedHeading(heading: string): { eyebrow: string; lines: string[] } | null {
+  const trimmed = heading.trim();
+  if (!trimmed) return null;
+
+  if (trimmed.includes('\n')) {
+    const parts = trimmed.split(/\n+/).map((part) => part.trim()).filter(Boolean);
+    if (parts.length >= 2) return { eyebrow: parts[0], lines: parts.slice(1) };
+  }
+
+  const words = trimmed.split(/\s+/).filter(Boolean);
+  if (words.length >= 3 && words[0].toUpperCase() === 'HAPPY') {
+    return {
+      eyebrow: words[0].toUpperCase(),
+      lines: words.slice(1).map((word) => word.toUpperCase()),
+    };
+  }
+
+  return null;
+}
+
+function BannerHeading({
+  color,
+  heading,
+}: {
+  color?: BannerHeadingColor;
+  heading: string;
+}) {
+  const stacked = parseStackedHeading(heading);
+  const accent = headingColor(color);
+
+  if (!stacked) {
+    return (
+      <Text selectable style={{ fontSize: fontSizes.size30, lineHeight: 32, fontWeight: '700', color: accent }}>
+        {heading}
+      </Text>
+    );
+  }
+
+  return (
+    <View style={{ gap: 2 }}>
+      <Text
+        selectable
+        style={{
+          fontFamily: DISPLAY_SERIF,
+          fontSize: fontSizes.size12,
+          lineHeight: 16,
+          fontWeight: '700',
+          letterSpacing: 2.4,
+          color: accent,
+        }}
+      >
+        {stacked.eyebrow}
+      </Text>
+      <View style={{ marginTop: 2 }}>
+        {stacked.lines.map((line) => (
+          <Text
+            key={line}
+            selectable
+            style={{
+              fontFamily: DISPLAY_SERIF,
+              fontSize: fontSizes.size34 - 2,
+              lineHeight: 34,
+              fontWeight: '700',
+              letterSpacing: 0.4,
+              color: accent,
+            }}
+          >
+            {line}
+          </Text>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+function BannerImage({ uri, height }: { height: number; uri: string }) {
+  return (
+    <Image
+      source={{ uri }}
+      contentFit="contain"
+      contentPosition="right center"
+      style={{ width: '100%', height }}
+    />
+  );
+}
+
+export function OfferCarousel({ embeddedOnPurple = false, slides }: OfferCarouselProps) {
+  const activeIndexRef = useRef(0);
+  const isAnimatingRef = useRef(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [baseIndex, setBaseIndex] = useState(0);
+  const [incomingIndex, setIncomingIndex] = useState<number | null>(null);
+  const [bannerWidth, setBannerWidth] = useState(0);
+  const slideIn = useSharedValue(0);
+  const touchStartX = useRef(0);
+
+  const finishTransition = (index: number) => {
     activeIndexRef.current = index;
+    setBaseIndex(index);
     setActiveIndex(index);
-    onHeaderColorChange?.(offers[index].headerColor);
-    scrollRef.current?.scrollTo({ x: pageWidth * index, animated });
+    setIncomingIndex(null);
+    slideIn.value = 0;
+    isAnimatingRef.current = false;
+  };
+
+  const goTo = (index: number) => {
+    if (!slides.length || isAnimatingRef.current || bannerWidth <= 0) return;
+    const current = activeIndexRef.current;
+    const length = slides.length;
+    const normalized = ((index % length) + length) % length;
+    if (normalized === current) return;
+
+    const isForward = !(
+      index < 0 ||
+      index === current - 1 ||
+      (index >= 0 && index < length && index < current)
+    );
+
+    isAnimatingRef.current = true;
+    setActiveIndex(normalized);
+    // Same full-bleed layout as the first image; new slide opens from the right over it
+    slideIn.value = isForward ? bannerWidth : -bannerWidth;
+    setIncomingIndex(normalized);
   };
 
   useEffect(() => {
-    if (!pageWidth) return;
+    if (incomingIndex == null || bannerWidth <= 0) return;
+
+    slideIn.value = withTiming(0, { duration: IMAGE_TRANSITION_MS, easing: Easing.out(Easing.cubic) }, (finished) => {
+      if (finished) runOnJS(finishTransition)(incomingIndex);
+    });
+  }, [incomingIndex, bannerWidth, slideIn]);
+
+  useEffect(() => {
+    activeIndexRef.current = 0;
+    setActiveIndex(0);
+    setBaseIndex(0);
+    setIncomingIndex(null);
+    slideIn.value = 0;
+    isAnimatingRef.current = false;
+  }, [slides, slideIn]);
+
+  useEffect(() => {
+    if (bannerWidth <= 0 || slides.length <= 1) return;
 
     const timer = setInterval(() => {
-      if (isDraggingRef.current) return;
-      const nextIndex = (activeIndexRef.current + 1) % offers.length;
-      selectPage(nextIndex);
+      if (isAnimatingRef.current) return;
+      goTo(activeIndexRef.current + 1);
     }, AUTO_SCROLL_INTERVAL_MS);
 
     return () => clearInterval(timer);
-  }, [pageWidth]);
+  }, [bannerWidth, slides.length]);
 
-  const handleLayout = (event: LayoutChangeEvent) => {
+  const handleBannerLayout = (event: LayoutChangeEvent) => {
     const nextWidth = Math.round(event.nativeEvent.layout.width);
-    if (nextWidth > 0 && nextWidth !== pageWidth) {
-      setPageWidth(nextWidth);
-      requestAnimationFrame(() => scrollRef.current?.scrollTo({ x: nextWidth * activeIndexRef.current, animated: false }));
-    }
+    if (nextWidth > 0 && nextWidth !== bannerWidth) setBannerWidth(nextWidth);
   };
 
-  const handleScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    if (!pageWidth) return;
-    const nextIndex = Math.max(0, Math.min(offers.length - 1, Math.round(event.nativeEvent.contentOffset.x / pageWidth)));
-    activeIndexRef.current = nextIndex;
-    setActiveIndex(nextIndex);
-    onHeaderColorChange?.(offers[nextIndex].headerColor);
-    isDraggingRef.current = false;
-  };
+  const incomingStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: slideIn.value }],
+  }));
 
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    if (!pageWidth) return;
-    const visibleIndex = Math.max(0, Math.min(offers.length - 1, Math.round(event.nativeEvent.contentOffset.x / pageWidth)));
-    if (visibleIndex === activeIndexRef.current) return;
-    activeIndexRef.current = visibleIndex;
-    setActiveIndex(visibleIndex);
-    onHeaderColorChange?.(offers[visibleIndex].headerColor);
-  };
+  if (!slides.length) return null;
+
+  const activeSlide = slides[activeIndex] ?? slides[0];
+  const baseSlide = slides[baseIndex] ?? slides[0];
+  const incomingSlide = incomingIndex != null ? slides[incomingIndex] : null;
+  const actionLabel = activeSlide.actionText
+    ? `${activeSlide.actionText}${activeSlide.showActionArrow ? '  →' : ''}`
+    : undefined;
+  const bannerHeight = embeddedOnPurple ? 160 : 140;
 
   return (
-    <View onLayout={handleLayout} style={{ marginHorizontal: embeddedOnPurple ? -20 : 0, gap: embeddedOnPurple ? 0 : 10 }}>
-      <ScrollView
-        ref={scrollRef}
-        horizontal
-        pagingEnabled
-        bounces={false}
-        decelerationRate="fast"
-        showsHorizontalScrollIndicator={false}
-        onScrollBeginDrag={() => {
-          isDraggingRef.current = true;
+    <View style={{ marginHorizontal: embeddedOnPurple ? -20 : 0, gap: embeddedOnPurple ? 0 : 10 }}>
+      <View
+        onLayout={handleBannerLayout}
+        style={{
+          minHeight: bannerHeight,
+          overflow: 'hidden',
+          borderRadius: embeddedOnPurple ? 0 : 24,
+          borderCurve: 'continuous',
         }}
-        onMomentumScrollEnd={handleScrollEnd}
-        onScroll={handleScroll}
-        onScrollEndDrag={(event) => {
-          if (event.nativeEvent.velocity?.x === 0) handleScrollEnd(event);
+        onTouchStart={(event) => {
+          touchStartX.current = event.nativeEvent.pageX;
         }}
-        scrollEventThrottle={16}
-        accessibilityRole="adjustable"
-        accessibilityLabel="Promotional offers"
+        onTouchEnd={(event) => {
+          if (slides.length <= 1 || isAnimatingRef.current) return;
+          const deltaX = event.nativeEvent.pageX - touchStartX.current;
+          if (Math.abs(deltaX) < 40) return;
+          goTo(activeIndexRef.current + (deltaX < 0 ? 1 : -1));
+        }}
       >
-        {offers.map((offer) => (
-          <View key={offer.id} style={{ width: pageWidth || undefined }}>
-            <View
-              style={{
-                minHeight: embeddedOnPurple ? 162 : 142,
-                overflow: 'hidden',
-                paddingHorizontal: 18,
-                paddingVertical: 17,
-                borderRadius: embeddedOnPurple ? 0 : 24,
-                borderCurve: 'continuous',
-                backgroundColor: colors.transparent,
-              }}
-            >
-              <Image source={offer.image} contentFit="contain" contentPosition="right center" style={{ position: 'absolute', inset: 0 }} />
-              <View style={{ width: '54%', minHeight: 128, justifyContent: 'center', gap: 7 }}>
-                <Text style={{ fontSize: fontSizes.size10, lineHeight: 13, fontWeight: '600', letterSpacing: 0.8, color: offer.eyebrowColor }}>{offer.eyebrow}</Text>
-                <Text selectable style={{ fontSize: fontSizes.size19, lineHeight: 24, fontWeight: '600', color: offer.titleColor }}>{offer.title}</Text>
-                <Text selectable style={{ fontSize: fontSizes.size11, lineHeight: 16, fontWeight: '600', color: offer.subtitleColor }}>{offer.subtitle}</Text>
-              </View>
-            </View>
-          </View>
-        ))}
-      </ScrollView>
+        {/* While next image slides in, old image hides instantly so it never shows underneath */}
+        <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, height: bannerHeight, opacity: incomingSlide ? 0 : 1 }}>
+          <BannerImage uri={baseSlide.imageUrl} height={bannerHeight} />
+        </View>
+        {incomingSlide ? (
+          <Animated.View
+            pointerEvents="none"
+            style={[{ position: 'absolute', top: 0, left: 0, right: 0, height: bannerHeight }, incomingStyle]}
+          >
+            <BannerImage uri={incomingSlide.imageUrl} height={bannerHeight} />
+          </Animated.View>
+        ) : null}
 
-      <View style={{ position: embeddedOnPurple ? 'absolute' : 'relative', right: embeddedOnPurple ? 18 : undefined, bottom: embeddedOnPurple ? 12 : undefined, minHeight: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-        {offers.map((offer, index) => {
-          const active = index === activeIndex;
-          return (
-            <Pressable
-              key={offer.id}
-              accessibilityRole="button"
-              accessibilityLabel={`Show offer ${index + 1}`}
-              onPress={() => selectPage(index)}
-              hitSlop={8}
-              style={({ pressed }) => ({
-                width: active ? 22 : 7,
-                height: 7,
-                borderRadius: 999,
-                backgroundColor: embeddedOnPurple
-                  ? active ? colors.white : colors.whiteAlpha38
-                  : active ? colors.violetTone58 : colors.violetTone84_2,
-                opacity: pressed ? 0.6 : 1,
-              })}
-            />
-          );
-        })}
+        <View
+          pointerEvents="none"
+          style={{
+            position: 'absolute',
+            left: 18,
+            top: 17,
+            bottom: 17,
+            width: '58%',
+            overflow: 'hidden',
+            justifyContent: 'center',
+          }}
+        >
+          <Animated.View
+            key={`copy-${activeIndex}`}
+            entering={TEXT_IN}
+            exiting={TEXT_OUT}
+            style={{ position: 'absolute', left: 0, right: 0, gap: 4 }}
+          >
+            <BannerHeading heading={activeSlide.mainHeading} color={activeSlide.mainHeadingColor} />
+            {activeSlide.label ? (
+              <Text style={{ fontSize: fontSizes.size13, lineHeight: 18, fontWeight: '600', color: activeSlide.textColor }}>
+                {activeSlide.label}
+              </Text>
+            ) : null}
+            {actionLabel ? (
+              <Text selectable style={{ marginTop: 18, fontSize: fontSizes.size14, lineHeight: 19, fontWeight: '700', color: activeSlide.textColor }}>
+                {actionLabel}
+              </Text>
+            ) : null}
+          </Animated.View>
+        </View>
       </View>
+
+      {slides.length > 1 ? (
+        <View
+          style={{
+            position: embeddedOnPurple ? 'absolute' : 'relative',
+            right: embeddedOnPurple ? 18 : undefined,
+            bottom: embeddedOnPurple ? 12 : undefined,
+            minHeight: 12,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+          }}
+        >
+          {slides.map((slide, index) => {
+            const active = index === activeIndex;
+            return (
+              <Pressable
+                key={`${slide.mainHeading}-dot-${index}`}
+                accessibilityRole="button"
+                accessibilityLabel={`Show offer ${index + 1}`}
+                onPress={() => goTo(index)}
+                hitSlop={8}
+                style={({ pressed }) => ({
+                  width: active ? 22 : 7,
+                  height: 7,
+                  borderRadius: 999,
+                  backgroundColor: embeddedOnPurple
+                    ? active
+                      ? colors.white
+                      : colors.whiteAlpha38
+                    : active
+                      ? colors.violetTone58
+                      : colors.violetTone84_2,
+                  opacity: pressed ? 0.6 : 1,
+                })}
+              />
+            );
+          })}
+        </View>
+      ) : null}
     </View>
   );
 }

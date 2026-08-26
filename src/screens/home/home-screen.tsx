@@ -8,6 +8,9 @@ import { DEFAULT_OFFER_HEADER_COLOR, OfferCarousel } from '../../components/offe
 import { LoadingDots } from '../../components/loading-dots';
 import type { ServiceCategory } from '../../data/service-catalog';
 import { useCurrentLocation } from '../../hooks/use-current-location';
+import { useHomePromotionalBanner } from '../../hooks/use-home-promotional-banner';
+import { useHomeSpotlights } from '../../hooks/use-home-spotlights';
+import type { HomeSpotlight } from '../../services/home-spotlights-api';
 
 const SEARCH_SUGGESTIONS = ['AC service', 'Facial', 'Kitchen cleaning'];
 
@@ -61,22 +64,27 @@ type HomeScreenProps = {
   locationTitle?: string;
   onCategoryPress: (category: ServiceCategory) => void;
   onLocationPress: () => void;
+  onSpotlightPress: (spotlight: HomeSpotlight) => void;
   onSeeAllCategories: () => void;
   onProfilePress: () => void;
   onRetry: () => void;
 };
 
-export function HomeScreen({ categories, errorMessage, isLoading, locationSubtitle, locationTitle, onCategoryPress, onLocationPress, onProfilePress, onRetry }: HomeScreenProps) {
+export function HomeScreen({ categories, errorMessage, isLoading, locationSubtitle, locationTitle, onCategoryPress, onLocationPress, onProfilePress, onRetry, onSpotlightPress }: HomeScreenProps) {
   const insets = useSafeAreaInsets();
   const [search, setSearch] = useState('');
   const [searchSuggestionIndex, setSearchSuggestionIndex] = useState(0);
   const [displayedSuggestion, setDisplayedSuggestion] = useState('');
   const [isDeletingSuggestion, setIsDeletingSuggestion] = useState(false);
-  const [headerColor, setHeaderColor] = useState<string>(DEFAULT_OFFER_HEADER_COLOR);
   const currentLocation = useCurrentLocation();
+  const promotionalBanner = useHomePromotionalBanner();
+  const spotlights = useHomeSpotlights();
+  const [spotlightScrollProgress, setSpotlightScrollProgress] = useState(0);
   const { width } = useWindowDimensions();
   const categoryWidth = Math.max(92, Math.floor((width - 32 - 24) / 3));
   const normalizedSearch = search.trim().toLowerCase();
+  const bannerSlides = promotionalBanner?.slides ?? [];
+  const headerBackgroundUrl = promotionalBanner?.backgroundImageUrl;
   const visibleCategories = useMemo(
     () =>
       normalizedSearch
@@ -140,9 +148,17 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
           paddingBottom: 0,
           gap: 14,
           overflow: 'hidden',
-          backgroundColor: headerColor,
+          backgroundColor: DEFAULT_OFFER_HEADER_COLOR,
         }}
       >
+        {headerBackgroundUrl ? (
+          <Image
+            source={{ uri: headerBackgroundUrl }}
+            contentFit="cover"
+            transition={180}
+            style={{ position: 'absolute', inset: 0 }}
+          />
+        ) : null}
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
           <Pressable
             accessibilityRole="button"
@@ -195,7 +211,7 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
           </View>
         </View>
 
-        {!normalizedSearch && <OfferCarousel embeddedOnPurple onHeaderColorChange={setHeaderColor} />}
+        {!normalizedSearch && bannerSlides.length > 0 ? <OfferCarousel embeddedOnPurple slides={bannerSlides} /> : null}
       </View>
 
       <View style={{ paddingHorizontal: 20, paddingTop: 16, gap: 25 }}>
@@ -265,15 +281,64 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
           )}
         </View>
 
-        {!normalizedSearch && (
-          <View style={{ padding: 18, flexDirection: 'row', gap: 14, alignItems: 'center', borderRadius: 22, borderCurve: 'continuous', backgroundColor: colors.greenTone94_2 }}>
-            <View style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: colors.white }}><Text style={{ fontSize: fontSizes.size23 }}>🛡️</Text></View>
-            <View style={{ flex: 1, gap: 3 }}>
-              <Text selectable style={{ fontSize: fontSizes.size14, fontWeight: '600', color: colors.greenTone22 }}>Safe & verified professionals</Text>
-              <Text style={{ fontSize: fontSizes.size11, lineHeight: 16, color: colors.slateTone39 }}>Background checked experts with transparent pricing.</Text>
-            </View>
+        {!normalizedSearch && spotlights && spotlights.spotlightContent.length > 0 ? (
+          <View style={{ marginHorizontal: -24, gap: 18, paddingTop: 10, paddingBottom: 2 }}>
+            <View style={{ width: '100%', height: 8, backgroundColor: colors.violetTone96_4 }} />
+            <Text style={{ marginTop: 8, paddingHorizontal: 20, fontSize: fontSizes.size21, lineHeight: 27, fontWeight: '700', color: colors.violetTone13 }}>
+              {spotlights.sectionTitle}
+            </Text>
+            <ScrollView
+              horizontal
+              decelerationRate="fast"
+              showsHorizontalScrollIndicator={false}
+              snapToAlignment="start"
+              snapToInterval={Math.min(width - 64, 360) + 16}
+              scrollEventThrottle={16}
+              onScroll={({ nativeEvent }) => {
+                const maximumOffset = nativeEvent.contentSize.width - nativeEvent.layoutMeasurement.width;
+                setSpotlightScrollProgress(maximumOffset > 0 ? Math.min(1, Math.max(0, nativeEvent.contentOffset.x / maximumOffset)) : 0);
+              }}
+              contentContainerStyle={{ paddingHorizontal: 20, gap: 16 }}
+            >
+              {spotlights.spotlightContent.map((spotlight) => (
+                <Pressable
+                  key={`${spotlight.sortOrder}-${spotlight.redirectType}-${spotlight.redirectId}`}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Open spotlight offer ${spotlight.sortOrder}`}
+                  onPress={() => onSpotlightPress(spotlight)}
+                  style={({ pressed }) => ({
+                    width: Math.min(width - 64, 360),
+                    aspectRatio: 1.80,
+                    overflow: 'hidden',
+                    borderRadius: 10,
+                    borderCurve: 'continuous',
+                    backgroundColor: colors.neutralTone95,
+                    opacity: pressed ? 0.76 : 1,
+                  })}
+                >
+                  <Image source={{ uri: spotlight.imageUrl }} contentFit="cover" transition={180} style={{ width: '100%', height: '100%' }} />
+                </Pressable>
+              ))}
+            </ScrollView>
+            {spotlights.spotlightContent.length > 1 ? (
+              <View style={{ width: 46, height: 4, alignSelf: 'center', overflow: 'hidden', borderRadius: 2, backgroundColor: colors.mauveTone86 }}>
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    bottom: 0,
+                    left: spotlightScrollProgress * (46 - Math.max(12, 46 / spotlights.spotlightContent.length)),
+                    width: Math.max(12, 46 / spotlights.spotlightContent.length),
+                    borderRadius: 2,
+                    backgroundColor: colors.mauveTone53,
+                  }}
+                />
+              </View>
+            ) : null}
           </View>
-        )}
+        ) : null}
+
+        {!normalizedSearch ? <View style={{ marginHorizontal: -20, height: 12, backgroundColor: colors.violetTone96_4 }} /> : null}
       </View>
     </ScrollView>
   );

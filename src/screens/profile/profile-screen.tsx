@@ -61,10 +61,10 @@ function ChevronRight() {
 
 export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteProfile, onHelpSupport, onLogout, onManageAddresses, onManagePaymentMethods, onMyBookings, onMyPlans, onMyRating, onNativeDevices, onPassesMembership, onSettings, onWallet }: ProfileScreenProps) {
   const insets = useSafeAreaInsets();
-  const displayName = name?.trim() || 'Urban Clap User';
+  const displayName = name?.trim() || 'Verified Customer';
   const displayEmail = email?.trim();
   const displayPhone = phone?.trim();
-  const isProfileIncomplete = !name?.trim() || !displayPhone || !displayEmail;
+  const isProfileIncomplete = !displayEmail;
 
   const quickActions: QuickAction[] = [
     { imageSource: require('../../../assets/bookings.png'), label: 'My bookings', onPress: onMyBookings },
@@ -122,48 +122,67 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
             >
               <EditIcon size={19} />
             </Pressable>
-          ) : <View style={{ width: 40 }} />}
+          ) : (
+            <View style={{ width: 40 }} />
+          )}
         </View>
 
-        <View style={{ gap: 8 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 14 }}>
-            <View style={{ flex: 1, gap: 7 }}>
-              {isProfileIncomplete ? (
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                  <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: colors.redTone54 }} />
-                  <Text style={{ fontSize: fontSizes.size12, lineHeight: 16, fontWeight: '600', color: colors.redTone47 }}>Incomplete profile</Text>
+        <View style={{ gap: 10 }}>
+          {isProfileIncomplete ? (
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 6,
+                  paddingHorizontal: 10,
+                  paddingVertical: 6,
+                  borderRadius: 999,
+                  backgroundColor: colors.redTone96,
+                }}
+              >
+                <View
+                  style={{
+                    width: 14,
+                    height: 14,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 7,
+                    backgroundColor: colors.redTone54,
+                  }}
+                >
+                  <Text style={{ marginTop: -0.5, fontSize: 10, lineHeight: 11, fontWeight: '700', color: colors.white }}>!</Text>
                 </View>
-              ) : null}
-              <Text selectable style={{ fontSize: fontSizes.size29, lineHeight: 35, fontWeight: '700', color: colors.violetTone10 }}>
-                {displayName}
-              </Text>
-              {displayPhone ? (
-                <Text selectable style={{ fontSize: fontSizes.size14, lineHeight: 19, color: colors.mauveTone43_2 }}>{displayPhone}</Text>
-              ) : null}
-              {displayEmail ? (
-                <Text selectable style={{ fontSize: fontSizes.size14, lineHeight: 19, color: colors.mauveTone43_2 }}>{displayEmail}</Text>
-              ) : null}
-              {!displayPhone && !displayEmail ? (
-                <Text style={{ fontSize: fontSizes.size14, lineHeight: 20, color: colors.mauveTone43_2 }}>Add your contact details to complete your profile</Text>
-              ) : null}
-            </View>
+                <Text style={{ fontSize: fontSizes.size12, lineHeight: 16, fontWeight: '600', color: colors.redTone47 }}>Incomplete profile</Text>
+              </View>
 
-            {isProfileIncomplete ? (
               <Pressable
                 accessibilityRole="button"
                 onPress={onCompleteProfile}
                 style={({ pressed }) => ({
-                  paddingHorizontal: 17,
-                  paddingVertical: 9,
-                  borderRadius: 9,
+                  paddingHorizontal: 16,
+                  paddingVertical: 8,
+                  borderRadius: 999,
                   borderCurve: 'continuous',
                   borderWidth: 1,
-                  borderColor: colors.mauveTone66_2,
+                  borderColor: colors.mauveTone17_2,
                   opacity: pressed ? 0.6 : 1,
                 })}
               >
                 <Text style={{ fontSize: fontSizes.size13, fontWeight: '600', color: colors.mauveTone17_2 }}>Complete</Text>
               </Pressable>
+            </View>
+          ) : null}
+
+          <View style={{ gap: 6 }}>
+            <Text selectable style={{ fontSize: fontSizes.size29, lineHeight: 35, fontWeight: '700', color: colors.violetTone10 }}>
+              {displayName}
+            </Text>
+            {displayPhone ? (
+              <Text selectable style={{ fontSize: fontSizes.size14, lineHeight: 19, color: colors.mauveTone43_2 }}>{displayPhone}</Text>
+            ) : null}
+            {displayEmail ? (
+              <Text selectable style={{ fontSize: fontSizes.size14, lineHeight: 19, color: colors.mauveTone43_2 }}>{displayEmail}</Text>
             ) : null}
           </View>
         </View>
@@ -268,12 +287,12 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
           { text: 'Logout', style: 'destructive', onPress: onLogout },
         ])}
         style={({ pressed }) => ({
-          minHeight: 46,
+          minHeight: 44,
           marginHorizontal: 20,
           marginTop: 20,
           alignItems: 'center',
           justifyContent: 'center',
-          borderRadius: 13,
+          borderRadius: 8,
           borderCurve: 'continuous',
           borderWidth: 1,
           borderColor: colors.violetTone92,

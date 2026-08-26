@@ -176,7 +176,7 @@ function HelpChip({ onPress }: { onPress: () => void }) {
   );
 }
 
-function TopicChevron() {
+function TopicChevron({ color = colors.mauveTone60_2 }: { color?: string }) {
   return (
     <View
       style={{
@@ -184,7 +184,7 @@ function TopicChevron() {
         height: 7,
         borderTopWidth: 1.5,
         borderRightWidth: 1.5,
-        borderColor: colors.mauveTone60_2,
+        borderColor: color,
         transform: [{ rotate: '45deg' }],
       }}
     />
@@ -233,8 +233,8 @@ const HELP_TOPICS = [
   { imageSource: require('../../../assets/native_devices.png'), label: 'Getting started with UC' },
   { imageSource: require('../../../assets/wallet.png'), label: 'Payment & UC Credits' },
   { imageSource: require('../../../assets/passes.png'), label: 'UC Plus Membership' },
-  { imageSource: require('../../../assets/suport.png'), label: 'UC Safety' },
-  { imageSource: require('../../../assets/receipt.png'), label: 'Claim Warranty' },
+  { imageSource: require('../../../assets/safety.png'), label: 'UC Safety' },
+  { imageSource: require('../../../assets/claim.png'), label: 'Claim Warranty' },
 ] as const;
 
 export function ProfileMyBookingsScreen({ onBack, onExplore, onHelp }: MyBookingsScreenProps) {
@@ -282,7 +282,7 @@ export function NativeDevicesScreen({ onBack }: ProfileOptionScreenProps) {
   );
 }
 
-export function HelpSupportScreen({ onAccount, onBack, onGettingStarted, onPaymentCredits }: ProfileOptionScreenProps & { onAccount: () => void; onGettingStarted: () => void; onPaymentCredits: () => void }) {
+export function HelpSupportScreen({ onAccount, onBack, onGettingStarted, onMembership, onPaymentCredits, onSafety, onWarranty }: ProfileOptionScreenProps & { onAccount: () => void; onGettingStarted: () => void; onMembership: () => void; onPaymentCredits: () => void; onSafety: () => void; onWarranty: () => void }) {
   const insets = useSafeAreaInsets();
 
   return (
@@ -299,7 +299,7 @@ export function HelpSupportScreen({ onAccount, onBack, onGettingStarted, onPayme
             <Pressable
               key={topic.label}
               accessibilityRole="button"
-              onPress={topic.label === 'Account' ? onAccount : topic.label === 'Getting started with UC' ? onGettingStarted : topic.label === 'Payment & UC Credits' ? onPaymentCredits : () => Alert.alert(topic.label, 'This help topic will be available soon.')}
+              onPress={topic.label === 'Account' ? onAccount : topic.label === 'Getting started with UC' ? onGettingStarted : topic.label === 'Payment & UC Credits' ? onPaymentCredits : topic.label === 'UC Plus Membership' ? onMembership : topic.label === 'UC Safety' ? onSafety : onWarranty}
               style={({ pressed }) => ({
                 minHeight: 56,
                 flexDirection: 'row',
@@ -314,7 +314,7 @@ export function HelpSupportScreen({ onAccount, onBack, onGettingStarted, onPayme
                 <Image source={topic.imageSource} contentFit="contain" tintColor={colors.mauveTone9_2} style={{ width: 18, height: 18 }} />
               </View>
               <Text style={{ flex: 1, fontSize: fontSizes.size15, lineHeight: 21, color: colors.violetTone18 }}>{topic.label}</Text>
-              <TopicChevron />
+              <TopicChevron color={colors.black} />
             </Pressable>
           ))}
         </View>
@@ -331,7 +331,164 @@ const ACCOUNT_HELP_TOPICS = [
 ] as const;
 
 export type GettingStartedArticleKey = 'about' | 'booking' | 'cancellation' | 'minimum-order' | 'preferred-professional' | 'rebook';
+export type MembershipArticleKey = 'benefits' | 'cancel' | 'cash-on-delivery' | 'excluded-categories' | 'family' | 'maximum-discount' | 'pause' | 'purchase';
 export type PaymentCreditsArticleKey = 'credits' | 'payment-failed' | 'pay-later' | 'referral' | 'referral-missing' | 'rewards-validity' | 'saved-payments' | 'wallet-balance';
+export type WarrantyArticleKey = 'covered-services' | 'payment';
+
+export function SafetyArticleScreen({ onBack }: ProfileOptionScreenProps) {
+  return (
+    <AccountArticleScreen
+      title="Know more about Urban Company’s safety measures"
+      description="At Urban Company, the safety of customers and professionals is taken extremely seriously. To ensure this, we have taken the following precautionary measures:"
+      onBack={onBack}
+    >
+      <BulletSteps steps={['We conduct background verification on all our professionals', 'In case of any critical support, SOS button is available in app for both our customers and professionals']} />
+    </AccountArticleScreen>
+  );
+}
+
+const WARRANTY_TOPICS: readonly { key: WarrantyArticleKey; label: string }[] = [
+  { key: 'covered-services', label: 'Which services are covered under UC warranty?' },
+  { key: 'payment', label: 'Do I have to pay for the service under warranty?' },
+];
+
+export function WarrantyHelpScreen({ onBack, onTopic }: ProfileOptionScreenProps & { onTopic: (key: WarrantyArticleKey) => void }) {
+  const insets = useSafeAreaInsets();
+
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.white }}>
+      <ProfilePageHeader onBack={onBack} />
+      <Text style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 14, fontSize: fontSizes.size26, lineHeight: 33, fontWeight: '700', color: colors.violetTone10_2 }}>Warranty</Text>
+      <View style={{ paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 20) + 28, borderTopWidth: 1, borderTopColor: colors.mauveTone94 }}>
+        {WARRANTY_TOPICS.map((topic, index) => (
+          <Pressable key={topic.key} accessibilityRole="button" onPress={() => onTopic(topic.key)} style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: index === WARRANTY_TOPICS.length - 1 ? 0 : 1, borderBottomColor: colors.mauveTone94, opacity: pressed ? 0.55 : 1 })}>
+            <Text style={{ flex: 1, paddingRight: 12, fontSize: fontSizes.size15, lineHeight: 22, color: colors.violetTone18 }}>{topic.label}</Text>
+            <TopicChevron />
+          </Pressable>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+export function WarrantyArticleScreen({ article, onBack }: ProfileOptionScreenProps & { article: WarrantyArticleKey }) {
+  if (article === 'payment') {
+    return <AccountArticleScreen title="Do I have to pay for the service under warranty?" description="No. You can book a free revisit from the booking screen if the same issue persists during warranty. Our professionals will visit your place again to solve the problem with your utmost satisfaction." onBack={onBack} />;
+  }
+
+  return (
+    <AccountArticleScreen title="Which services are covered under UC warranty?" description="UC Warranty covers:" onBack={onBack}>
+      <View style={{ paddingTop: 16, gap: 10 }}>
+        {[
+          ['Appliance repairs', ' like AC, RO, Washing machine repairs etc.'],
+          ['Pest control', ' services'],
+          ['Painting', ' services'],
+        ].map(([label, detail], index) => (
+          <View key={label} style={{ flexDirection: 'row', alignItems: 'flex-start', paddingLeft: 12 }}>
+            <Text style={{ width: 20, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>{index + 1}.</Text>
+            <Text style={{ flex: 1, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}><Text style={{ fontWeight: '700' }}>{label}</Text>{detail}</Text>
+          </View>
+        ))}
+      </View>
+      <View style={{ height: 1, marginTop: 20, backgroundColor: colors.mauveTone94 }} />
+      <Text style={{ paddingTop: 18, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>However, the UC warranty <Text style={{ fontWeight: '700' }}>does not</Text> cover:</Text>
+      <NumberedSteps steps={['Any new issue that occurs post the service', 'Any item/service that is not mentioned on the invoice']} />
+    </AccountArticleScreen>
+  );
+}
+
+const MEMBERSHIP_SECTIONS: readonly {
+  title: string;
+  topics: readonly { key: MembershipArticleKey; label: string }[];
+}[] = [
+  {
+    title: 'Purchase',
+    topics: [
+      { key: 'benefits', label: 'What are the benefits of the membership?' },
+      { key: 'maximum-discount', label: 'What is the maximum discount that I can get by using UC Plus?' },
+      { key: 'purchase', label: 'How do I buy the membership?' },
+      { key: 'cash-on-delivery', label: 'Can I pay for membership with cash on delivery?' },
+      { key: 'family', label: 'Can I share membership with family?' },
+      { key: 'excluded-categories', label: 'Are any categories not included in Plus membership?' },
+    ],
+  },
+  {
+    title: 'Modifications',
+    topics: [
+      { key: 'cancel', label: 'How do I cancel my membership plan?' },
+      { key: 'pause', label: 'Can I pause my membership?' },
+    ],
+  },
+];
+
+export function MembershipHelpScreen({ onBack, onTopic }: ProfileOptionScreenProps & { onTopic: (key: MembershipArticleKey) => void }) {
+  const insets = useSafeAreaInsets();
+  const headerHeight = Math.max(insets.top, 18) + 52;
+
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.white }}>
+      <ProfilePageHeader overlay onBack={onBack} />
+      <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: Math.max(insets.bottom, 20) + 28 }}>
+        <Text style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 14, fontSize: fontSizes.size26, lineHeight: 33, fontWeight: '700', color: colors.violetTone10_2 }}>UC Plus membership</Text>
+        {MEMBERSHIP_SECTIONS.map((section, sectionIndex) => (
+          <View key={section.title} style={{ borderTopWidth: sectionIndex === 0 ? 1 : 8, borderTopColor: sectionIndex === 0 ? colors.mauveTone94 : colors.violetTone96_6, paddingHorizontal: 20, paddingTop: 18 }}>
+            <Text style={{ paddingBottom: 8, fontSize: fontSizes.size17, lineHeight: 23, fontWeight: '600', color: colors.violetTone10_2 }}>{section.title}</Text>
+            {section.topics.map((topic, index) => (
+              <Pressable key={topic.key} accessibilityRole="button" onPress={() => onTopic(topic.key)} style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: index === section.topics.length - 1 ? 0 : 1, borderBottomColor: colors.mauveTone94, opacity: pressed ? 0.55 : 1 })}>
+                <Text style={{ flex: 1, paddingRight: 12, fontSize: fontSizes.size15, lineHeight: 22, color: colors.violetTone18 }}>{topic.label}</Text>
+                <TopicChevron />
+              </Pressable>
+            ))}
+          </View>
+        ))}
+      </ScrollView>
+    </View>
+  );
+}
+
+export function MembershipArticleScreen({ article, onBack }: ProfileOptionScreenProps & { article: MembershipArticleKey }) {
+  const articleContent: Record<MembershipArticleKey, { title: string; description: string; children?: ReactNode }> = {
+    benefits: {
+      title: 'What are the benefits of the membership?',
+      description: 'UC Plus membership comes with a range of benefits that are designed just for you.',
+      children: <Text style={{ paddingTop: 18, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>As a valued member of our community, you’ll enjoy our ever expanding list of exclusive perks.</Text>,
+    },
+    cancel: {
+      title: 'How do I cancel my membership plan?',
+      description: 'UC Plus membership once activated, cannot be cancelled.',
+    },
+    'cash-on-delivery': {
+      title: 'Can I pay for membership with cash on delivery?',
+      description: 'No, the membership can only be activated when payment is made online.',
+      children: <Text style={{ paddingTop: 18, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>Once the membership is activated, you can place the next set of bookings using Cash on Delivery method as well.</Text>,
+    },
+    'excluded-categories': {
+      title: 'Are any categories not included in Plus membership?',
+      description: 'Plus discount is not applicable on Multi-session Packs, Weekly Bathroom Cleaning plans, Native smart appliances, and bookings made in Home Decor & Insta Help.',
+    },
+    family: {
+      title: 'Can I share membership with family?',
+      description: 'Only you can avail benefits of the UC Plus membership as it is linked with your UC account only.',
+      children: <Text style={{ paddingTop: 18, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>However, you can book the services for others from your account and still receive same benefits under your name.</Text>,
+    },
+    'maximum-discount': {
+      title: 'What is the maximum discount that I can get by using UC Plus?',
+      description: 'There is no limit on the number of bookings under the membership. But as per our fair usage policy, the total discount you can avail is limited to 6 times the membership price paid.',
+    },
+    pause: {
+      title: 'Can I pause my membership?',
+      description: 'No, the membership, once activated cannot be paused.',
+    },
+    purchase: {
+      title: 'How do I buy the membership?',
+      description: 'To buy UC Plus membership:',
+      children: <><BulletSteps steps={['Select the service of your choice', 'During checkout you have an option to choose between annual and half-yearly membership plans', 'Once your booking is placed successfully, UC Plus membership will be activated']} /><Text style={{ paddingTop: 18, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>Please note that the membership can only be activated when payment is made online.</Text></>,
+    },
+  };
+  const content = articleContent[article];
+
+  return <AccountArticleScreen title={content.title} description={content.description} onBack={onBack}>{content.children}</AccountArticleScreen>;
+}
 
 const GETTING_STARTED_SECTIONS = [
   { title: 'About us', topics: [{ key: 'about', label: 'What is Urban Company?' }] },
@@ -376,7 +533,7 @@ function NumberedSteps({ steps }: { steps: readonly string[] }) {
     <View style={{ paddingTop: 16, gap: 10 }}>
       {steps.map((step, index) => (
         <View key={step} style={{ flexDirection: 'row', alignItems: 'flex-start', paddingLeft: 12 }}>
-          <Text style={{ width: 28, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>{index + 1}.</Text>
+          <Text style={{ width: 20, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>{index + 1}.</Text>
           <Text style={{ flex: 1, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>{step}</Text>
         </View>
       ))}
@@ -389,7 +546,7 @@ function BulletSteps({ steps }: { steps: readonly string[] }) {
     <View style={{ paddingTop: 16, gap: 10 }}>
       {steps.map((step) => (
         <View key={step} style={{ flexDirection: 'row', alignItems: 'flex-start', paddingLeft: 12 }}>
-          <Text style={{ width: 28, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>•</Text>
+          <Text style={{ width: 18, fontSize: fontSizes.size17, lineHeight: 23, color: colors.mauveTone38_2 }}>•</Text>
           <Text style={{ flex: 1, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>{step}</Text>
         </View>
       ))}
@@ -557,12 +714,13 @@ type AccountArticleScreenProps = ProfileOptionScreenProps & {
 
 export function AccountArticleScreen({ buttonLabel, children, description, onAction, onBack, title }: AccountArticleScreenProps) {
   const insets = useSafeAreaInsets();
+  const headerHeight = Math.max(insets.top, 18) + 52;
   const [feedback, setFeedback] = useState<'down' | 'up' | null>(null);
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.white }}>
-      <ProfilePageHeader onBack={onBack} />
-      <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: Math.max(insets.bottom, 20) }}>
+      <ProfilePageHeader overlay onBack={onBack} />
+      <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: Math.max(insets.bottom, 20) }}>
         <View style={{ paddingHorizontal: 20, paddingTop: 18 }}>
           <Text style={{ fontSize: fontSizes.size22, lineHeight: 29, fontWeight: '700', color: colors.violetTone10_2 }}>{title}</Text>
           <Text style={{ paddingTop: 14, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>{description}</Text>
@@ -571,7 +729,7 @@ export function AccountArticleScreen({ buttonLabel, children, description, onAct
             <Text style={{ fontSize: fontSizes.size15, fontWeight: '600', color: colors.white }}>{buttonLabel}</Text>
           </Pressable> : null}
         </View>
-        <View style={{ height: 8, marginTop: 24, backgroundColor: colors.violetTone96_6 }} />
+        <View style={{ height: 1, marginTop: 24, backgroundColor: colors.mauveTone94 }} />
         <View style={{ minHeight: 72, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center' }}>
           <Text style={{ flex: 1, fontSize: fontSizes.size15, color: colors.mauveTone38_2 }}>{feedback ? 'Thanks for your feedback' : 'Was this article helpful?'}</Text>
           <Pressable accessibilityRole="button" accessibilityLabel="Not helpful" onPress={() => setFeedback('down')} style={({ pressed }) => ({ width: 42, height: 42, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.55 : 1 })}>
