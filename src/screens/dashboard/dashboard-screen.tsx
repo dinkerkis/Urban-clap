@@ -104,6 +104,7 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
   const [sheetCategory, setSheetCategory] = useState<ServiceCategory | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<{ subtitle: string; title: string } | null>(null);
   const [isConsultationLoading, setIsConsultationLoading] = useState(false);
+  const [isNativeCategoryOpen, setIsNativeCategoryOpen] = useState(false);
   const [profileTransition, setProfileTransition] = useState<'pop' | 'push'>('push');
   const productNavigationPendingRef = useRef(false);
   const cartState = useCart(authToken);
@@ -328,7 +329,7 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
   } else if (activeTab === 'rewards') {
     content = <RewardsScreen />;
   } else if (activeTab === 'native') {
-    content = <NativeScreen cart={cartState.quantities} onAddToCart={addNativeSelectionsToCart} onViewCart={() => changeTab('cart')} />;
+    content = <NativeScreen cart={cartState.quantities} onAddToCart={addNativeSelectionsToCart} onCategoryVisibilityChange={setIsNativeCategoryOpen} onViewCart={() => changeTab('cart')} />;
   } else if (activeTab === 'categories') {
     content = (
       <CategoriesScreen
@@ -382,7 +383,7 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
   const dashboardRoot = (
     <View style={{ flex: 1, backgroundColor: colors.violetTone98_2 }}>
       {content}
-      {page.type === 'root' ? <BottomTabBar activeTab={activeTab} cartCount={cartState.totalItems} onChange={changeTab} /> : null}
+      {page.type === 'root' && !isNativeCategoryOpen ? <BottomTabBar activeTab={activeTab} cartCount={cartState.totalItems} onChange={changeTab} /> : null}
       {page.type === 'profile-details' ? (
         <Animated.View
           entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN}

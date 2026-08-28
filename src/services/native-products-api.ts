@@ -80,6 +80,37 @@ export type NativeProductsData = {
   newlyLaunched?: NativeProductSection;
 };
 
+export type NativeCategorySliderImage = {
+  image: string;
+  relatedImages?: string[];
+  sortOrder?: number;
+};
+
+export type NativeCategorySliderVideo = {
+  relatedVideos?: string[];
+  sortOrder?: number;
+  video: string;
+};
+
+export type NativeCategoryDetailSection = {
+  relatedImages?: string[];
+  slider_description?: string;
+  slider_images?: string[];
+  slider_title?: string;
+  sliderImageDetails?: NativeCategorySliderImage[];
+  slider_videos?: NativeCategorySliderVideo[];
+  sort_order: number;
+  type: 'image' | 'slider';
+  url?: string;
+};
+
+export type NativeCategoryProductsData = {
+  bannerImage?: string;
+  categoryDetails: NativeCategoryDetailSection[];
+  marqueeContent: string[];
+  products: NativeProduct[];
+};
+
 type NativeDescriptionData = {
   _id?: string;
   descriptionMedia?: unknown[];
@@ -127,6 +158,31 @@ export async function fetchNativeProducts(signal?: AbortSignal): Promise<NativeP
     categories,
     categorySections,
     newlyLaunched: data.newly_launched && Array.isArray(data.newly_launched.products) ? data.newly_launched : undefined,
+  };
+}
+
+export async function fetchNativeProductsByCategory(categoryId: string, signal?: AbortSignal): Promise<NativeCategoryProductsData> {
+  const response = await apiRequest<ApiResponse<Record<string, unknown>>>(apiEndpoints.nativeProducts.byCategory(categoryId), {
+    defaultErrorMessage: 'Unable to load this Native category. Please try again.',
+    logScope: 'Native Category Products API',
+    signal,
+  });
+  const data = requireApiData(response);
+  const details = Array.isArray(data.category_details)
+    ? data.category_details
+        .filter((item): item is NativeCategoryDetailSection => {
+          if (!item || typeof item !== 'object') return false;
+          const section = item as Partial<NativeCategoryDetailSection>;
+          return (section.type === 'image' || section.type === 'slider') && typeof section.sort_order === 'number';
+        })
+        .sort((left, right) => left.sort_order - right.sort_order)
+    : [];
+
+  return {
+    bannerImage: typeof data.bannerImage === 'string' ? data.bannerImage : undefined,
+    marqueeContent: Array.isArray(data.marqueeContent) ? data.marqueeContent.filter((item): item is string => typeof item === 'string') : [],
+    categoryDetails: details,
+    products: Array.isArray(data.products) ? (data.products as NativeProduct[]) : [],
   };
 }
 

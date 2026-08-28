@@ -22,6 +22,7 @@ export const apiEndpoints = {
     list: '/native-products/mobile',
     description: '/native-products/description/mobile',
     detail: (productId: string) => `/native-products/${encodeURIComponent(productId)}/mobile`,
+    byCategory: (categoryId: string) => `/mobile/native-category/${encodeURIComponent(categoryId)}/products`,
   },
   home: {
     promotionalBanner: '/mobile/home/promotional-banner',
