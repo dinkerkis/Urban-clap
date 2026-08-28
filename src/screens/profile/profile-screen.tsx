@@ -64,7 +64,7 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
   const displayName = name?.trim() || 'Verified Customer';
   const displayEmail = email?.trim();
   const displayPhone = phone?.trim();
-  const isProfileIncomplete = !displayEmail;
+  const isProfileIncomplete = !name?.trim() || !displayEmail;
 
   const quickActions: QuickAction[] = [
     { imageSource: require('../../../assets/bookings.png'), label: 'My bookings', onPress: onMyBookings },
@@ -77,7 +77,7 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
     { imageSource: require('../../../assets/wallet.png'), label: 'Wallet', onPress: onWallet },
     { imageSource: require('../../../assets/passes.png'), label: 'Passes & membership', onPress: onPassesMembership },
     { imageSource: require('../../../assets/rating.png'), label: 'My rating', onPress: onMyRating },
-    { imageSource: require('../../../assets/addresses.png'), label: 'Manage addresses', onPress: onManageAddresses },
+    { imageSource: require('../../../assets/location.png'), label: 'Manage addresses', onPress: onManageAddresses },
     { imageSource: require('../../../assets/payment.png'), label: 'Manage payment methods', onPress: onManagePaymentMethods },
     { imageSource: require('../../../assets/setting.png'), label: 'Settings', onPress: onSettings },
     { isAbout: true, label: 'About UC', onPress: onAbout },
@@ -90,7 +90,7 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
       style={{ flex: 1, backgroundColor: colors.white }}
       contentContainerStyle={{ paddingBottom: Math.max(insets.bottom, 20) + 24 }}
     >
-      <View style={{ paddingTop: Math.max(insets.top, 18) + 8, paddingHorizontal: 20, gap: 18 }}>
+      <View style={{ paddingTop: Math.max(insets.top, 18) + 8, paddingHorizontal: 16, gap: 18 }}>
         <View style={{ height: 34, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <Pressable
             accessibilityRole="button"
@@ -214,7 +214,7 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
 
       <View style={{ height: 8, marginTop: 22, backgroundColor: colors.violetTone96_6 }} />
 
-      <View style={{ paddingHorizontal: 20, paddingVertical: 6 }}>
+      <View style={{ paddingHorizontal: 16, paddingVertical: 6 }}>
         {menuItems.map((item) => (
           <Pressable
             key={item.label}
@@ -224,7 +224,7 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
               minHeight: 44,
               flexDirection: 'row',
               alignItems: 'center',
-              gap: 15,
+              gap: 12,
               paddingHorizontal: 4,
               opacity: pressed ? 0.55 : 1,
             })}
@@ -246,7 +246,7 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
 
       <View
         style={{
-          marginHorizontal: 20,
+          marginHorizontal: 16,
           marginTop: 12,
           marginBottom: 12,
           padding: 18,
@@ -288,7 +288,7 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
         ])}
         style={({ pressed }) => ({
           minHeight: 44,
-          marginHorizontal: 20,
+          marginHorizontal: 16,
           marginTop: 20,
           alignItems: 'center',
           justifyContent: 'center',

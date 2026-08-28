@@ -58,7 +58,7 @@ function DownloadDataModal({ initialEmail, visible, onClose }: { initialEmail?: 
   };
 
   return (
-    <Modal animationType="fade" transparent visible={visible} onRequestClose={onClose}>
+    <Modal animationType="slide" transparent visible={visible} onRequestClose={onClose}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1, justifyContent: 'flex-end' }}>
         <Pressable accessibilityRole="button" accessibilityLabel="Close download data form" onPress={onClose} style={{ position: 'absolute', inset: 0, backgroundColor: colors.blackAlpha72 }} />
         <View style={{ marginHorizontal: 10, paddingHorizontal: 20, paddingTop: 28, paddingBottom: Math.max(insets.bottom, 20) + 16, borderTopLeftRadius: 18, borderTopRightRadius: 18, backgroundColor: colors.white }}>

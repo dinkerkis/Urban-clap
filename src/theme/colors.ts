@@ -233,7 +233,7 @@ const palette = {
   violetTone98_2: '#FAF9FB',
   neutralTone98: '#FAFAFA',
   yellowTone50: '#FBBC05',
-  violetTone98_3: '#FBF9FD',
+  violetTone98_3: '#F5F5F5',
   redTone96: '#FCECEE',
   yellowTone98: '#FCFCFA',
   orangeTone96: '#FFF0EA',

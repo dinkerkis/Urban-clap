@@ -1,4 +1,5 @@
 import { apiRequest, ApiClientError, requireApiData } from './api-client';
+import { apiEndpoints } from './api-endpoints';
 
 export type AddressLabel = 'Home' | 'Work' | 'Other';
 export type AddressType = 'apartment' | 'independent_house' | 'office' | 'other';
@@ -142,7 +143,7 @@ export function buildAddressFromCurrentLocation(
 }
 
 export async function fetchAddresses(token: string, signal?: AbortSignal): Promise<UserAddress[]> {
-  const payload = await apiRequest<AddressListResponse>('/address', {
+  const payload = await apiRequest<AddressListResponse>(apiEndpoints.addresses.list, {
     logScope: 'Address API',
     signal,
     token,
@@ -156,7 +157,7 @@ export async function fetchAddresses(token: string, signal?: AbortSignal): Promi
 }
 
 export async function addAddress(token: string, body: AddAddressPayload): Promise<UserAddress> {
-  const payload = await apiRequest<AddressResponse>('/address', {
+  const payload = await apiRequest<AddressResponse>(apiEndpoints.addresses.add, {
     method: 'POST',
     json: body,
     logScope: 'Address API',
@@ -167,7 +168,7 @@ export async function addAddress(token: string, body: AddAddressPayload): Promis
 }
 
 export async function updateAddress(token: string, addressId: string, body: AddAddressPayload): Promise<UserAddress> {
-  const payload = await apiRequest<AddressResponse>(`/address/${encodeURIComponent(addressId)}`, {
+  const payload = await apiRequest<AddressResponse>(apiEndpoints.addresses.byId(addressId), {
     method: 'PUT',
     json: body,
     logScope: 'Address API',
@@ -178,7 +179,7 @@ export async function updateAddress(token: string, addressId: string, body: AddA
 }
 
 export async function setDefaultAddress(token: string, addressId: string): Promise<UserAddress> {
-  const payload = await apiRequest<AddressResponse>(`/address/${encodeURIComponent(addressId)}/default`, {
+  const payload = await apiRequest<AddressResponse>(apiEndpoints.addresses.setDefault(addressId), {
     method: 'PATCH',
     logScope: 'Address API',
     token,
@@ -188,7 +189,7 @@ export async function setDefaultAddress(token: string, addressId: string): Promi
 }
 
 export async function deleteAddress(token: string, addressId: string): Promise<string> {
-  const payload = await apiRequest<DeleteAddressResponse>(`/address/${encodeURIComponent(addressId)}`, {
+  const payload = await apiRequest<DeleteAddressResponse>(apiEndpoints.addresses.byId(addressId), {
     method: 'DELETE',
     logScope: 'Address API',
     token,

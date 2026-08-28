@@ -1,4 +1,5 @@
 import { apiRequest, requireApiData, type ApiResponse } from './api-client';
+import { apiEndpoints } from './api-endpoints';
 
 export type CartVariant = {
   image?: string | null;
@@ -59,13 +60,13 @@ export function addCartItem(
   body: { product_id: string; quantity: number; variant_key?: string },
   token?: string,
 ): Promise<AddCartData> {
-  return request<AddCartData>('/cart/add', 'POST', token, body);
+  return request<AddCartData>(apiEndpoints.cart.add, 'POST', token, body);
 }
 
 export function getCart(token: string): Promise<GetCartData> {
-  return request<GetCartData>('/cart', 'GET', token, undefined, 'Get Cart API');
+  return request<GetCartData>(apiEndpoints.cart.details, 'GET', token, undefined, 'Get Cart API');
 }
 
 export function decrementCartItem(itemId: string, token?: string): Promise<DecrementCartData> {
-  return request<DecrementCartData>(`/cart/${encodeURIComponent(itemId)}/decrement`, 'PATCH', token);
+  return request<DecrementCartData>(apiEndpoints.cart.decrement(itemId), 'PATCH', token);
 }

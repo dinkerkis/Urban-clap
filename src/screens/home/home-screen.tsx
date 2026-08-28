@@ -2,7 +2,9 @@ import { colors, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, TextInput, useWindowDimensions, View } from 'react-native';
+import Animated, { useAnimatedReaction, useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { scheduleOnRN } from 'react-native-worklets';
 
 import { DEFAULT_OFFER_HEADER_COLOR, OfferCarousel } from '../../components/offer-carousel';
 import { LoadingDots } from '../../components/loading-dots';
@@ -13,6 +15,14 @@ import { useHomeSpotlights } from '../../hooks/use-home-spotlights';
 import type { HomeSpotlight } from '../../services/home-spotlights-api';
 
 const SEARCH_SUGGESTIONS = ['AC service', 'Facial', 'Kitchen cleaning'];
+
+function lightenHexColor(color: string, whiteMix = 0.54) {
+  const match = /^#([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(color);
+  if (!match) return '#D1C6F6';
+  const channels = match.slice(1).map((channel) => Number.parseInt(channel, 16));
+  const lightened = channels.map((channel) => Math.round(channel + (255 - channel) * whiteMix));
+  return `#${lightened.map((channel) => channel.toString(16).padStart(2, '0')).join('')}`;
+}
 
 function formatCategoryLabel(title: string) {
   const commaIndex = title.indexOf(', ');
@@ -56,6 +66,45 @@ function SearchIcon() {
   );
 }
 
+function SearchBar({ displayedSuggestion, onChangeText, search, sticky = false }: { displayedSuggestion: string; onChangeText: (value: string) => void; search: string; sticky?: boolean }) {
+  return (
+    <View
+      style={{
+        height: sticky ? 44 : 40,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        paddingHorizontal: 14,
+        borderRadius: 10,
+        borderCurve: 'continuous',
+        borderWidth: sticky ? 1 : 0,
+        borderColor: colors.mauveTone89,
+        backgroundColor: colors.white,
+        boxShadow: sticky ? `0 2px 8px ${colors.blackAlpha12}` : undefined,
+      }}
+    >
+      <SearchIcon />
+      <View style={{ flex: 1, height: 40, justifyContent: 'center' }}>
+        {!search ? (
+          <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={{ fontSize: fontSizes.size13, color: colors.violetTone57 }}>Search for '</Text>
+            <View style={{ height: 20, flex: 1, overflow: 'hidden', justifyContent: 'center' }}>
+              <Text numberOfLines={1} style={{ fontSize: fontSizes.size13, color: colors.violetTone57 }}>{`${displayedSuggestion}'`}</Text>
+            </View>
+          </View>
+        ) : null}
+        <TextInput
+          value={search}
+          onChangeText={onChangeText}
+          accessibilityLabel="Search for services"
+          returnKeyType="search"
+          style={{ flex: 1, minHeight: 40, paddingVertical: 6, fontSize: fontSizes.size13, color: colors.violetTone14 }}
+        />
+      </View>
+    </View>
+  );
+}
+
 type HomeScreenProps = {
   categories: ServiceCategory[];
   errorMessage: string;
@@ -80,11 +129,17 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
   const promotionalBanner = useHomePromotionalBanner();
   const spotlights = useHomeSpotlights();
   const [spotlightScrollProgress, setSpotlightScrollProgress] = useState(0);
+  const [stickySearchVisible, setStickySearchVisible] = useState(false);
+  const [stickyHeaderWhite, setStickyHeaderWhite] = useState(false);
+  const scrollY = useSharedValue(0);
+  const stickySearchThreshold = useSharedValue(10_000);
+  const stickyWhiteThreshold = useSharedValue(10_000);
   const { width } = useWindowDimensions();
   const categoryWidth = Math.max(92, Math.floor((width - 32 - 24) / 3));
   const normalizedSearch = search.trim().toLowerCase();
   const bannerSlides = promotionalBanner?.slides ?? [];
   const headerBackgroundUrl = promotionalBanner?.backgroundImageUrl;
+  const stickyBannerColor = lightenHexColor(promotionalBanner?.backgroundColor ?? DEFAULT_OFFER_HEADER_COLOR);
   const visibleCategories = useMemo(
     () =>
       normalizedSearch
@@ -132,19 +187,43 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
 
   const locationHeading = locationTitle || 'In 44 minutes';
   const locationLine = locationSubtitle || currentLocation.label;
+  const handleScroll = useAnimatedScrollHandler((event) => {
+    scrollY.set(event.contentOffset.y);
+  });
+
+  useAnimatedReaction(
+    () => scrollY.get() >= stickySearchThreshold.get(),
+    (visible, wasVisible) => {
+      if (visible !== wasVisible) scheduleOnRN(setStickySearchVisible, visible);
+    },
+  );
+
+  useAnimatedReaction(
+    () => scrollY.get() >= stickyWhiteThreshold.get(),
+    (white, wasWhite) => {
+      if (white !== wasWhite) scheduleOnRN(setStickyHeaderWhite, white);
+    },
+  );
 
   return (
-    <ScrollView
+    <View style={{ flex: 1, backgroundColor: colors.violetTone98_2 }}>
+    <Animated.ScrollView
       contentInsetAdjustmentBehavior="never"
       keyboardShouldPersistTaps="handled"
+      onScroll={handleScroll}
+      scrollEventThrottle={16}
       showsVerticalScrollIndicator={false}
       style={{ flex: 1, backgroundColor: colors.violetTone98_2 }}
       contentContainerStyle={{ paddingBottom: 126 + insets.bottom }}
     >
       <View
+        onLayout={({ nativeEvent }) => {
+          const stickyHeaderHeight = Math.max(insets.top, 8) + 54;
+          stickyWhiteThreshold.set(Math.max(0, nativeEvent.layout.height - stickyHeaderHeight));
+        }}
         style={{
           paddingTop: process.env.EXPO_OS === 'ios' ? 56 : insets.top + 16,
-          paddingHorizontal: 20,
+          paddingHorizontal: 16,
           paddingBottom: 0,
           gap: 14,
           overflow: 'hidden',
@@ -168,7 +247,7 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
           >
             <LocationPinIcon />
             <View style={{ flex: 1, gap: 2 }}>
-              <Text style={{ fontSize: fontSizes.size14, lineHeight: 19, fontWeight: '700', color: colors.whiteAlpha90 }}>{locationHeading}</Text>
+              <Text style={{ fontSize: fontSizes.size16, lineHeight: 21, fontWeight: '600', color: colors.whiteAlpha90 }}>{locationHeading}</Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                 {!locationSubtitle && currentLocation.status === 'loading' && <LoadingDots color={colors.white} gap={5} size={5} />}
                 <Text selectable numberOfLines={1} ellipsizeMode="tail" style={{ flexShrink: 1, fontSize: fontSizes.size12, lineHeight: 17, fontWeight: '500', color: colors.whiteAlpha90 }}>
@@ -188,33 +267,18 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
           </Pressable>
         </View>
 
-        <View style={{ height: 40, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, borderRadius: 10, borderCurve: 'continuous', backgroundColor: colors.white }}>
-          <SearchIcon />
-          <View style={{ flex: 1, height: 40, justifyContent: 'center' }}>
-            {!search ? (
-              <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={{ fontSize: fontSizes.size13, color: colors.violetTone57 }}>Search for '</Text>
-                <View style={{ height: 20, flex: 1, overflow: 'hidden', justifyContent: 'center' }}>
-                  <Text numberOfLines={1} style={{ fontSize: fontSizes.size13, color: colors.violetTone57 }}>
-                    {`${displayedSuggestion}'`}
-                  </Text>
-                </View>
-              </View>
-            ) : null}
-            <TextInput
-              value={search}
-              onChangeText={setSearch}
-              accessibilityLabel="Search for services"
-              returnKeyType="search"
-              style={{ flex: 1, minHeight: 40, paddingVertical: 6, fontSize: fontSizes.size13, color: colors.violetTone14 }}
-            />
-          </View>
+        <View
+          onLayout={({ nativeEvent }) => {
+            stickySearchThreshold.set(nativeEvent.layout.y - insets.top);
+          }}
+        >
+          <SearchBar displayedSuggestion={displayedSuggestion} onChangeText={setSearch} search={search} />
         </View>
 
         {!normalizedSearch && bannerSlides.length > 0 ? <OfferCarousel embeddedOnPurple slides={bannerSlides} /> : null}
       </View>
 
-      <View style={{ paddingHorizontal: 20, paddingTop: 16, gap: 25 }}>
+      <View style={{ paddingHorizontal: 16, paddingTop: 16, gap: 25 }}>
         <View style={{ gap: 15 }}>
           {normalizedSearch ? (
             <Text selectable style={{ fontSize: fontSizes.size19, lineHeight: 25, fontWeight: '600', color: colors.violetTone13 }}>
@@ -235,7 +299,7 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
               </Pressable>
             </View>
           ) : visibleCategories.length > 0 ? (
-            <View style={{ marginHorizontal: -4, flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
               {visibleCategories.map((category) => (
                 <Pressable
                   key={category.id}
@@ -282,9 +346,9 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
         </View>
 
         {!normalizedSearch && spotlights && spotlights.spotlightContent.length > 0 ? (
-          <View style={{ marginHorizontal: -24, gap: 18, paddingTop: 10, paddingBottom: 2 }}>
+          <View style={{ marginHorizontal: -16, gap: 18, paddingTop: 10, paddingBottom: 2 }}>
             <View style={{ width: '100%', height: 8, backgroundColor: colors.violetTone96_4 }} />
-            <Text style={{ marginTop: 8, paddingHorizontal: 20, fontSize: fontSizes.size21, lineHeight: 27, fontWeight: '700', color: colors.violetTone13 }}>
+            <Text style={{ marginTop: 8, paddingHorizontal: 16, fontSize: fontSizes.size21, lineHeight: 27, fontWeight: '700', color: colors.violetTone13 }}>
               {spotlights.sectionTitle}
             </Text>
             <ScrollView
@@ -298,7 +362,7 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
                 const maximumOffset = nativeEvent.contentSize.width - nativeEvent.layoutMeasurement.width;
                 setSpotlightScrollProgress(maximumOffset > 0 ? Math.min(1, Math.max(0, nativeEvent.contentOffset.x / maximumOffset)) : 0);
               }}
-              contentContainerStyle={{ paddingHorizontal: 20, gap: 16 }}
+              contentContainerStyle={{ paddingHorizontal: 16, gap: 16 }}
             >
               {spotlights.spotlightContent.map((spotlight) => (
                 <Pressable
@@ -338,8 +402,27 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
           </View>
         ) : null}
 
-        {!normalizedSearch ? <View style={{ marginHorizontal: -20, height: 12, backgroundColor: colors.violetTone96_4 }} /> : null}
+        {!normalizedSearch ? <View style={{ marginHorizontal: -16, height: 12, backgroundColor: colors.violetTone96_4 }} /> : null}
       </View>
-    </ScrollView>
+    </Animated.ScrollView>
+    {stickySearchVisible ? (
+      <View
+        style={{
+          position: 'absolute',
+          zIndex: 50,
+          top: 0,
+          left: 0,
+          right: 0,
+          paddingTop: Math.max(insets.top, 8),
+          paddingHorizontal: 16,
+          paddingBottom: 10,
+          overflow: 'hidden',
+          backgroundColor: stickyHeaderWhite ? colors.white : stickyBannerColor,
+        }}
+      >
+        <SearchBar displayedSuggestion={displayedSuggestion} onChangeText={setSearch} search={search} sticky />
+      </View>
+    ) : null}
+    </View>
   );
 }

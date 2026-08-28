@@ -13,7 +13,7 @@ type Props = {
 export function CountryPickerModal({ onClose, onSelect, selectedCountry, visible }: Props) {
   return (
     <Modal
-      animationType="fade"
+      animationType="slide"
       onRequestClose={onClose}
       presentationStyle="overFullScreen"
       statusBarTranslucent

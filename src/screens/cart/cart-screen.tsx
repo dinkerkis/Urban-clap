@@ -379,7 +379,7 @@ export function CartScreen({
         </View>
       ) : null}
 
-      <Modal animationType="fade" transparent visible={showBillSummary} onRequestClose={() => setShowBillSummary(false)}>
+      <Modal animationType="slide" transparent visible={showBillSummary} onRequestClose={() => setShowBillSummary(false)}>
         <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: colors.mauveTone8Alpha80 }}>
           <Pressable accessibilityLabel="Close bill summary" onPress={() => setShowBillSummary(false)} style={{ alignSelf: 'flex-end', width: 40, height: 40, marginRight: 20, marginBottom: 8, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: colors.white }}>
             <Text style={{ fontSize: fontSizes.size23, lineHeight: 25, fontWeight: '300', color: colors.mauveTone9 }}>×</Text>
@@ -410,7 +410,7 @@ export function CartScreen({
         />
       ) : null}
 
-      <Modal animationType="fade" transparent visible={addressSheet === 'saved'} onRequestClose={() => setAddressSheet(null)}>
+      <Modal animationType="slide" transparent visible={addressSheet === 'saved'} onRequestClose={() => setAddressSheet(null)}>
         <SavedAddressSheet
           addresses={addressState.addresses}
           isProceeding={isSettingDefaultAddress}
@@ -421,7 +421,7 @@ export function CartScreen({
           onSelect={setSelectedAddressId}
         />
       </Modal>
-      <Modal animationType="fade" transparent visible={addressSheet === 'search'} onRequestClose={() => setAddressSheet(null)}>
+      <Modal animationType="slide" transparent visible={addressSheet === 'search'} onRequestClose={() => setAddressSheet(null)}>
         <LocationSearchSheet
           addresses={addressState.addresses}
           onClose={() => setAddressSheet(null)}
@@ -431,7 +431,7 @@ export function CartScreen({
           }}
         />
       </Modal>
-      <Modal animationType="fade" transparent visible={addressSheet === 'details' && Boolean(selectedPlace)} onRequestClose={() => setAddressSheet(null)}>
+      <Modal animationType="slide" transparent visible={addressSheet === 'details' && Boolean(selectedPlace)} onRequestClose={() => setAddressSheet(null)}>
         {selectedPlace ? (
           <AddressDetailsSheet
             authToken={authToken}
@@ -449,7 +449,7 @@ export function CartScreen({
           />
         ) : null}
       </Modal>
-      <Modal animationType="fade" transparent visible={addressSheet === 'slot'} onRequestClose={() => setAddressSheet(null)}>
+      <Modal animationType="slide" transparent visible={addressSheet === 'slot'} onRequestClose={() => setAddressSheet(null)}>
         <SlotSelectionSheet
           selectedDate={selectedSlotDate}
           selectedTime={selectedSlotTime}

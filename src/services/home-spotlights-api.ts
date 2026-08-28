@@ -1,4 +1,5 @@
 import { apiRequest, getApiAssetUrl, requireApiData, type ApiResponse } from './api-client';
+import { apiEndpoints } from './api-endpoints';
 
 export type SpotlightRedirectType = 'native' | 'service';
 
@@ -44,7 +45,7 @@ function parseSpotlight(value: unknown): HomeSpotlight | null {
 }
 
 export async function fetchHomeSpotlights(signal?: AbortSignal): Promise<HomeSpotlightsData> {
-  const response = await apiRequest<ApiResponse<HomeSpotlightsPayload>>('/mobile/home/spotlights', {
+  const response = await apiRequest<ApiResponse<HomeSpotlightsPayload>>(apiEndpoints.home.spotlights, {
     defaultErrorMessage: 'Unable to load spotlight offers. Please try again.',
     logScope: 'Home Spotlights API',
     signal,

@@ -1,4 +1,5 @@
 import { apiRequest, getApiAssetUrl, requireApiData, type ApiResponse } from './api-client';
+import { apiEndpoints } from './api-endpoints';
 
 export type BannerHeadingGradient = {
   direction: string;
@@ -21,14 +22,23 @@ export type PromotionalBannerSlide = {
 };
 
 export type HomePromotionalBannerData = {
+  backgroundColor?: string;
   backgroundImageUrl?: string;
   slides: PromotionalBannerSlide[];
 };
 
 type PromotionalBannerPayload = {
+  backgroundColor?: unknown;
+  bannerBackgroundColor?: unknown;
   backgroundImage?: unknown;
   sliderContent?: unknown;
 };
+
+function parseColor(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const color = value.trim();
+  return /^#[\da-f]{6}$/i.test(color) ? color : undefined;
+}
 
 function parseHeadingColor(value: unknown): BannerHeadingColor | undefined {
   if (!value || typeof value !== 'object') return undefined;
@@ -80,7 +90,7 @@ function parseSlide(value: unknown): PromotionalBannerSlide | null {
 }
 
 export async function fetchHomePromotionalBanner(signal?: AbortSignal): Promise<HomePromotionalBannerData> {
-  const response = await apiRequest<ApiResponse<PromotionalBannerPayload>>('/mobile/home/promotional-banner', {
+  const response = await apiRequest<ApiResponse<PromotionalBannerPayload>>(apiEndpoints.home.promotionalBanner, {
     defaultErrorMessage: 'Unable to load promotional banner. Please try again.',
     logScope: 'Home Promotional Banner API',
     signal,
@@ -91,6 +101,7 @@ export async function fetchHomePromotionalBanner(signal?: AbortSignal): Promise<
     : [];
 
   return {
+    backgroundColor: parseColor(data.backgroundColor) ?? parseColor(data.bannerBackgroundColor),
     backgroundImageUrl:
       typeof data.backgroundImage === 'string' && data.backgroundImage.trim()
         ? getApiAssetUrl(data.backgroundImage.trim())

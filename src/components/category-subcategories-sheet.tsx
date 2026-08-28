@@ -23,7 +23,7 @@ export function CategorySubcategoriesSheet({ category, onClose, onSubcategoryPre
 
   return (
     <Modal
-      animationType="fade"
+      animationType="slide"
       onRequestClose={onClose}
       presentationStyle="overFullScreen"
       statusBarTranslucent

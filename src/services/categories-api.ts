@@ -1,4 +1,5 @@
 import { apiRequest, ApiClientError, getApiAssetUrl } from './api-client';
+import { apiEndpoints } from './api-endpoints';
 
 export type ApiCategory = {
   _id: string;
@@ -20,7 +21,7 @@ export function getCategoryImageUrl(path?: string): string | undefined {
 }
 
 export async function fetchCategories(signal?: AbortSignal): Promise<ApiCategory[]> {
-  const payload = await apiRequest<CategoriesResponse>('/categories', {
+  const payload = await apiRequest<CategoriesResponse>(apiEndpoints.categories.list, {
     logScope: 'Categories API',
     signal,
     defaultErrorMessage: 'Unable to load categories. Please try again.',

@@ -1,5 +1,6 @@
 import { getCategoryImageUrl } from './categories-api';
 import { apiRequest, ApiClientError } from './api-client';
+import { apiEndpoints } from './api-endpoints';
 
 export type ApiProductVariant = {
   image?: string | null;
@@ -68,7 +69,7 @@ export function resolveProductImage(path?: string | null): string | undefined {
 }
 
 export async function fetchProductsWithCategory(categoryId: string, signal?: AbortSignal): Promise<ProductsWithCategoryData> {
-  const path = `/products-with-category/${encodeURIComponent(categoryId)}`;
+  const path = apiEndpoints.categories.products(categoryId);
   const payload = await apiRequest<ProductsWithCategoryResponse>(path, {
     logScope: 'Products API',
     signal,

@@ -86,7 +86,7 @@ function ExchangeInfoModal({ visible, onClose }: { onClose: () => void; visible:
   const insets = useSafeAreaInsets();
 
   return (
-    <Modal animationType="fade" onRequestClose={onClose} presentationStyle="overFullScreen" statusBarTranslucent transparent visible={visible}>
+    <Modal animationType="slide" onRequestClose={onClose} presentationStyle="overFullScreen" statusBarTranslucent transparent visible={visible}>
       <View style={{ flex: 1, backgroundColor: colors.blackAlpha78 }}>
         <Pressable
           accessibilityRole="button"
@@ -674,7 +674,7 @@ export function NativeProductDetailModal({ onAddToCart, onClose, productId }: Na
   };
 
   return (
-    <Modal animationType="fade" onRequestClose={onClose} presentationStyle="overFullScreen" statusBarTranslucent transparent visible={Boolean(productId)}>
+    <Modal animationType="slide" onRequestClose={onClose} presentationStyle="overFullScreen" statusBarTranslucent transparent visible={Boolean(productId)}>
       <View style={{ flex: 1, backgroundColor: colors.blackAlpha78 }}>
         <Pressable accessibilityRole="button" accessibilityLabel="Close product details" onPress={onClose} style={({ pressed }) => ({ position: 'absolute', zIndex: 2, top: insets.top + 10, right: 16, width: 30, height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 15, backgroundColor: colors.white, opacity: pressed ? 0.7 : 1 })}>
           <Text style={{ marginTop: -1, fontSize: fontSizes.size21, lineHeight: 23, fontWeight: '300', color: colors.mauveTone9_2 }}>×</Text>

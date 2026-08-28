@@ -1,4 +1,5 @@
 import { apiRequest, getApiAssetUrl, requireApiData, type ApiResponse } from './api-client';
+import { apiEndpoints } from './api-endpoints';
 
 export type NativeDescriptionImage = {
   sort_order: number;
@@ -93,7 +94,7 @@ function isDescriptionMedia(value: unknown): value is NativeDescriptionMedia {
 }
 
 export async function fetchNativeDescription(signal?: AbortSignal): Promise<NativeDescriptionMedia[]> {
-  const response = await apiRequest<ApiResponse<NativeDescriptionData>>('/native-products/description/mobile', {
+  const response = await apiRequest<ApiResponse<NativeDescriptionData>>(apiEndpoints.nativeProducts.description, {
     defaultErrorMessage: 'Unable to load Native product details. Please try again.',
     logScope: 'Native Description API',
     signal,
@@ -108,7 +109,7 @@ export async function fetchNativeDescription(signal?: AbortSignal): Promise<Nati
 type NativeProductsPayload = Record<string, unknown> & { categories?: NativeProductCategory[]; newly_launched?: NativeProductSection };
 
 export async function fetchNativeProducts(signal?: AbortSignal): Promise<NativeProductsData> {
-  const response = await apiRequest<ApiResponse<NativeProductsPayload>>('/native-products/mobile', {
+  const response = await apiRequest<ApiResponse<NativeProductsPayload>>(apiEndpoints.nativeProducts.list, {
     defaultErrorMessage: 'Unable to load Native products. Please try again.',
     logScope: 'Native Products API',
     signal,
@@ -130,7 +131,7 @@ export async function fetchNativeProducts(signal?: AbortSignal): Promise<NativeP
 }
 
 export async function fetchNativeProductDetail(productId: string, signal?: AbortSignal): Promise<NativeProductDetail> {
-  const response = await apiRequest<ApiResponse<NativeProductDetail>>(`/native-products/${encodeURIComponent(productId)}/mobile`, {
+  const response = await apiRequest<ApiResponse<NativeProductDetail>>(apiEndpoints.nativeProducts.detail(productId), {
     defaultErrorMessage: 'Unable to load this Native product. Please try again.',
     logScope: 'Native Product Detail API',
     signal,

@@ -1,12 +1,13 @@
 import { colors, fontSizes } from '../../theme';
 import { useState } from 'react';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BackIcon } from '../../components/back-icon';
 
 type WalletScreenProps = {
   onBack: () => void;
+  onHelp: () => void;
 };
 
 const FAQS = [
@@ -44,7 +45,7 @@ function Chevron({ expanded }: { expanded: boolean }) {
   );
 }
 
-export function WalletScreen({ onBack }: WalletScreenProps) {
+export function WalletScreen({ onBack, onHelp }: WalletScreenProps) {
   const insets = useSafeAreaInsets();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const headerHeight = Math.max(insets.top, 16) + 58;
@@ -87,7 +88,8 @@ export function WalletScreen({ onBack }: WalletScreenProps) {
           <Text style={{ marginLeft: 13, fontSize: fontSizes.size18, lineHeight: 24, fontWeight: '700', color: colors.mauveTone12_2 }}>UC Wallet</Text>
           <Pressable
             accessibilityRole="button"
-            onPress={() => Alert.alert('Help', 'Wallet support will be available soon.')}
+            accessibilityLabel="Help"
+            onPress={onHelp}
             style={({ pressed }) => ({
               marginLeft: 'auto',
               minWidth: 66,

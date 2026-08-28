@@ -48,7 +48,7 @@ function AddCardModal({ visible, onClose }: { visible: boolean; onClose: () => v
   };
 
   return (
-    <Modal animationType="fade" transparent visible={visible} onRequestClose={onClose}>
+    <Modal animationType="slide" transparent visible={visible} onRequestClose={onClose}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1, justifyContent: 'flex-end' }}>
         <Pressable accessibilityRole="button" accessibilityLabel="Close add card form" onPress={onClose} style={{ position: 'absolute', inset: 0, backgroundColor: colors.blackAlpha72 }} />
         <View style={{ paddingHorizontal: 18, paddingTop: 26, paddingBottom: Math.max(insets.bottom, 16) + 12, borderTopLeftRadius: 18, borderTopRightRadius: 18, backgroundColor: colors.white }}>

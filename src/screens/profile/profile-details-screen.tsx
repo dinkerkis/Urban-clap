@@ -12,22 +12,27 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import Animated, { FadeIn, FadeOut, SlideInDown, SlideOutDown } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BackIcon } from '../../components/back-icon';
+import { LoadingDots } from '../../components/loading-dots';
 import { countries, defaultCountry, type Country } from '../../config/countries';
-import { getApiErrorMessage } from '../../services/auth-api';
-import { updateUserProfile, verifyUserEmailOtp, type UpdateUserProfilePayload } from '../../services/user-profile-api';
+import { getApiErrorMessage, requestLoginOtp, verifyLoginOtp } from '../../services/auth-api';
+import { fetchUserProfile, updateUserProfile, verifyUserEmailOtp, type UpdateUserProfilePayload } from '../../services/user-profile-api';
 
 export type CompletedProfile = {
+  anniversaryDate?: string | null;
+  dob?: string | null;
   email: string;
   name: string;
   phone: string;
 };
 
 type ProfileDetailsScreenProps = {
+  anniversaryDate?: string | null;
   authToken?: string;
+  dob?: string | null;
   email?: string;
   name?: string;
   phone?: string;
@@ -83,7 +88,7 @@ function ProfilePickerModal({ children, onClose, title, visible }: ProfilePicker
   const insets = useSafeAreaInsets();
 
   return (
-    <Modal visible={visible} transparent animationType="none" statusBarTranslucent onRequestClose={onClose}>
+    <Modal visible={visible} transparent animationType="slide" statusBarTranslucent onRequestClose={onClose}>
       <Animated.View entering={FadeIn.duration(180)} exiting={FadeOut.duration(150)} style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: colors.violetTone5Alpha76 }}>
         <Pressable accessibilityLabel={`Close ${title}`} onPress={onClose} style={{ position: 'absolute', inset: 0 }} />
         <Pressable
@@ -106,9 +111,7 @@ function ProfilePickerModal({ children, onClose, title, visible }: ProfilePicker
         >
           <Text style={{ fontSize: fontSizes.size22, lineHeight: 24, fontWeight: '300', color: colors.mauveTone15_2 }}>×</Text>
         </Pressable>
-        <Animated.View
-          entering={SlideInDown.duration(250)}
-          exiting={SlideOutDown.duration(210)}
+        <View
           style={{
             paddingTop: 26,
             paddingHorizontal: 22,
@@ -121,22 +124,22 @@ function ProfilePickerModal({ children, onClose, title, visible }: ProfilePicker
         >
           <Text selectable style={{ paddingBottom: 12, fontSize: fontSizes.size20, lineHeight: 27, fontWeight: '700', color: colors.mauveTone9 }}>{title}</Text>
           {children}
-        </Animated.View>
+        </View>
       </Animated.View>
     </Modal>
   );
 }
 
-type VerifyEmailModalProps = {
-  authToken: string;
-  email: string;
-  pendingPayload: UpdateUserProfilePayload | null;
+type VerificationModalProps = {
+  destination: string;
+  kind: 'email' | 'phone';
   visible: boolean;
   onClose: () => void;
-  onVerified: (profile: { email: string; phone: string }) => void;
+  onResend: () => Promise<void>;
+  onVerify: (otp: string) => Promise<void>;
 };
 
-function VerifyEmailModal({ authToken, email, pendingPayload, visible, onClose, onVerified }: VerifyEmailModalProps) {
+function VerificationModal({ destination, kind, visible, onClose, onResend, onVerify }: VerificationModalProps) {
   const insets = useSafeAreaInsets();
   const [otp, setOtp] = useState('');
   const [seconds, setSeconds] = useState(30);
@@ -166,8 +169,7 @@ function VerifyEmailModal({ authToken, email, pendingPayload, visible, onClose, 
 
     setIsVerifying(true);
     try {
-      const result = await verifyUserEmailOtp(authToken, otp);
-      onVerified({ email: result.data.email, phone: result.data.phone });
+      await onVerify(otp);
     } catch (error) {
       Alert.alert('Verification failed', getApiErrorMessage(error));
     } finally {
@@ -176,13 +178,13 @@ function VerifyEmailModal({ authToken, email, pendingPayload, visible, onClose, 
   };
 
   const resendOtp = async () => {
-    if (!pendingPayload || isResending || seconds > 0) return;
+    if (isResending || seconds > 0) return;
     setIsResending(true);
     try {
-      await updateUserProfile(authToken, pendingPayload);
+      await onResend();
       setOtp('');
       setSeconds(30);
-      Alert.alert('OTP sent', 'A new verification code was sent to your email.');
+      Alert.alert('OTP sent', `A new verification code was sent to your ${kind}.`);
     } catch (error) {
       Alert.alert('Resend failed', getApiErrorMessage(error));
     } finally {
@@ -191,14 +193,12 @@ function VerifyEmailModal({ authToken, email, pendingPayload, visible, onClose, 
   };
 
   return (
-    <Modal visible={visible} transparent animationType="none" statusBarTranslucent onRequestClose={onClose}>
+    <Modal visible={visible} transparent animationType="slide" statusBarTranslucent onRequestClose={onClose}>
       <KeyboardAvoidingView behavior={process.env.EXPO_OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <Animated.View entering={FadeIn.duration(180)} exiting={FadeOut.duration(150)} style={{ flex: 1, backgroundColor: colors.violetTone6Alpha72 }}>
-          <Pressable accessibilityLabel="Close email verification" onPress={onClose} style={{ flex: 1 }} />
+          <Pressable accessibilityLabel={`Close ${kind} verification`} onPress={onClose} style={{ flex: 1 }} />
 
-          <Animated.View
-            entering={SlideInDown.duration(260)}
-            exiting={SlideOutDown.duration(220)}
+          <View
             style={{
               paddingHorizontal: 22,
               paddingTop: 28,
@@ -230,8 +230,8 @@ function VerifyEmailModal({ authToken, email, pendingPayload, visible, onClose, 
               <Text style={{ fontSize: fontSizes.size22, lineHeight: 24, fontWeight: '300', color: colors.mauveTone15_2 }}>×</Text>
             </Pressable>
 
-            <Text selectable style={{ fontSize: fontSizes.size27, lineHeight: 34, fontWeight: '700', color: colors.mauveTone9 }}>Verify your email</Text>
-            <Text selectable style={{ fontSize: fontSizes.size15, lineHeight: 21, color: colors.neutralTone45 }}>We sent a 6-digit code to {email}.</Text>
+            <Text selectable style={{ fontSize: kind === 'phone' ? 25 : fontSizes.size27, lineHeight: kind === 'phone' ? 32 : 34, fontWeight: '700', color: colors.mauveTone9 }}>Verify your {kind}</Text>
+            <Text selectable style={{ fontSize: kind === 'phone' ? 13 : fontSizes.size15, lineHeight: kind === 'phone' ? 19 : 21, color: colors.neutralTone45 }}>We sent a 6-digit code to {destination}.</Text>
             <TextInput
               accessibilityLabel="6-digit verification code"
               keyboardType="number-pad"
@@ -241,7 +241,7 @@ function VerifyEmailModal({ authToken, email, pendingPayload, visible, onClose, 
               value={otp}
               editable={!isVerifying}
               onChangeText={(value) => setOtp(value.replace(/\D/g, ''))}
-              style={[inputStyle(), { fontSize: fontSizes.size18, fontVariant: ['tabular-nums'], letterSpacing: 2 }]}
+              style={[inputStyle(), { fontSize: kind === 'phone' ? 12 : fontSizes.size18, fontVariant: ['tabular-nums'], letterSpacing: 2 }]}
             />
 
             <Pressable
@@ -252,8 +252,8 @@ function VerifyEmailModal({ authToken, email, pendingPayload, visible, onClose, 
               }}
               style={({ pressed }) => ({
                 alignSelf: 'flex-start',
-                minWidth: 132,
-                minHeight: 48,
+                minWidth: 76,
+                minHeight: 40,
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: 10,
@@ -261,29 +261,29 @@ function VerifyEmailModal({ authToken, email, pendingPayload, visible, onClose, 
                 opacity: isVerifying ? 0.7 : pressed ? 0.72 : 1,
               })}
             >
-              {isVerifying ? <ActivityIndicator color={colors.white} /> : <Text style={{ fontSize: fontSizes.size16, fontWeight: '700', color: colors.white }}>Verify</Text>}
+              {isVerifying ? <ActivityIndicator color={colors.white} /> : <Text style={{ fontSize: fontSizes.size14, fontWeight: '700', color: colors.white }}>Verify</Text>}
             </Pressable>
 
             <Pressable
               accessibilityRole="button"
-              disabled={seconds > 0 || isResending || !pendingPayload}
+              disabled={seconds > 0 || isResending}
               onPress={() => {
                 void resendOtp();
               }}
               style={{ alignSelf: 'flex-start', paddingVertical: 4 }}
             >
-              <Text style={{ fontSize: fontSizes.size14, color: seconds > 0 || isResending ? colors.mauveTone66_4 : colors.blueTone54 }}>
+              <Text style={{ fontSize: fontSizes.size13, color: seconds > 0 || isResending ? colors.mauveTone66_4 : colors.blueTone54 }}>
                 {isResending ? 'Sending…' : seconds > 0 ? `Resend OTP in ${seconds}s` : 'Resend OTP'}
               </Text>
             </Pressable>
-          </Animated.View>
+          </View>
         </Animated.View>
       </KeyboardAvoidingView>
     </Modal>
   );
 }
 
-export function ProfileDetailsScreen({ authToken, email, name, phone, onBack, onVerified }: ProfileDetailsScreenProps) {
+export function ProfileDetailsScreen({ anniversaryDate, authToken, dob, email, name, phone, onBack, onVerified }: ProfileDetailsScreenProps) {
   const insets = useSafeAreaInsets();
   const initialCountry = countries.find((country) => phone?.replace(/\s/g, '').startsWith(country.callingCode)) ?? defaultCountry;
   const [titleIndex, setTitleIndex] = useState(0);
@@ -291,16 +291,21 @@ export function ProfileDetailsScreen({ authToken, email, name, phone, onBack, on
   const [fullName, setFullName] = useState(name?.trim() || '');
   const [emailAddress, setEmailAddress] = useState(email?.trim() || '');
   const [country, setCountry] = useState(initialCountry);
+  const [baselineCountryId, setBaselineCountryId] = useState(initialCountry.id);
   const [phoneNumber, setPhoneNumber] = useState((phone || '').replace(initialCountry.callingCode, '').replace(/\D/g, ''));
+  const [baselinePhone, setBaselinePhone] = useState(phone || '');
   const [isCountryPickerOpen, setIsCountryPickerOpen] = useState(false);
-  const [dateOfBirth, setDateOfBirth] = useState('');
-  const [anniversary, setAnniversary] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState(dob?.trim() || '');
+  const [anniversary, setAnniversary] = useState(anniversaryDate?.trim() || '');
   const [showVerification, setShowVerification] = useState(false);
+  const [showPhoneVerification, setShowPhoneVerification] = useState(false);
   const [pendingPayload, setPendingPayload] = useState<UpdateUserProfilePayload | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(Boolean(authToken));
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [errors, setErrors] = useState<{ anniversary?: boolean; dob?: boolean; email?: boolean; name?: boolean; phone?: boolean }>({});
   const countrySelectorWidth = country.id === 'SA' || country.id === 'AE' ? 100 : 90;
+  const verificationPhone = formatSessionPhone(phoneNumber, country.callingCode);
 
   useEffect(() => {
     const showEvent = process.env.EXPO_OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
@@ -313,10 +318,43 @@ export function ProfileDetailsScreen({ authToken, email, name, phone, onBack, on
     };
   }, []);
 
+  useEffect(() => {
+    if (!authToken) {
+      setIsLoadingProfile(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    setIsLoadingProfile(true);
+    void fetchUserProfile(authToken, controller.signal)
+      .then((profile) => {
+        const fetchedCountry = countries.find((item) => profile.phone.replace(/\s/g, '').startsWith(item.callingCode)) ?? defaultCountry;
+        setFullName(profile.name);
+        setEmailAddress(profile.email);
+        setCountry(fetchedCountry);
+        setBaselineCountryId(fetchedCountry.id);
+        setPhoneNumber(profile.phone.replace(fetchedCountry.callingCode, '').replace(/\D/g, ''));
+        setBaselinePhone(profile.phone);
+        setDateOfBirth(profile.dob?.trim() || '');
+        setAnniversary(profile.anniversaryDate?.trim() || '');
+      })
+      .catch((error: unknown) => {
+        if (error instanceof Error && error.name === 'AbortError') return;
+        if (__DEV__) console.warn('[Profile Details API]', error);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setIsLoadingProfile(false);
+      });
+
+    return () => controller.abort();
+  }, [authToken]);
+
   const buildCompletedProfile = (nextEmail: string, nextPhone: string): CompletedProfile => ({
     name: fullName.trim(),
     email: nextEmail.trim().toLowerCase(),
     phone: formatSessionPhone(nextPhone, country.callingCode),
+    dob: normalizeOptionalDate(dateOfBirth) ?? null,
+    anniversaryDate: normalizeOptionalDate(anniversary) ?? null,
   });
 
   const submit = async () => {
@@ -354,6 +392,16 @@ export function ProfileDetailsScreen({ authToken, email, name, phone, onBack, on
         ...(dobValue ? { dob: dobValue } : {}),
         ...(anniversaryValue ? { anniversaryDate: anniversaryValue } : {}),
       };
+
+      const currentPhoneDigits = baselinePhone.replace(/\D/g, '');
+      const phoneChanged = country.id !== baselineCountryId || currentPhoneDigits.slice(-country.phoneLength) !== phoneNumber;
+      if (phoneChanged) {
+        await requestLoginOtp(verificationPhone);
+        setPendingPayload(payload);
+        setShowPhoneVerification(true);
+        return;
+      }
+
       const result = await updateUserProfile(authToken, payload);
 
       if (result.kind === 'email_verification_required') {
@@ -378,6 +426,30 @@ export function ProfileDetailsScreen({ authToken, email, name, phone, onBack, on
     Alert.alert('Email verified', 'Email verified and updated successfully');
     onVerified(buildCompletedProfile(verified.email, verified.phone));
   };
+
+  const verifyChangedPhone = async (otp: string) => {
+    if (!authToken || !pendingPayload) return;
+    await verifyLoginOtp(verificationPhone, otp);
+    const result = await updateUserProfile(authToken, pendingPayload);
+    setShowPhoneVerification(false);
+
+    if (result.kind === 'email_verification_required') {
+      setShowVerification(true);
+      return;
+    }
+
+    setPendingPayload(null);
+    Alert.alert('Phone verified', 'Your phone number and profile were updated successfully.');
+    onVerified(buildCompletedProfile(result.data.email, result.data.phone));
+  };
+
+  if (isLoadingProfile) {
+    return (
+      <View accessibilityLabel="Loading profile details" accessibilityRole="progressbar" style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.white }}>
+        <LoadingDots />
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView behavior={process.env.EXPO_OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: colors.white }}>
@@ -510,24 +582,42 @@ export function ProfileDetailsScreen({ authToken, email, name, phone, onBack, on
             justifyContent: 'center',
             borderRadius: 9,
             borderCurve: 'continuous',
-            backgroundColor: colors.blueTone53,
-            opacity: isSubmitting ? 0.7 : pressed ? 0.72 : 1,
+            backgroundColor: isSubmitting ? colors.transparent : colors.blueTone53,
+            opacity: pressed ? 0.72 : 1,
           })}
         >
-          {isSubmitting ? <ActivityIndicator color={colors.white} /> : <Text style={{ fontSize: fontSizes.size15, fontWeight: '700', color: colors.white }}>Complete</Text>}
+          {isSubmitting ? <LoadingDots color={colors.blueTone53} gap={6} size={6} /> : <Text style={{ fontSize: fontSizes.size15, fontWeight: '700', color: colors.white }}>Complete</Text>}
         </Pressable>
       </View>
 
-      <VerifyEmailModal
-        authToken={authToken ?? ''}
-        email={emailAddress.trim()}
-        pendingPayload={pendingPayload}
+      <VerificationModal
+        destination={emailAddress.trim()}
+        kind="email"
         visible={showVerification}
         onClose={() => {
           setShowVerification(false);
           setPendingPayload(null);
         }}
-        onVerified={completeProfile}
+        onResend={async () => {
+          if (!authToken || !pendingPayload) return;
+          await updateUserProfile(authToken, pendingPayload);
+        }}
+        onVerify={async (otp) => {
+          if (!authToken) return;
+          const result = await verifyUserEmailOtp(authToken, otp);
+          completeProfile({ email: result.data.email, phone: result.data.phone });
+        }}
+      />
+      <VerificationModal
+        destination={verificationPhone}
+        kind="phone"
+        visible={showPhoneVerification}
+        onClose={() => {
+          setShowPhoneVerification(false);
+          setPendingPayload(null);
+        }}
+        onResend={() => requestLoginOtp(verificationPhone).then(() => undefined)}
+        onVerify={verifyChangedPhone}
       />
       <ProfilePickerModal visible={isTitlePickerOpen} title="Select title" onClose={() => setIsTitlePickerOpen(false)}>
         {TITLE_OPTIONS.map((title, index) => (

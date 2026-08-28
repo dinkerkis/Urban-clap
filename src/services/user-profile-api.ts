@@ -1,4 +1,5 @@
 import { apiRequest, ApiClientError, requireApiData, type ApiResponse } from './api-client';
+import { apiEndpoints } from './api-endpoints';
 
 export type UpdateUserProfilePayload = {
   anniversaryDate?: string;
@@ -13,6 +14,20 @@ export type UpdatedUserProfile = {
   dob?: string | null;
   email: string;
   isEmailVerified?: boolean;
+  phone: string;
+  profile_status?: string;
+  user_id: string;
+};
+
+export type UserProfile = {
+  anniversaryDate?: string | null;
+  address?: string;
+  dob?: string | null;
+  email: string;
+  isEmailVerified?: boolean;
+  latitude?: number | null;
+  longitude?: number | null;
+  name: string;
   phone: string;
   profile_status?: string;
   user_id: string;
@@ -48,12 +63,54 @@ function parseUpdatedProfile(value: unknown): UpdatedUserProfile | null {
   };
 }
 
+function parseUserProfile(value: unknown): UserProfile | null {
+  if (!isRecord(value)) return null;
+
+  const userId = typeof value._id === 'string' ? value._id.trim() : typeof value.user_id === 'string' ? value.user_id.trim() : '';
+  if (!userId) return null;
+
+  return {
+    user_id: userId,
+    name: typeof value.name === 'string' ? value.name.trim() : '',
+    email: typeof value.email === 'string' ? value.email.trim() : '',
+    phone: typeof value.phone === 'string' ? value.phone.trim() : '',
+    address: typeof value.address === 'string' ? value.address.trim() : undefined,
+    latitude: typeof value.latitude === 'number' ? value.latitude : value.latitude == null ? null : undefined,
+    longitude: typeof value.longitude === 'number' ? value.longitude : value.longitude == null ? null : undefined,
+    dob: typeof value.dob === 'string' ? value.dob : value.dob == null ? null : undefined,
+    anniversaryDate:
+      typeof value.anniversaryDate === 'string'
+        ? value.anniversaryDate
+        : value.anniversaryDate == null
+          ? null
+          : undefined,
+    profile_status: typeof value.profile_status === 'string' ? value.profile_status : undefined,
+    isEmailVerified: typeof value.isEmailVerified === 'boolean' ? value.isEmailVerified : undefined,
+  };
+}
+
+export async function fetchUserProfile(token: string, signal?: AbortSignal): Promise<UserProfile> {
+  const response = await apiRequest<ApiResponse<UserProfile>>(apiEndpoints.user.profile, {
+    method: 'GET',
+    token,
+    signal,
+    defaultErrorMessage: 'Unable to load profile. Please try again.',
+    logScope: 'Get User Profile API',
+  });
+  const data = requireApiData(response, 'The profile response was missing. Please try again.');
+  const parsed = parseUserProfile(data);
+  if (!parsed) {
+    throw new ApiClientError('The profile response was incomplete. Please try again.', 200, 'INVALID_RESPONSE');
+  }
+  return parsed;
+}
+
 export async function updateUserProfile(
   token: string,
   payload: UpdateUserProfilePayload,
   signal?: AbortSignal,
 ): Promise<UpdateUserProfileResult> {
-  const response = await apiRequest<ApiResponse<UpdatedUserProfile | null>>('/mobile/user/profile', {
+  const response = await apiRequest<ApiResponse<UpdatedUserProfile | null>>(apiEndpoints.user.profile, {
     method: 'PUT',
     token,
     json: payload,
@@ -78,7 +135,7 @@ export async function verifyUserEmailOtp(
   otp: string,
   signal?: AbortSignal,
 ): Promise<{ data: UpdatedUserProfile; message: string }> {
-  const response = await apiRequest<ApiResponse<UpdatedUserProfile>>('/mobile/user/profile/verify-email', {
+  const response = await apiRequest<ApiResponse<UpdatedUserProfile>>(apiEndpoints.user.verifyEmail, {
     method: 'POST',
     token,
     json: { otp },

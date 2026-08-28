@@ -14,6 +14,7 @@ import { CustomSplashScreen } from './screens/splash';
 import type { AuthSession } from './services/auth-api';
 import type { CompletedProfile } from './screens/profile';
 import { clearAuthSession, getStoredAuthSession, saveAuthSession } from './services/auth-session-storage';
+import { fetchUserProfile } from './services/user-profile-api';
 
 type Screen = 'loading' | 'location-bootstrap' | 'phone' | 'otp' | 'dashboard';
 
@@ -49,6 +50,28 @@ export default function App() {
       active = false;
     };
   }, []);
+
+  useEffect(() => {
+    const token = session?.token;
+    if (screen !== 'dashboard' || !token) return;
+
+    const controller = new AbortController();
+    void fetchUserProfile(token, controller.signal)
+      .then((profile) => {
+        setSession((current) => {
+          if (!current || current.token !== token) return current;
+          const updatedSession: AuthSession = { ...current, ...profile };
+          void saveAuthSession(updatedSession);
+          return updatedSession;
+        });
+      })
+      .catch((error: unknown) => {
+        if (error instanceof Error && error.name === 'AbortError') return;
+        if (__DEV__) console.warn('[Get User Profile API]', error);
+      });
+
+    return () => controller.abort();
+  }, [screen, session?.token]);
 
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
@@ -91,7 +114,9 @@ export default function App() {
         )}
         {screen === 'dashboard' && (
           <DashboardScreen
+            anniversaryDate={session?.anniversaryDate}
             authToken={session?.token}
+            dob={session?.dob}
             email={session?.email}
             name={session?.name}
             phone={session?.phone || (phoneNumber ? `${callingCode} ${phoneNumber}` : undefined)}
