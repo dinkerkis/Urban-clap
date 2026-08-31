@@ -1,4 +1,4 @@
-import { colors, fontSizes } from '../../theme';
+import { colors, fontFamilies, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -29,6 +29,8 @@ const VIDEO_LOOP_HEAD_SECONDS = 0.08;
 const VIDEO_LOOP_TAIL_SECONDS = 0.4;
 const OPTION_ACTION_HEIGHT = 34;
 const EXCHANGE_GREEN = colors.greenTone33;
+const NATIVE_SECTION_COLOR = colors.violetTone98_3;
+const NATIVE_PRODUCT_BACKGROUND = colors.neutralTone96;
 const EXCHANGE_STEPS = [
   { textBefore: 'Select ', bold: '“With exchange”', textAfter: ' during checkout to avail up to ₹800 off.' },
   { textBefore: 'When the technician comes to install your Native RO, they’ll inspect your old unit.', bold: '', textAfter: '' },
@@ -42,14 +44,14 @@ const EXCHANGE_ELIGIBILITY = [
 
 function ExchangeIcon({ size = 22 }: { size?: number }) {
   return (
-    <Text style={{ fontSize: size, lineHeight: size + 2, fontWeight: '700', color: EXCHANGE_GREEN }}>⇄</Text>
+    <Text style={{ fontSize: size, lineHeight: size + 2, fontFamily: fontFamilies.bold, color: EXCHANGE_GREEN }}>⇄</Text>
   );
 }
 
 function GreenCheck() {
   return (
     <View style={{ width: 26, height: 26, marginTop: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 13, backgroundColor: EXCHANGE_GREEN }}>
-      <Text style={{ marginTop: -1, fontSize: fontSizes.size17, fontWeight: '700', color: colors.white }}>✓</Text>
+      <Text style={{ marginTop: -1, fontSize: fontSizes.size17, fontFamily: fontFamilies.bold, color: colors.white }}>✓</Text>
     </View>
   );
 }
@@ -57,7 +59,7 @@ function GreenCheck() {
 function HowExchangeRow({ onPress }: { onPress: () => void }) {
   return (
     <View>
-      <View style={{ height: 8, backgroundColor: colors.violetTone96_6 }} />
+      <View style={{ height: 8, backgroundColor: NATIVE_SECTION_COLOR }} />
       <Pressable
         accessibilityRole="button"
         onPress={onPress}
@@ -72,12 +74,12 @@ function HowExchangeRow({ onPress }: { onPress: () => void }) {
       >
         <ExchangeIcon size={28} />
         <View style={{ flex: 1, gap: 3 }}>
-          <Text selectable style={{ fontSize: fontSizes.size17, lineHeight: 23, fontWeight: '700', color: colors.mauveTone9_2 }}>How exchange works</Text>
+          <Text selectable style={{ fontSize: fontSizes.size17, lineHeight: 23, fontFamily: fontFamilies.bold, color: colors.mauveTone9_2 }}>How exchange works</Text>
           <Text selectable style={{ fontSize: fontSizes.size14, lineHeight: 20, color: colors.mauveTone38_2 }}>See eligibility & process</Text>
         </View>
-        <Text style={{ fontSize: fontSizes.size28, lineHeight: 30, fontWeight: '300', color: colors.mauveTone9_2 }}>›</Text>
+        <Text style={{ fontSize: fontSizes.size28, lineHeight: 30, fontFamily: fontFamilies.light, color: colors.mauveTone9_2 }}>›</Text>
       </Pressable>
-      <View style={{ height: 8, backgroundColor: colors.violetTone96_6 }} />
+      <View style={{ height: 8, backgroundColor: NATIVE_SECTION_COLOR }} />
     </View>
   );
 }
@@ -106,7 +108,7 @@ function ExchangeInfoModal({ visible, onClose }: { onClose: () => void; visible:
             opacity: pressed ? 0.7 : 1,
           })}
         >
-          <Text style={{ marginTop: -1, fontSize: fontSizes.size21, lineHeight: 23, fontWeight: '300', color: colors.mauveTone9_2 }}>×</Text>
+          <Text style={{ marginTop: -1, fontSize: fontSizes.size21, lineHeight: 23, fontFamily: fontFamilies.light, color: colors.mauveTone9_2 }}>×</Text>
         </Pressable>
 
         <View
@@ -127,30 +129,30 @@ function ExchangeInfoModal({ visible, onClose }: { onClose: () => void; visible:
           >
             <View style={{ paddingHorizontal: 20, gap: 14 }}>
               <ExchangeIcon size={32} />
-              <Text selectable style={{ fontSize: fontSizes.size28, lineHeight: 36, fontWeight: '700', color: colors.mauveTone9_2 }}>
+              <Text selectable style={{ fontSize: fontSizes.size28, lineHeight: 36, fontFamily: fontFamilies.bold, color: colors.mauveTone9_2 }}>
                 Exchange your old RO & get up to <Text style={{ color: EXCHANGE_GREEN }}>₹800 off</Text>
               </Text>
             </View>
 
-            <View style={{ height: 8, backgroundColor: colors.violetTone96_6 }} />
+            <View style={{ height: 8, backgroundColor: NATIVE_SECTION_COLOR }} />
 
             <View style={{ paddingHorizontal: 20, gap: 16 }}>
-              <Text selectable style={{ fontSize: fontSizes.size22, lineHeight: 28, fontWeight: '700', color: colors.mauveTone9_2 }}>Exchange eligibility</Text>
+              <Text selectable style={{ fontSize: fontSizes.size22, lineHeight: 28, fontFamily: fontFamilies.bold, color: colors.mauveTone9_2 }}>Exchange eligibility</Text>
               {EXCHANGE_ELIGIBILITY.map((item) => (
                 <View key={item.title} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 12 }}>
                   <GreenCheck />
                   <View style={{ flex: 1, gap: 3 }}>
-                    <Text selectable style={{ fontSize: fontSizes.size19, lineHeight: 25, fontWeight: '700', color: colors.mauveTone9_2 }}>{item.title}</Text>
+                    <Text selectable style={{ fontSize: fontSizes.size19, lineHeight: 25, fontFamily: fontFamilies.bold, color: colors.mauveTone9_2 }}>{item.title}</Text>
                     <Text selectable style={{ fontSize: fontSizes.size16, lineHeight: 22, color: colors.mauveTone38_2 }}>{item.subtitle}</Text>
                   </View>
                 </View>
               ))}
             </View>
 
-            <View style={{ height: 8, backgroundColor: colors.violetTone96_6 }} />
+            <View style={{ height: 8, backgroundColor: NATIVE_SECTION_COLOR }} />
 
             <View style={{ paddingHorizontal: 20, gap: 16 }}>
-              <Text selectable style={{ fontSize: fontSizes.size22, lineHeight: 28, fontWeight: '700', color: colors.mauveTone9_2 }}>Here’s how it works</Text>
+              <Text selectable style={{ fontSize: fontSizes.size22, lineHeight: 28, fontFamily: fontFamilies.bold, color: colors.mauveTone9_2 }}>Here’s how it works</Text>
               <View>
                 {EXCHANGE_STEPS.map((step, index) => {
                   const isLast = index === EXCHANGE_STEPS.length - 1;
@@ -158,14 +160,14 @@ function ExchangeInfoModal({ visible, onClose }: { onClose: () => void; visible:
                     <View key={`step-${index + 1}`} style={{ flexDirection: 'row', alignItems: 'stretch', gap: 14 }}>
                       <View style={{ width: 28, alignItems: 'center' }}>
                         <View style={{ width: 28, height: 28, alignItems: 'center', justifyContent: 'center', borderRadius: 14, backgroundColor: colors.mauveTone9_2 }}>
-                          <Text style={{ fontSize: fontSizes.size16, fontWeight: '700', color: colors.white }}>{index + 1}</Text>
+                          <Text style={{ fontSize: fontSizes.size16, fontFamily: fontFamilies.bold, color: colors.white }}>{index + 1}</Text>
                         </View>
-                        {!isLast ? <View style={{ flex: 1, width: 2, marginVertical: 4, backgroundColor: colors.mauveTone90_3 }} /> : null}
+                        {!isLast ? <View style={{ flex: 1, width: 2, marginVertical: 4, backgroundColor: NATIVE_SECTION_COLOR }} /> : null}
                       </View>
                       <View style={{ flex: 1, paddingBottom: isLast ? 0 : 18 }}>
                         <Text selectable style={{ fontSize: fontSizes.size17, lineHeight: 24, color: colors.mauveTone24_2 }}>
                           {step.textBefore}
-                          {step.bold ? <Text style={{ fontWeight: '700', color: colors.mauveTone9_2 }}>{step.bold}</Text> : null}
+                          {step.bold ? <Text style={{ fontFamily: fontFamilies.bold, color: colors.mauveTone9_2 }}>{step.bold}</Text> : null}
                           {step.textAfter}
                         </Text>
                       </View>
@@ -216,7 +218,7 @@ function OptionAction({
           backgroundColor: pressed ? colors.violetTone97_3 : colors.white,
         })}
       >
-        <Text style={{ fontSize: fontSizes.size14, fontWeight: '600', color: colors.violetTone58 }}>Add</Text>
+        <Text style={{ fontSize: fontSizes.size14, fontFamily: fontFamilies.semiBold, color: colors.violetTone58 }}>Add</Text>
       </Pressable>
     );
   }
@@ -245,7 +247,7 @@ function OptionAction({
       >
         <Text style={{ fontSize: fontSizes.size18, lineHeight: 20, color: colors.violetTone58 }}>−</Text>
       </Pressable>
-      <Text style={{ flex: 1, textAlign: 'center', fontSize: fontSizes.size14, fontWeight: '700', color: colors.violetTone58, fontVariant: ['tabular-nums'] }}>{quantity}</Text>
+      <Text style={{ flex: 1, textAlign: 'center', fontSize: fontSizes.size14, fontFamily: fontFamilies.bold, color: colors.violetTone58, fontVariant: ['tabular-nums'] }}>{quantity}</Text>
       <View
         accessibilityRole="button"
         accessibilityLabel="Increase quantity"
@@ -272,14 +274,14 @@ function OptionCard({
   return (
     <View style={{ width: 156, overflow: 'hidden', borderWidth: 1, borderColor: colors.mauveTone88_3, borderRadius: 10, borderCurve: 'continuous', backgroundColor: colors.white }}>
       {option.image ? (
-        <View style={{ height: 145, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.violetTone96_5 }}>
+        <View style={{ height: 145, alignItems: 'center', justifyContent: 'center', backgroundColor: NATIVE_PRODUCT_BACKGROUND }}>
           <Image source={{ uri: resolveNativeMediaUrl(option.image) }} contentFit="contain" transition={180} style={{ width: '100%', height: '100%' }} />
         </View>
       ) : null}
       <View style={{ padding: 12, gap: 5 }}>
-        <Text selectable numberOfLines={2} style={{ fontSize: fontSizes.size14, lineHeight: 19, fontWeight: '600', color: colors.mauveTone9_2 }}>{option.label}</Text>
+        <Text selectable numberOfLines={2} style={{ fontSize: fontSizes.size14, lineHeight: 19, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9_2 }}>{option.label}</Text>
         {option.rating ? <Text selectable style={{ fontSize: fontSizes.size12, color: colors.mauveTone39 }}>★ {option.rating.average ?? 0} ({formatCount(option.rating.count)} reviews)</Text> : null}
-        <Text selectable style={{ fontSize: fontSizes.size14, fontWeight: '700', color: colors.mauveTone9_2, fontVariant: ['tabular-nums'] }}>₹{option.price.toLocaleString('en-IN')}</Text>
+        <Text selectable style={{ fontSize: fontSizes.size14, fontFamily: fontFamilies.bold, color: colors.mauveTone9_2, fontVariant: ['tabular-nums'] }}>₹{option.price.toLocaleString('en-IN')}</Text>
         <OptionAction quantity={quantity} onAdd={onAdd} onRemove={onRemove} />
       </View>
     </View>
@@ -312,7 +314,7 @@ function FullSpecificationsModal({ images, onClose, visible }: { images: { image
     <Modal animationType="slide" onRequestClose={onClose} presentationStyle="overFullScreen" statusBarTranslucent transparent visible={visible}>
       <View style={{ flex: 1, backgroundColor: colors.blackAlpha78 }}>
         <Pressable accessibilityRole="button" accessibilityLabel="Close specifications" onPress={onClose} style={({ pressed }) => ({ position: 'absolute', zIndex: 2, top: insets.top + 10, right: 16, width: 30, height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 15, backgroundColor: colors.white, opacity: pressed ? 0.7 : 1 })}>
-          <Text style={{ marginTop: -1, fontSize: fontSizes.size21, lineHeight: 23, fontWeight: '300', color: colors.mauveTone9_2 }}>×</Text>
+          <Text style={{ marginTop: -1, fontSize: fontSizes.size21, lineHeight: 23, fontFamily: fontFamilies.light, color: colors.mauveTone9_2 }}>×</Text>
         </Pressable>
         <View style={{ flex: 1, marginTop: insets.top + 52, overflow: 'hidden', borderTopLeftRadius: 16, borderTopRightRadius: 16, borderCurve: 'continuous', backgroundColor: colors.white }}>
           <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: Math.max(insets.bottom, 16) }}>
@@ -679,12 +681,12 @@ export function NativeProductDetailModal({ onAddToCart, onClose, productId }: Na
     <Modal animationType="slide" onRequestClose={onClose} presentationStyle="overFullScreen" statusBarTranslucent transparent visible={Boolean(productId)}>
       <View style={{ flex: 1, backgroundColor: colors.blackAlpha78 }}>
         <Pressable accessibilityRole="button" accessibilityLabel="Close product details" onPress={onClose} style={({ pressed }) => ({ position: 'absolute', zIndex: 2, top: insets.top + 10, right: 16, width: 30, height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 15, backgroundColor: colors.white, opacity: pressed ? 0.7 : 1 })}>
-          <Text style={{ marginTop: -1, fontSize: fontSizes.size21, lineHeight: 23, fontWeight: '300', color: colors.mauveTone9_2 }}>×</Text>
+          <Text style={{ marginTop: -1, fontSize: fontSizes.size21, lineHeight: 23, fontFamily: fontFamilies.light, color: colors.mauveTone9_2 }}>×</Text>
         </Pressable>
 
         <View style={{ flex: 1, marginTop: insets.top + 52, overflow: 'hidden', borderTopLeftRadius: 16, borderTopRightRadius: 16, borderCurve: 'continuous', backgroundColor: colors.white }}>
           {isLoading ? <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, backgroundColor: colors.transparent }}><LoadingDots /><Text style={{ fontSize: fontSizes.size14, color: colors.mauveTone39 }}>Loading product details...</Text></View> : null}
-          {!isLoading && errorMessage ? <View style={{ flex: 1, padding: 24, alignItems: 'center', justifyContent: 'center', gap: 16 }}><Text selectable style={{ textAlign: 'center', fontSize: fontSizes.size14, lineHeight: 21, color: colors.mauveTone39 }}>{errorMessage}</Text><Pressable accessibilityRole="button" onPress={retry} style={({ pressed }) => ({ paddingHorizontal: 22, paddingVertical: 11, borderRadius: 8, backgroundColor: colors.violetTone58, opacity: pressed ? 0.72 : 1 })}><Text style={{ fontWeight: '700', color: colors.white }}>Retry</Text></Pressable></View> : null}
+          {!isLoading && errorMessage ? <View style={{ flex: 1, padding: 24, alignItems: 'center', justifyContent: 'center', gap: 16 }}><Text selectable style={{ textAlign: 'center', fontSize: fontSizes.size14, lineHeight: 21, color: colors.mauveTone39 }}>{errorMessage}</Text><Pressable accessibilityRole="button" onPress={retry} style={({ pressed }) => ({ paddingHorizontal: 22, paddingVertical: 11, borderRadius: 8, backgroundColor: colors.violetTone58, opacity: pressed ? 0.72 : 1 })}><Text style={{ fontFamily: fontFamilies.bold, color: colors.white }}>Retry</Text></Pressable></View> : null}
           {!isLoading && data ? (
             <>
               <ScrollView
@@ -699,7 +701,7 @@ export function NativeProductDetailModal({ onAddToCart, onClose, productId }: Na
                 ) : null}
 
                 <View style={{ paddingHorizontal: 20, paddingVertical: 22, gap: 5 }}>
-                  <Text selectable style={{ fontSize: fontSizes.size22, lineHeight: 29, fontWeight: '700', color: colors.mauveTone9_2 }}>{data.product_name}</Text>
+                  <Text selectable style={{ fontSize: fontSizes.size22, lineHeight: 29, fontFamily: fontFamilies.bold, color: colors.mauveTone9_2 }}>{data.product_name}</Text>
                   {data.rating ? (
                     <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 4 }}>
                       <Text style={{ fontSize: fontSizes.size13, lineHeight: 19, color: colors.mauveTone38_2 }}>★</Text>
@@ -712,7 +714,7 @@ export function NativeProductDetailModal({ onAddToCart, onClose, productId }: Na
 
                 {data.options.length ? (
                   <View>
-                    <View style={{ height: 1, backgroundColor: colors.mauveTone90_3 }} />
+                    <View style={{ height: 1, backgroundColor: NATIVE_SECTION_COLOR }} />
                     <ScrollView horizontal contentInsetAdjustmentBehavior="never" showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 22, paddingBottom: 22, gap: 12 }}>
                       {data.options.map((option, index) => (
                         <OptionCard
@@ -738,7 +740,7 @@ export function NativeProductDetailModal({ onAddToCart, onClose, productId }: Na
                       <ProductVideo path={item.url} isActive={isDetailVideoVisible(item.sort_order)} loop nativeControls={false} />
                     </View>
                   );
-                  if (item.type === 'slider') return <View key={`detail-${item.sort_order}`} style={{ paddingVertical: 22, gap: 15, backgroundColor: colors.slateTone5 }}>{item.slider_title ? <Text selectable style={{ paddingHorizontal: 20, fontSize: fontSizes.size21, lineHeight: 28, fontWeight: '700', color: colors.white }}>{item.slider_title}</Text> : null}<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}>{item.slider_images.map((path, index) => <DetailImage key={`${item.sort_order}-${index}`} path={path} width={220} />)}</ScrollView></View>;
+                  if (item.type === 'slider') return <View key={`detail-${item.sort_order}`} style={{ paddingVertical: 22, gap: 15, backgroundColor: colors.slateTone5 }}>{item.slider_title ? <Text selectable style={{ paddingHorizontal: 20, fontSize: fontSizes.size21, lineHeight: 28, fontFamily: fontFamilies.bold, color: colors.white }}>{item.slider_title}</Text> : null}<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}>{item.slider_images.map((path, index) => <DetailImage key={`${item.sort_order}-${index}`} path={path} width={220} />)}</ScrollView></View>;
                   return null;
                 })}
                 {data.product_specification?.short_desc_image ? (
@@ -761,7 +763,7 @@ export function NativeProductDetailModal({ onAddToCart, onClose, productId }: Na
                     paddingTop: 12,
                     paddingBottom: Math.max(insets.bottom, 10),
                     borderTopWidth: 1,
-                    borderTopColor: colors.mauveTone90_3,
+                    borderTopColor: NATIVE_SECTION_COLOR,
                     backgroundColor: colors.white,
                     flexDirection: 'row',
                     alignItems: 'center',
@@ -770,9 +772,9 @@ export function NativeProductDetailModal({ onAddToCart, onClose, productId }: Na
                 >
                   <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                     <View style={{ minWidth: 28, height: 28, paddingHorizontal: 8, alignItems: 'center', justifyContent: 'center', borderRadius: 6, backgroundColor: colors.violetTone95_2 }}>
-                      <Text selectable style={{ fontSize: fontSizes.size14, fontWeight: '700', color: colors.mauveTone9_2, fontVariant: ['tabular-nums'] }}>{selectedSummary.quantity}</Text>
+                      <Text selectable style={{ fontSize: fontSizes.size14, fontFamily: fontFamilies.bold, color: colors.mauveTone9_2, fontVariant: ['tabular-nums'] }}>{selectedSummary.quantity}</Text>
                     </View>
-                    <Text selectable style={{ fontSize: fontSizes.size16, fontWeight: '700', color: colors.mauveTone9_2, fontVariant: ['tabular-nums'] }}>₹{selectedSummary.total.toLocaleString('en-IN')}</Text>
+                    <Text selectable style={{ fontSize: fontSizes.size16, fontFamily: fontFamilies.bold, color: colors.mauveTone9_2, fontVariant: ['tabular-nums'] }}>₹{selectedSummary.total.toLocaleString('en-IN')}</Text>
                   </View>
                   <Pressable
                     accessibilityRole="button"
@@ -790,7 +792,7 @@ export function NativeProductDetailModal({ onAddToCart, onClose, productId }: Na
                       opacity: isAddingToCart ? 0.88 : 1,
                     })}
                   >
-                    {isAddingToCart ? <LoadingDots color={colors.white} size={6} /> : <Text style={{ fontSize: fontSizes.size16, fontWeight: '700', color: colors.white }}>Done</Text>}
+                    {isAddingToCart ? <LoadingDots color={colors.white} size={6} /> : <Text style={{ fontSize: fontSizes.size16, fontFamily: fontFamilies.bold, color: colors.white }}>Done</Text>}
                   </Pressable>
                 </View>
               ) : null}

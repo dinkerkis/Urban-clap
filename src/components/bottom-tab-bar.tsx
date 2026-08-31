@@ -1,4 +1,4 @@
-import { colors, fontSizes } from '../theme';
+import { colors, fontFamilies, fontSizes } from '../theme';
 import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -24,7 +24,7 @@ function TabIcon({ active, tab }: { active: boolean; tab: DashboardTab }) {
   if (tab === 'home') {
     return (
       <View style={{ width: 20, height: 20, alignItems: 'center', justifyContent: 'center', borderWidth: 1.4, borderColor: active ? colors.violetTone58 : color, borderRadius: 4, borderCurve: 'continuous', backgroundColor: badgeColor }}>
-        <Text style={{ fontSize: fontSizes.size7, lineHeight: 9, fontWeight: '800', color }}>UC</Text>
+        <Text style={{ fontSize: fontSizes.size7, lineHeight: 9, fontFamily: fontFamilies.extraBold, color }}>UC</Text>
       </View>
     );
   }
@@ -93,7 +93,7 @@ export function BottomTabBar({ activeTab, cartCount, onChange }: BottomTabBarPro
             >
               <TabIcon active={active} tab={tab.id} />
             </View>
-            <Text style={{ fontSize: fontSizes.size10, lineHeight: 13, fontWeight: active ? '700' : '500', color: colors.black }}>
+            <Text style={{ fontSize: fontSizes.size10, lineHeight: 13, fontFamily: active ? fontFamilies.bold : fontFamilies.medium, color: colors.black }}>
               {tab.label}
             </Text>
           </Pressable>

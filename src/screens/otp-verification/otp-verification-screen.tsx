@@ -1,4 +1,4 @@
-import { colors, fontSizes, typography } from '../../theme';
+import { colors, fontFamilies, fontSizes, typography } from '../../theme';
 import { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Pressable, ScrollView, Text, View } from 'react-native';
 
@@ -94,7 +94,7 @@ export function OtpVerificationScreen({ callingCode, onBack, onVerified, phoneNu
             <Text style={{ ...typography.body, color: colors.textSecondary }}>
               A 6-digit verification code has been sent to
             </Text>
-            <Text selectable style={{ ...typography.body, fontWeight: '600', color: colors.text }}>
+            <Text selectable style={{ ...typography.body, fontFamily: fontFamilies.semiBold, color: colors.text }}>
               {callingCode} {phoneNumber}
             </Text>
           </View>
@@ -119,7 +119,7 @@ export function OtpVerificationScreen({ callingCode, onBack, onVerified, phoneNu
               </Text>
             ) : (
               <Pressable accessibilityRole="button" disabled={isResending} onPress={() => void resend()} hitSlop={10}>
-                <Text style={{ ...typography.body, fontWeight: '600', color: colors.primary }}>
+                <Text style={{ ...typography.body, fontFamily: fontFamilies.semiBold, color: colors.primary }}>
                   {isResending ? 'Sending…' : 'Resend code'}
                 </Text>
               </Pressable>

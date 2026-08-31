@@ -1,4 +1,4 @@
-import { colors, fontSizes } from '../theme';
+import { colors, fontFamilies, fontSizes } from '../theme';
 import { Image } from 'expo-image';
 import { Modal, Pressable, Text, useWindowDimensions, View } from 'react-native';
 import Animated, { Easing, FadeIn, SlideInDown } from 'react-native-reanimated';
@@ -55,7 +55,7 @@ export function CategorySubcategoriesSheet({ category, onClose, onSubcategoryPre
                   opacity: pressed ? 0.7 : 1,
                 })}
               >
-                <Text style={{ fontSize: fontSizes.size22, lineHeight: 24, fontWeight: '400', color: colors.neutralTone10, marginTop: -1 }}>×</Text>
+                <Text style={{ fontSize: fontSizes.size22, lineHeight: 24, fontFamily: fontFamilies.regular, color: colors.neutralTone10, marginTop: -1 }}>×</Text>
               </Pressable>
             </Animated.View>
 
@@ -70,7 +70,7 @@ export function CategorySubcategoriesSheet({ category, onClose, onSubcategoryPre
                 backgroundColor: colors.white,
               }}
             >
-              <Text selectable style={{ marginBottom: 22, fontSize: fontSizes.size22, lineHeight: 28, fontWeight: '700', color: colors.neutralTone7 }}>
+              <Text selectable style={{ marginBottom: 22, fontSize: fontSizes.size22, lineHeight: 28, fontFamily: fontFamilies.bold, color: colors.neutralTone7 }}>
                 {category.title}
               </Text>
 
@@ -115,7 +115,7 @@ export function CategorySubcategoriesSheet({ category, onClose, onSubcategoryPre
                           textAlign: 'center',
                           fontSize: fontSizes.size12,
                           lineHeight: 16,
-                          fontWeight: '400',
+                          fontFamily: fontFamilies.regular,
                           color: colors.violetTone17,
                         }}
                       >

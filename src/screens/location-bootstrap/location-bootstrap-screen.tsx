@@ -1,4 +1,4 @@
-import { colors, fontSizes } from '../../theme';
+import { colors, fontFamilies, fontSizes } from '../../theme';
 import { useEffect, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 import Animated, {
@@ -188,7 +188,7 @@ export function LocationBootstrapScreen({ authToken, onComplete }: LocationBoots
           style={{ alignItems: 'center', transform: [{ translateY: -36 }] }}
         >
           <FetchingPin />
-          <Text style={{ marginTop: 2, fontSize: fontSizes.size15, lineHeight: 21, fontWeight: '400', color: colors.neutralTone18 }}>
+          <Text style={{ marginTop: 2, fontSize: fontSizes.size15, lineHeight: 21, fontFamily: fontFamilies.regular, color: colors.neutralTone18 }}>
             Fetching your location...
           </Text>
         </Animated.View>
@@ -213,12 +213,12 @@ export function LocationBootstrapScreen({ authToken, onComplete }: LocationBoots
           style={{ alignItems: 'center', paddingHorizontal: 36, transform: [{ translateY: -20 }] }}
         >
           <ConfirmPin />
-          <Text style={{ marginTop: 14, fontSize: fontSizes.size13, lineHeight: 18, fontWeight: '400', color: CONFIRM_GREEN }}>
+          <Text style={{ marginTop: 14, fontSize: fontSizes.size13, lineHeight: 18, fontFamily: fontFamilies.regular, color: CONFIRM_GREEN }}>
             Delivering service at
           </Text>
           <Text
             selectable
-            style={{ marginTop: 6, fontSize: fontSizes.size22, lineHeight: 28, fontWeight: '700', color: colors.neutralTone7, textAlign: 'center' }}
+            style={{ marginTop: 6, fontSize: fontSizes.size22, lineHeight: 28, fontFamily: fontFamilies.bold, color: colors.neutralTone7, textAlign: 'center' }}
           >
             {display.title}
           </Text>
@@ -230,7 +230,7 @@ export function LocationBootstrapScreen({ authToken, onComplete }: LocationBoots
                 maxWidth: 300,
                 fontSize: fontSizes.size14,
                 lineHeight: 20,
-                fontWeight: '400',
+                fontFamily: fontFamilies.regular,
                 color: colors.neutralTone16,
                 textAlign: 'center',
               }}

@@ -1,4 +1,4 @@
-import { colors, fontSizes } from '../../theme';
+import { colors, fontFamilies, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
 import { useState, type ReactNode } from 'react';
 import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
@@ -56,7 +56,7 @@ function ProfilePageHeader({
         >
           <BackIcon color={colors.violetTone15} />
         </Pressable>
-        {title ? <Text style={{ marginLeft: 5, flex: 1, fontSize: fontSizes.size18, lineHeight: 24, fontWeight: '700', color: colors.mauveTone12_2 }}>{title}</Text> : <View style={{ flex: 1 }} />}
+        {title ? <Text style={{ marginLeft: 5, flex: 1, fontSize: fontSizes.size18, lineHeight: 24, fontFamily: fontFamilies.bold, color: colors.mauveTone12_2 }}>{title}</Text> : <View style={{ flex: 1 }} />}
         {rightSlot ?? null}
       </View>
     </View>
@@ -71,7 +71,7 @@ export function MyPlansScreen({ onBack }: ProfileOptionScreenProps) {
       <ProfilePageHeader title="My plan" onBack={onBack} />
       <View style={{ height: 1, backgroundColor: colors.mauveTone94 }} />
       <View style={{ paddingHorizontal: 20, paddingTop: 28, paddingBottom: Math.max(insets.bottom, 20) }}>
-        <Text style={{ fontSize: fontSizes.size21, lineHeight: 27, fontWeight: '700', color: colors.mauveTone11 }}>Active plans</Text>
+        <Text style={{ fontSize: fontSizes.size21, lineHeight: 27, fontFamily: fontFamilies.bold, color: colors.mauveTone11 }}>Active plans</Text>
         <Text style={{ paddingTop: 16, fontSize: fontSizes.size15, lineHeight: 23, color: colors.neutralTone45 }}>You have no active plans</Text>
       </View>
     </View>
@@ -85,7 +85,7 @@ function EmptyPassIcon() {
         {[0, 1, 2].map((line) => <View key={line} style={{ width: line === 2 ? 13 : 20, height: 3, borderRadius: 2, backgroundColor: colors.mauveTone77_2 }} />)}
       </View>
       <View style={{ position: 'absolute', right: 0, bottom: 0, width: 20, height: 20, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: colors.redTone54_2 }}>
-        <Text style={{ marginTop: -1, fontSize: fontSizes.size14, lineHeight: 17, fontWeight: '700', color: colors.white }}>×</Text>
+        <Text style={{ marginTop: -1, fontSize: fontSizes.size14, lineHeight: 17, fontFamily: fontFamilies.bold, color: colors.white }}>×</Text>
       </View>
     </View>
   );
@@ -123,28 +123,28 @@ export function MyRatingScreen({ onBack }: ProfileOptionScreenProps) {
       >
         <View style={{ paddingHorizontal: 20, paddingTop: 26, paddingBottom: 28, gap: 7 }}>
           <Text style={{ fontSize: fontSizes.size13, lineHeight: 19, color: colors.neutralTone45 }}>Your rating</Text>
-          <Text style={{ alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 5, backgroundColor: colors.greenTone95_2, fontSize: fontSizes.size12, lineHeight: 17, fontWeight: '600', color: colors.greenTone35 }}>New user</Text>
-          <Text style={{ paddingTop: 3, fontSize: fontSizes.size24, lineHeight: 30, fontWeight: '700', color: colors.mauveTone11 }}>No rating yet</Text>
+          <Text style={{ alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 5, backgroundColor: colors.greenTone95_2, fontSize: fontSizes.size12, lineHeight: 17, fontFamily: fontFamilies.semiBold, color: colors.greenTone35 }}>New user</Text>
+          <Text style={{ paddingTop: 3, fontSize: fontSizes.size24, lineHeight: 30, fontFamily: fontFamilies.bold, color: colors.mauveTone11 }}>No rating yet</Text>
         </View>
 
         <View style={{ height: 8, backgroundColor: colors.violetTone96_6 }} />
 
         <View style={{ paddingHorizontal: 20, paddingTop: 28, gap: 10 }}>
-          <Text style={{ fontSize: fontSizes.size19, lineHeight: 25, fontWeight: '600', color: colors.mauveTone11 }}>Introducing customer ratings</Text>
+          <Text style={{ fontSize: fontSizes.size19, lineHeight: 25, fontFamily: fontFamilies.semiBold, color: colors.mauveTone11 }}>Introducing customer ratings</Text>
           <Text style={{ fontSize: fontSizes.size17, lineHeight: 25, color: colors.neutralTone45 }}>Just like you rate UC professionals for the overall quality of the service, they also rate you on a scale of 1 to 5. Your aggregate rating is calculated after you have received ratings in at least 3 services.</Text>
 
-          <Text style={{ paddingTop: 26, fontSize: fontSizes.size19, lineHeight: 25, fontWeight: '600', color: colors.mauveTone11 }}>How can I be a 5-star customer?</Text>
+          <Text style={{ paddingTop: 26, fontSize: fontSizes.size19, lineHeight: 25, fontFamily: fontFamilies.semiBold, color: colors.mauveTone11 }}>How can I be a 5-star customer?</Text>
           <Text style={{ fontSize: fontSizes.size17, lineHeight: 25, color: colors.neutralTone45 }}>Did you know that nearly 80% of UC customers are 5-star rated. If you also want that coveted rating, here are a few kind gestures.</Text>
 
           {RATING_TIPS.map((tip) => (
             <View key={tip.title} style={{ paddingTop: 24, gap: 7 }}>
               <Text style={{ fontSize: fontSizes.size42, lineHeight: 48 }}>{tip.icon}</Text>
-              <Text style={{ fontSize: fontSizes.size17, lineHeight: 23, fontWeight: '500', color: colors.mauveTone11 }}>{tip.title}</Text>
+              <Text style={{ fontSize: fontSizes.size17, lineHeight: 23, fontFamily: fontFamilies.medium, color: colors.mauveTone11 }}>{tip.title}</Text>
               <Text style={{ fontSize: fontSizes.size17, lineHeight: 25, color: colors.neutralTone45 }}>{tip.description}</Text>
             </View>
           ))}
 
-          <Text style={{ paddingTop: 28, fontSize: fontSizes.size19, lineHeight: 25, fontWeight: '600', color: colors.mauveTone11 }}>How is customer rating calculated?</Text>
+          <Text style={{ paddingTop: 28, fontSize: fontSizes.size19, lineHeight: 25, fontFamily: fontFamilies.semiBold, color: colors.mauveTone11 }}>How is customer rating calculated?</Text>
           <Text style={{ fontSize: fontSizes.size17, lineHeight: 25, color: colors.neutralTone45 }}>Your aggregate rating is a simple average of all the ratings you’ve received from UC professionals in the past. These individual ratings are anonymous, and so won’t be visible to you or the professional.</Text>
         </View>
       </ScrollView>
@@ -171,7 +171,7 @@ function HelpChip({ onPress }: { onPress: () => void }) {
         opacity: pressed ? 0.6 : 1,
       })}
     >
-      <Text style={{ fontSize: fontSizes.size14, fontWeight: '600', color: colors.violetTone58 }}>Help</Text>
+      <Text style={{ fontSize: fontSizes.size14, fontFamily: fontFamilies.semiBold, color: colors.violetTone58 }}>Help</Text>
     </Pressable>
   );
 }
@@ -249,7 +249,7 @@ export function ProfileMyBookingsScreen({ onBack, onExplore, onHelp }: MyBooking
       />
 
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 36, paddingBottom: Math.max(insets.bottom, 20) + 40 }}>
-        <Text style={{ fontSize: fontSizes.size20, lineHeight: 26, fontWeight: '700', color: colors.violetTone10_2, textAlign: 'center' }}>No bookings yet.</Text>
+        <Text style={{ fontSize: fontSizes.size20, lineHeight: 26, fontFamily: fontFamilies.bold, color: colors.violetTone10_2, textAlign: 'center' }}>No bookings yet.</Text>
         <Text style={{ paddingTop: 10, maxWidth: 280, textAlign: 'center', fontSize: fontSizes.size14, lineHeight: 21, color: colors.neutralTone45 }}>
           Looks like you haven’t experienced quality services at home.
         </Text>
@@ -258,7 +258,7 @@ export function ProfileMyBookingsScreen({ onBack, onExplore, onHelp }: MyBooking
           onPress={onExplore}
           style={({ pressed }) => ({ marginTop: 18, opacity: pressed ? 0.55 : 1 })}
         >
-          <Text style={{ fontSize: fontSizes.size15, lineHeight: 21, fontWeight: '600', color: colors.violetTone58 }}>Explore our services →</Text>
+          <Text style={{ fontSize: fontSizes.size15, lineHeight: 21, fontFamily: fontFamilies.semiBold, color: colors.violetTone58 }}>Explore our services →</Text>
         </Pressable>
       </View>
     </View>
@@ -271,11 +271,11 @@ export function NativeDevicesScreen({ onBack }: ProfileOptionScreenProps) {
   return (
     <View style={{ flex: 1, backgroundColor: colors.white }}>
       <ProfilePageHeader onBack={onBack} />
-      <Text style={{ paddingHorizontal: 20, paddingTop: 8, fontSize: fontSizes.size28, lineHeight: 34, fontWeight: '700', color: colors.violetTone10_2 }}>Your Native devices</Text>
+      <Text style={{ paddingHorizontal: 20, paddingTop: 8, fontSize: fontSizes.size28, lineHeight: 34, fontFamily: fontFamilies.bold, color: colors.violetTone10_2 }}>Your Native devices</Text>
 
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingBottom: Math.max(insets.bottom, 20) + 60 }}>
         <NativeDevicesArt />
-        <Text style={{ paddingTop: 22, fontSize: fontSizes.size16, lineHeight: 22, fontWeight: '700', color: colors.violetTone10_2 }}>No devices</Text>
+        <Text style={{ paddingTop: 22, fontSize: fontSizes.size16, lineHeight: 22, fontFamily: fontFamilies.bold, color: colors.violetTone10_2 }}>No devices</Text>
         <Text style={{ paddingTop: 6, fontSize: fontSizes.size14, lineHeight: 20, color: colors.mauveTone54 }}>Your Native devices will be visible here</Text>
       </View>
     </View>
@@ -293,7 +293,7 @@ export function HelpSupportScreen({ onAccount, onBack, onGettingStarted, onMembe
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 18, paddingBottom: Math.max(insets.bottom, 20) + 28 }}
       >
-        <Text style={{ fontSize: fontSizes.size22, lineHeight: 28, fontWeight: '700', color: colors.violetTone10_2 }}>All topics</Text>
+        <Text style={{ fontSize: fontSizes.size22, lineHeight: 28, fontFamily: fontFamilies.bold, color: colors.violetTone10_2 }}>All topics</Text>
         <View style={{ marginTop: 14 }}>
           {HELP_TOPICS.map((topic, index) => (
             <Pressable
@@ -358,7 +358,7 @@ export function WarrantyHelpScreen({ onBack, onTopic }: ProfileOptionScreenProps
   return (
     <View style={{ flex: 1, backgroundColor: colors.white }}>
       <ProfilePageHeader onBack={onBack} />
-      <Text style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 14, fontSize: fontSizes.size26, lineHeight: 33, fontWeight: '700', color: colors.violetTone10_2 }}>Warranty</Text>
+      <Text style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 14, fontSize: fontSizes.size26, lineHeight: 33, fontFamily: fontFamilies.bold, color: colors.violetTone10_2 }}>Warranty</Text>
       <View style={{ paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 20) + 28, borderTopWidth: 1, borderTopColor: colors.mauveTone94 }}>
         {WARRANTY_TOPICS.map((topic, index) => (
           <Pressable key={topic.key} accessibilityRole="button" onPress={() => onTopic(topic.key)} style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: index === WARRANTY_TOPICS.length - 1 ? 0 : 1, borderBottomColor: colors.mauveTone94, opacity: pressed ? 0.55 : 1 })}>
@@ -386,12 +386,12 @@ export function WarrantyArticleScreen({ article, onBack }: ProfileOptionScreenPr
         ].map(([label, detail], index) => (
           <View key={label} style={{ flexDirection: 'row', alignItems: 'flex-start', paddingLeft: 12 }}>
             <Text style={{ width: 20, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>{index + 1}.</Text>
-            <Text style={{ flex: 1, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}><Text style={{ fontWeight: '700' }}>{label}</Text>{detail}</Text>
+            <Text style={{ flex: 1, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}><Text style={{ fontFamily: fontFamilies.bold }}>{label}</Text>{detail}</Text>
           </View>
         ))}
       </View>
       <View style={{ height: 1, marginTop: 20, backgroundColor: colors.mauveTone94 }} />
-      <Text style={{ paddingTop: 18, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>However, the UC warranty <Text style={{ fontWeight: '700' }}>does not</Text> cover:</Text>
+      <Text style={{ paddingTop: 18, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>However, the UC warranty <Text style={{ fontFamily: fontFamilies.bold }}>does not</Text> cover:</Text>
       <NumberedSteps steps={['Any new issue that occurs post the service', 'Any item/service that is not mentioned on the invoice']} />
     </AccountArticleScreen>
   );
@@ -429,10 +429,10 @@ export function MembershipHelpScreen({ onBack, onTopic }: ProfileOptionScreenPro
     <View style={{ flex: 1, backgroundColor: colors.white }}>
       <ProfilePageHeader overlay onBack={onBack} />
       <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: Math.max(insets.bottom, 20) + 28 }}>
-        <Text style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 14, fontSize: fontSizes.size26, lineHeight: 33, fontWeight: '700', color: colors.violetTone10_2 }}>UC Plus membership</Text>
+        <Text style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 14, fontSize: fontSizes.size26, lineHeight: 33, fontFamily: fontFamilies.bold, color: colors.violetTone10_2 }}>UC Plus membership</Text>
         {MEMBERSHIP_SECTIONS.map((section, sectionIndex) => (
           <View key={section.title} style={{ borderTopWidth: sectionIndex === 0 ? 1 : 8, borderTopColor: sectionIndex === 0 ? colors.mauveTone94 : colors.violetTone96_6, paddingHorizontal: 20, paddingTop: 18 }}>
-            <Text style={{ paddingBottom: 8, fontSize: fontSizes.size17, lineHeight: 23, fontWeight: '600', color: colors.violetTone10_2 }}>{section.title}</Text>
+            <Text style={{ paddingBottom: 8, fontSize: fontSizes.size17, lineHeight: 23, fontFamily: fontFamilies.semiBold, color: colors.violetTone10_2 }}>{section.title}</Text>
             {section.topics.map((topic, index) => (
               <Pressable key={topic.key} accessibilityRole="button" onPress={() => onTopic(topic.key)} style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: index === section.topics.length - 1 ? 0 : 1, borderBottomColor: colors.mauveTone94, opacity: pressed ? 0.55 : 1 })}>
                 <Text style={{ flex: 1, paddingRight: 12, fontSize: fontSizes.size15, lineHeight: 22, color: colors.violetTone18 }}>{topic.label}</Text>
@@ -511,10 +511,10 @@ export function GettingStartedHelpScreen({ onBack, onTopic }: ProfileOptionScree
     <View style={{ flex: 1, backgroundColor: colors.white }}>
       <ProfilePageHeader onBack={onBack} />
       <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: Math.max(insets.bottom, 20) + 28 }}>
-        <Text style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 14, fontSize: fontSizes.size26, lineHeight: 33, fontWeight: '700', color: colors.violetTone10_2 }}>Getting started with UC</Text>
+        <Text style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 14, fontSize: fontSizes.size26, lineHeight: 33, fontFamily: fontFamilies.bold, color: colors.violetTone10_2 }}>Getting started with UC</Text>
         {GETTING_STARTED_SECTIONS.map((section, sectionIndex) => (
           <View key={section.title} style={{ borderTopWidth: sectionIndex === 0 ? 1 : 8, borderTopColor: sectionIndex === 0 ? colors.mauveTone94 : colors.violetTone96_6, paddingHorizontal: 20, paddingTop: 18 }}>
-            <Text style={{ paddingBottom: 8, fontSize: fontSizes.size17, lineHeight: 23, fontWeight: '600', color: colors.violetTone10_2 }}>{section.title}</Text>
+            <Text style={{ paddingBottom: 8, fontSize: fontSizes.size17, lineHeight: 23, fontFamily: fontFamilies.semiBold, color: colors.violetTone10_2 }}>{section.title}</Text>
             {section.topics.map((topic, index) => (
               <Pressable key={topic.key} accessibilityRole="button" onPress={() => onTopic(topic.key)} style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: index === section.topics.length - 1 ? 0 : 1, borderBottomColor: colors.mauveTone94, opacity: pressed ? 0.55 : 1 })}>
                 <Text style={{ flex: 1, paddingRight: 12, fontSize: fontSizes.size15, lineHeight: 22, color: colors.violetTone18 }}>{topic.label}</Text>
@@ -570,7 +570,7 @@ export function PaymentCreditsHelpScreen({ onBack, onTopic }: ProfileOptionScree
   return (
     <View style={{ flex: 1, backgroundColor: colors.white }}>
       <ProfilePageHeader onBack={onBack} />
-      <Text style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 14, fontSize: fontSizes.size26, lineHeight: 33, fontWeight: '700', color: colors.violetTone10_2 }}>Payment & UC Credits</Text>
+      <Text style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 14, fontSize: fontSizes.size26, lineHeight: 33, fontFamily: fontFamilies.bold, color: colors.violetTone10_2 }}>Payment & UC Credits</Text>
       <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 20) + 28, borderTopWidth: 1, borderTopColor: colors.mauveTone94 }}>
         {PAYMENT_CREDITS_TOPICS.map((topic, index) => (
           <Pressable key={topic.key} accessibilityRole="button" onPress={() => onTopic(topic.key)} style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: index === PAYMENT_CREDITS_TOPICS.length - 1 ? 0 : 1, borderBottomColor: colors.mauveTone94, opacity: pressed ? 0.55 : 1 })}>
@@ -682,7 +682,7 @@ export function AccountHelpScreen({ onBack, onChangeEmail, onChangePhone, onPaym
   return (
     <View style={{ flex: 1, backgroundColor: colors.white }}>
       <ProfilePageHeader onBack={onBack} />
-      <Text style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 12, fontSize: fontSizes.size26, lineHeight: 33, fontWeight: '700', color: colors.violetTone10_2 }}>Account</Text>
+      <Text style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 12, fontSize: fontSizes.size26, lineHeight: 33, fontFamily: fontFamilies.bold, color: colors.violetTone10_2 }}>Account</Text>
       <View style={{ paddingHorizontal: 20 }}>
         {ACCOUNT_HELP_TOPICS.map((topic, index) => (
           <Pressable
@@ -722,11 +722,11 @@ export function AccountArticleScreen({ buttonLabel, children, description, onAct
       <ProfilePageHeader overlay onBack={onBack} />
       <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: Math.max(insets.bottom, 20) }}>
         <View style={{ paddingHorizontal: 20, paddingTop: 18 }}>
-          <Text style={{ fontSize: fontSizes.size22, lineHeight: 29, fontWeight: '700', color: colors.violetTone10_2 }}>{title}</Text>
+          <Text style={{ fontSize: fontSizes.size22, lineHeight: 29, fontFamily: fontFamilies.bold, color: colors.violetTone10_2 }}>{title}</Text>
           <Text style={{ paddingTop: 14, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>{description}</Text>
           {children}
           {buttonLabel && onAction ? <Pressable accessibilityRole="button" onPress={onAction} style={({ pressed }) => ({ alignSelf: 'flex-start', height: 40, marginTop: 18, paddingHorizontal: 20, alignItems: 'center', justifyContent: 'center', borderRadius: 8, backgroundColor: colors.blueTone53, opacity: pressed ? 0.72 : 1 })}>
-            <Text style={{ fontSize: fontSizes.size15, fontWeight: '600', color: colors.white }}>{buttonLabel}</Text>
+            <Text style={{ fontSize: fontSizes.size15, fontFamily: fontFamilies.semiBold, color: colors.white }}>{buttonLabel}</Text>
           </Pressable> : null}
         </View>
         <View style={{ height: 1, marginTop: 24, backgroundColor: colors.mauveTone94 }} />

@@ -1,4 +1,4 @@
-import { colors, fontSizes } from '../../theme';
+import { colors, fontFamilies, fontSizes } from '../../theme';
 import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -46,7 +46,7 @@ const DATE_PATTERN = /^(0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])-\d{4}$/;
 const PROFILE_COUNTRIES = ['IN', 'AE', 'SA', 'SG'].map((id) => countries.find((country) => country.id === id)).filter((country): country is Country => Boolean(country));
 
 function FieldLabel({ children }: { children: string }) {
-  return <Text style={{ fontSize: fontSizes.size13, lineHeight: 19, fontWeight: '600', color: colors.mauveTone16 }}>{children}</Text>;
+  return <Text style={{ fontSize: fontSizes.size13, lineHeight: 19, fontFamily: fontFamilies.semiBold, color: colors.mauveTone16 }}>{children}</Text>;
 }
 
 function inputStyle(hasError = false) {
@@ -109,7 +109,7 @@ function ProfilePickerModal({ children, onClose, title, visible }: ProfilePicker
             boxShadow: `0 7px 22px ${colors.blackAlpha18}`,
           })}
         >
-          <Text style={{ fontSize: fontSizes.size22, lineHeight: 24, fontWeight: '300', color: colors.mauveTone15_2 }}>×</Text>
+          <Text style={{ fontSize: fontSizes.size22, lineHeight: 24, fontFamily: fontFamilies.light, color: colors.mauveTone15_2 }}>×</Text>
         </Pressable>
         <View
           style={{
@@ -122,7 +122,7 @@ function ProfilePickerModal({ children, onClose, title, visible }: ProfilePicker
             backgroundColor: colors.white,
           }}
         >
-          <Text selectable style={{ paddingBottom: 12, fontSize: fontSizes.size20, lineHeight: 27, fontWeight: '700', color: colors.mauveTone9 }}>{title}</Text>
+          <Text selectable style={{ paddingBottom: 12, fontSize: fontSizes.size20, lineHeight: 27, fontFamily: fontFamilies.bold, color: colors.mauveTone9 }}>{title}</Text>
           {children}
         </View>
       </Animated.View>
@@ -227,10 +227,10 @@ function VerificationModal({ destination, kind, visible, onClose, onResend, onVe
                 opacity: pressed ? 0.65 : 1,
               })}
             >
-              <Text style={{ fontSize: fontSizes.size22, lineHeight: 24, fontWeight: '300', color: colors.mauveTone15_2 }}>×</Text>
+              <Text style={{ fontSize: fontSizes.size22, lineHeight: 24, fontFamily: fontFamilies.light, color: colors.mauveTone15_2 }}>×</Text>
             </Pressable>
 
-            <Text selectable style={{ fontSize: kind === 'phone' ? 25 : fontSizes.size27, lineHeight: kind === 'phone' ? 32 : 34, fontWeight: '700', color: colors.mauveTone9 }}>Verify your {kind}</Text>
+            <Text selectable style={{ fontSize: kind === 'phone' ? 25 : fontSizes.size27, lineHeight: kind === 'phone' ? 32 : 34, fontFamily: fontFamilies.bold, color: colors.mauveTone9 }}>Verify your {kind}</Text>
             <Text selectable style={{ fontSize: kind === 'phone' ? 13 : fontSizes.size15, lineHeight: kind === 'phone' ? 19 : 21, color: colors.neutralTone45 }}>We sent a 6-digit code to {destination}.</Text>
             <TextInput
               accessibilityLabel="6-digit verification code"
@@ -261,7 +261,7 @@ function VerificationModal({ destination, kind, visible, onClose, onResend, onVe
                 opacity: isVerifying ? 0.7 : pressed ? 0.72 : 1,
               })}
             >
-              {isVerifying ? <ActivityIndicator color={colors.white} /> : <Text style={{ fontSize: fontSizes.size14, fontWeight: '700', color: colors.white }}>Verify</Text>}
+              {isVerifying ? <ActivityIndicator color={colors.white} /> : <Text style={{ fontSize: fontSizes.size14, fontFamily: fontFamilies.bold, color: colors.white }}>Verify</Text>}
             </Pressable>
 
             <Pressable
@@ -464,7 +464,7 @@ export function ProfileDetailsScreen({ anniversaryDate, authToken, dob, email, n
           <Pressable accessibilityRole="button" accessibilityLabel="Go back" onPress={onBack} hitSlop={10} style={({ pressed }) => ({ width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 17, borderWidth: 0.7, borderColor: colors.mauveTone89, backgroundColor: colors.transparent, opacity: pressed ? 0.65 : 1 })}>
             <BackIcon color={colors.violetTone15} />
           </Pressable>
-          <Text selectable style={{ fontSize: fontSizes.size18, lineHeight: 25, fontWeight: '700', color: colors.mauveTone11 }}>Profile details</Text>
+          <Text selectable style={{ fontSize: fontSizes.size18, lineHeight: 25, fontFamily: fontFamilies.bold, color: colors.mauveTone11 }}>Profile details</Text>
         </View>
 
         <View style={{ gap: 8 }}>
@@ -478,7 +478,7 @@ export function ProfileDetailsScreen({ anniversaryDate, authToken, dob, email, n
               }}
               style={({ pressed }) => ({ width: 65, minHeight: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, borderWidth: 1, borderRightWidth: 0, borderColor: errors.name ? colors.redTone53 : colors.violetTone88_2, borderTopLeftRadius: 10, borderBottomLeftRadius: 10, opacity: pressed ? 0.65 : 1 })}
             >
-              <Text style={{ fontSize: fontSizes.size14, fontWeight: '600', color: colors.mauveTone14_2 }}>{TITLE_OPTIONS[titleIndex]}</Text>
+              <Text style={{ fontSize: fontSizes.size14, fontFamily: fontFamilies.semiBold, color: colors.mauveTone14_2 }}>{TITLE_OPTIONS[titleIndex]}</Text>
               <View
                 accessibilityElementsHidden
                 importantForAccessibility="no"
@@ -526,7 +526,7 @@ export function ProfileDetailsScreen({ anniversaryDate, authToken, dob, email, n
               style={({ pressed }) => ({ height: '100%', width: countrySelectorWidth, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: pressed ? 0.62 : 1 })}
             >
               <Text style={{ fontSize: fontSizes.size17 }}>{country.flag}</Text>
-              <Text selectable style={{ fontSize: fontSizes.size14, fontWeight: '600', color: colors.mauveTone14_2 }}>{country.callingCode}</Text>
+              <Text selectable style={{ fontSize: fontSizes.size14, fontFamily: fontFamilies.semiBold, color: colors.mauveTone14_2 }}>{country.callingCode}</Text>
               <View
                 accessibilityElementsHidden
                 importantForAccessibility="no"
@@ -586,7 +586,7 @@ export function ProfileDetailsScreen({ anniversaryDate, authToken, dob, email, n
             opacity: pressed ? 0.72 : 1,
           })}
         >
-          {isSubmitting ? <LoadingDots color={colors.blueTone53} gap={6} size={6} /> : <Text style={{ fontSize: fontSizes.size15, fontWeight: '700', color: colors.white }}>Complete</Text>}
+          {isSubmitting ? <LoadingDots color={colors.blueTone53} gap={6} size={6} /> : <Text style={{ fontSize: fontSizes.size15, fontFamily: fontFamilies.bold, color: colors.white }}>Complete</Text>}
         </Pressable>
       </View>
 

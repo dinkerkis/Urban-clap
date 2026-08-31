@@ -1,4 +1,4 @@
-import { colors, fontSizes } from '../../theme';
+import { colors, fontFamilies, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
 import { useMemo, useState } from 'react';
 import { FlatList, Pressable, Text, TextInput, View } from 'react-native';
@@ -32,7 +32,7 @@ function HighlightedTitle({ queryTokens, title }: { queryTokens: string[]; title
     <Text>
       {title.split(expression).filter(Boolean).map((part, index) => {
         const matched = queryTokens.some((token) => part.toLocaleLowerCase().includes(token));
-        return <Text key={`${part}-${index}`} style={{ fontWeight: matched ? '700' : '400', color: colors.mauveTone9_2 }}>{part}</Text>;
+        return <Text key={`${part}-${index}`} style={{ fontFamily: matched ? fontFamilies.bold : fontFamilies.regular, color: colors.mauveTone9_2 }}>{part}</Text>;
       })}
     </Text>
   );
@@ -92,14 +92,14 @@ export function ServiceSearchScreen({ categoryTitle, onBack, onResultPress, subc
           />
           {query.length ? (
             <Pressable accessibilityRole="button" accessibilityLabel="Clear search" hitSlop={8} onPress={() => setQuery('')} style={({ pressed }) => ({ width: 28, height: 28, alignItems: 'center', justifyContent: 'center', borderRadius: 14, backgroundColor: colors.mauveTone39, opacity: pressed ? 0.65 : 1 })}>
-              <Text style={{ marginTop: -1, fontSize: fontSizes.size17, lineHeight: 19, fontWeight: '600', color: colors.white }}>×</Text>
+              <Text style={{ marginTop: -1, fontSize: fontSizes.size17, lineHeight: 19, fontFamily: fontFamilies.semiBold, color: colors.white }}>×</Text>
             </Pressable>
           ) : null}
         </View>
       </View>
 
       {isLoading ? <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}><LoadingDots /></View> : null}
-      {!isLoading && errorMessage ? <View style={{ flex: 1, padding: 24, alignItems: 'center', justifyContent: 'center', gap: 14 }}><Text selectable style={{ textAlign: 'center', color: colors.mauveTone38_2 }}>{errorMessage}</Text><Pressable onPress={retry} style={{ paddingHorizontal: 20, paddingVertical: 10, borderRadius: 9, backgroundColor: colors.violetTone58 }}><Text style={{ fontWeight: '700', color: colors.white }}>Retry</Text></Pressable></View> : null}
+      {!isLoading && errorMessage ? <View style={{ flex: 1, padding: 24, alignItems: 'center', justifyContent: 'center', gap: 14 }}><Text selectable style={{ textAlign: 'center', color: colors.mauveTone38_2 }}>{errorMessage}</Text><Pressable onPress={retry} style={{ paddingHorizontal: 20, paddingVertical: 10, borderRadius: 9, backgroundColor: colors.violetTone58 }}><Text style={{ fontFamily: fontFamilies.bold, color: colors.white }}>Retry</Text></Pressable></View> : null}
       {!isLoading && !errorMessage ? (
         <FlatList
           style={{ flex: 1 }}

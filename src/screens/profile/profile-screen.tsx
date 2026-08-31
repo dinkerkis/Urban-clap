@@ -1,4 +1,4 @@
-import { colors, fontSizes } from '../../theme';
+import { colors, fontFamilies, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
 import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -151,9 +151,9 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
                     backgroundColor: colors.redTone54,
                   }}
                 >
-                  <Text style={{ marginTop: -0.5, fontSize: 10, lineHeight: 11, fontWeight: '700', color: colors.white }}>!</Text>
+                  <Text style={{ marginTop: -0.5, fontSize: 10, lineHeight: 11, fontFamily: fontFamilies.bold, color: colors.white }}>!</Text>
                 </View>
-                <Text style={{ fontSize: fontSizes.size12, lineHeight: 16, fontWeight: '600', color: colors.redTone47 }}>Incomplete profile</Text>
+                <Text style={{ fontSize: fontSizes.size12, lineHeight: 16, fontFamily: fontFamilies.semiBold, color: colors.redTone47 }}>Incomplete profile</Text>
               </View>
 
               <Pressable
@@ -169,13 +169,13 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
                   opacity: pressed ? 0.6 : 1,
                 })}
               >
-                <Text style={{ fontSize: fontSizes.size13, fontWeight: '600', color: colors.mauveTone17_2 }}>Complete</Text>
+                <Text style={{ fontSize: fontSizes.size13, fontFamily: fontFamilies.semiBold, color: colors.mauveTone17_2 }}>Complete</Text>
               </Pressable>
             </View>
           ) : null}
 
           <View style={{ gap: 6 }}>
-            <Text selectable style={{ fontSize: fontSizes.size29, lineHeight: 35, fontWeight: '700', color: colors.violetTone10 }}>
+            <Text selectable style={{ fontSize: fontSizes.size29, lineHeight: 35, fontFamily: fontFamilies.bold, color: colors.violetTone10 }}>
               {displayName}
             </Text>
             {displayPhone ? (
@@ -206,7 +206,7 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
               })}
             >
               <Image source={action.imageSource} contentFit="contain" style={{ width: 24, height: 24 }} />
-              <Text style={{ fontSize: fontSizes.size15, lineHeight: 21, fontWeight: '600', color: colors.mauveTone14_3 }}>{action.label}</Text>
+              <Text style={{ fontSize: fontSizes.size15, lineHeight: 21, fontFamily: fontFamilies.semiBold, color: colors.mauveTone14_3 }}>{action.label}</Text>
             </Pressable>
           ))}
         </View>
@@ -232,13 +232,13 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
             <View style={{ width: 24, alignItems: 'center' }}>
               {item.isAbout ? (
                 <View style={{ width: 16, height: 16, alignItems: 'center', justifyContent: 'center', borderWidth: 1.2, borderColor: colors.mauveTone30_2, borderRadius: 4, borderCurve: 'continuous' }}>
-                  <Text style={{ fontSize: fontSizes.size7, lineHeight: 9, fontWeight: '800', color: colors.mauveTone30_2 }}>UC</Text>
+                  <Text style={{ fontSize: fontSizes.size7, lineHeight: 9, fontFamily: fontFamilies.extraBold, color: colors.mauveTone30_2 }}>UC</Text>
                 </View>
               ) : item.imageSource ? (
                 <Image source={item.imageSource} contentFit="contain" style={{ width: 16, height: 16 }} />
               ) : null}
             </View>
-            <Text style={{ flex: 1, fontSize: fontSizes.size15, lineHeight: 21, fontWeight: '400', color: colors.mauveTone19_4 }}>{item.label}</Text>
+            <Text style={{ flex: 1, fontSize: fontSizes.size15, lineHeight: 21, fontFamily: fontFamilies.regular, color: colors.mauveTone19_4 }}>{item.label}</Text>
             <ChevronRight />
           </Pressable>
         ))}
@@ -258,7 +258,7 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
         }}
       >
         <View style={{ maxWidth: '72%', gap: 8 }}>
-          <Text selectable style={{ fontSize: fontSizes.size17, lineHeight: 23, fontWeight: '700', color: colors.violetTone15_2 }}>Refer & earn ₹50</Text>
+          <Text selectable style={{ fontSize: fontSizes.size17, lineHeight: 23, fontFamily: fontFamilies.bold, color: colors.violetTone15_2 }}>Refer & earn ₹50</Text>
           <Text style={{ fontSize: fontSizes.size14, lineHeight: 21, color: colors.violetTone38_2 }}>Get ₹50 when your friend completes their first booking</Text>
           <Pressable
             accessibilityRole="button"
@@ -274,7 +274,7 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
               opacity: pressed ? 0.72 : 1,
             })}
           >
-            <Text style={{ fontSize: fontSizes.size13, fontWeight: '700', color: colors.white }}>Refer now</Text>
+            <Text style={{ fontSize: fontSizes.size13, fontFamily: fontFamilies.bold, color: colors.white }}>Refer now</Text>
           </Pressable>
         </View>
         <Text style={{ position: 'absolute', right: 18, top: 45, fontSize: fontSizes.size56 }}>🎁</Text>
@@ -299,7 +299,7 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
           backgroundColor: pressed ? colors.redTone98 : colors.white,
         })}
       >
-        <Text style={{ fontSize: fontSizes.size16, fontWeight: '600', color: colors.redTone43 }}>Logout</Text>
+        <Text style={{ fontSize: fontSizes.size16, fontFamily: fontFamilies.semiBold, color: colors.redTone43 }}>Logout</Text>
       </Pressable>
 
       <Text selectable style={{ paddingTop: 18, textAlign: 'center', fontSize: fontSizes.size11, color: colors.mauveTone70 }}>Version 1.0.0</Text>

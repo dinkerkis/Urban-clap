@@ -1,4 +1,4 @@
-import { colors, fontSizes } from '../../theme';
+import { colors, fontFamilies, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEffect, useMemo, useState } from 'react';
@@ -30,6 +30,9 @@ type NativeCategoryDetailsScreenProps = {
 };
 
 type Product = { id: string; imageUrl?: string; kind: 'lock' | 'purifier'; name: string; optionsCount?: number; price: string; rating: string };
+
+const NATIVE_SECTION_COLOR = colors.violetTone98_3;
+const NATIVE_PRODUCT_BACKGROUND = colors.neutralTone96;
 
 function compactCount(count = 0): string {
   if (count >= 1_000_000) return `${Math.round(count / 100_000) / 10}M`;
@@ -75,11 +78,11 @@ function ProductArt({ compact, kind }: { compact?: boolean; kind: Product['kind'
 
 function CategoryCard({ imageUrl, kind, onPress, title }: { imageUrl?: string; kind: Product['kind']; onPress: () => void; title: string }) {
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => ({ width: 118, height: 120, alignItems: 'center', justifyContent: 'space-between', paddingTop: 14, paddingBottom: 9, borderRadius: 6, backgroundColor: colors.slateTone96_2, opacity: pressed ? 0.62 : 1 })}>
+    <Pressable onPress={onPress} style={({ pressed }) => ({ width: 118, height: 120, alignItems: 'center', justifyContent: 'space-between', paddingTop: 14, paddingBottom: 9, borderRadius: 6, backgroundColor: NATIVE_SECTION_COLOR, opacity: pressed ? 0.62 : 1 })}>
       <View style={{ width: 100, height: 78, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
         {imageUrl ? <Image source={{ uri: imageUrl }} contentFit="contain" transition={180} style={{ width: 120, height: 120 }} /> : <ProductArt compact kind={kind} />}
       </View>
-      <Text numberOfLines={1} style={{ transform: [{ translateY: -4 }], fontSize: fontSizes.size14, lineHeight: 18, fontWeight: '600', color: colors.mauveTone17_3 }}>{title}</Text>
+      <Text numberOfLines={1} style={{ transform: [{ translateY: -4 }], fontSize: fontSizes.size14, lineHeight: 18, fontFamily: fontFamilies.semiBold, color: colors.mauveTone17_3 }}>{title}</Text>
     </Pressable>
   );
 }
@@ -126,7 +129,7 @@ function CategoryMarquee({ items }: { items: string[] }) {
         onLayout={(event) => setContentWidth(event.nativeEvent.layout.width)}
         style={[{ alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 18, gap: 26 }, marqueeStyle]}
       >
-        {items.map((item, index) => <Text key={`${item}-${index}`} numberOfLines={1} style={{ fontSize: fontSizes.size13, fontWeight: '600', color: colors.white }}>⚡ {item}</Text>)}
+        {items.map((item, index) => <Text key={`${item}-${index}`} numberOfLines={1} style={{ fontSize: fontSizes.size13, fontFamily: fontFamilies.semiBold, color: colors.white }}>⚡ {item}</Text>)}
       </Animated.View>
     </View>
   );
@@ -151,7 +154,7 @@ function NativeCategorySection({ onOpenRelatedImages, onOpenVideos, section }: {
   const videos = section.slider_videos?.map((item) => item.video) ?? [];
   return (
     <View style={{ paddingVertical: 24, gap: 14, backgroundColor: colors.white }}>
-      {section.slider_title ? <Text style={{ paddingHorizontal: 16, fontSize: fontSizes.size21, lineHeight: 28, fontWeight: '700', color: colors.mauveTone10 }}>{section.slider_title}</Text> : null}
+      {section.slider_title ? <Text style={{ paddingHorizontal: 16, fontSize: fontSizes.size21, lineHeight: 28, fontFamily: fontFamilies.bold, color: colors.mauveTone10 }}>{section.slider_title}</Text> : null}
       {section.slider_description ? <Text style={{ paddingHorizontal: 16, marginTop: -8, fontSize: fontSizes.size13, lineHeight: 19, color: colors.mauveTone39 }}>{section.slider_description}</Text> : null}
       {images.length ? (
         <>
@@ -174,7 +177,7 @@ function NativeCategorySection({ onOpenRelatedImages, onOpenVideos, section }: {
                   const { height, width } = event.source;
                   if (width > 0 && height > 0) setSliderAspectRatio(width / height);
                 } : undefined}
-                style={{ width: 200, aspectRatio: sliderAspectRatio, overflow: 'hidden', borderRadius: 8, backgroundColor: colors.violetTone96_5 }}
+                style={{ width: 200, aspectRatio: sliderAspectRatio, overflow: 'hidden', borderRadius: 8, backgroundColor: NATIVE_SECTION_COLOR }}
               />
               </Pressable>
               );
@@ -257,7 +260,7 @@ function VideoStoriesScreen({ initialIndex, onClose, videos }: { initialIndex: n
       </View>
 
       <Pressable accessibilityRole="button" accessibilityLabel="Close videos" hitSlop={12} onPress={onClose} style={({ pressed }) => ({ position: 'absolute', left: 18, top: Math.max(insets.top, 12) + 6, zIndex: 4, width: 38, height: 38, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.6 : 1 })}>
-        <Text style={{ fontSize: 31, lineHeight: 34, fontWeight: '300', color: colors.white }}>×</Text>
+        <Text style={{ fontSize: 31, lineHeight: 34, fontFamily: fontFamilies.light, color: colors.white }}>×</Text>
       </Pressable>
       <Pressable accessibilityRole="button" accessibilityLabel={muted ? 'Unmute video' : 'Mute video'} hitSlop={10} onPress={() => setMuted((current) => !current)} style={({ pressed }) => ({ position: 'absolute', right: 18, top: Math.max(insets.top, 12) + 6, zIndex: 4, width: 38, height: 38, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.6 : 1 })}>
         <Text style={{ fontSize: 20, color: colors.white }}>{muted ? '🔇' : '🔊'}</Text>
@@ -289,7 +292,7 @@ function RelatedImagesScreen({ images, onBack }: { images: string[]; onBack: () 
       </Animated.ScrollView>
       <View style={{ position: 'absolute', left: 0, right: 0, top: 0, height: Math.max(insets.top, 18) + 54, paddingTop: Math.max(insets.top, 18), paddingHorizontal: 20, justifyContent: 'center', backgroundColor: colors.white }}>
         <Pressable accessibilityRole="button" accessibilityLabel="Go back" hitSlop={12} onPress={onBack} style={({ pressed }) => ({ width: 34, height: 34, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.55 : 1 })}><BackIcon /></Pressable>
-        <Animated.View pointerEvents="none" style={[{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 1, backgroundColor: colors.violetTone93_2 }, dividerStyle]} />
+        <Animated.View pointerEvents="none" style={[{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 1, backgroundColor: NATIVE_SECTION_COLOR }, dividerStyle]} />
       </View>
     </Animated.View>
   );
@@ -348,14 +351,14 @@ function CategoryDetailSkeleton({ onBack }: { onBack: () => void }) {
             ))}
           </View>
         </View>
-        <View style={{ height: 8, backgroundColor: colors.violetTone96_4 }} />
+        <View style={{ height: 8, backgroundColor: NATIVE_SECTION_COLOR }} />
         <View style={{ padding: 20, gap: 18 }}>
           <SkeletonBlock height={28} progress={progress} screenWidth={screenWidth} width="66%" />
           <SkeletonBlock height={250} progress={progress} radius={10} screenWidth={screenWidth} />
         </View>
       </ScrollView>
       <View style={{ position: 'absolute', left: 0, right: 0, top: 0, height: headerHeight, paddingTop: Math.max(insets.top, 18), paddingHorizontal: 20, justifyContent: 'center', backgroundColor: colors.white }}>
-        <Pressable accessibilityRole="button" accessibilityLabel="Go back" hitSlop={12} onPress={onBack} style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, borderWidth: 1, borderColor: colors.violetTone93_2, backgroundColor: colors.white, opacity: pressed ? 0.6 : 1 })}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Go back" hitSlop={12} onPress={onBack} style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, borderWidth: 1, borderColor: NATIVE_SECTION_COLOR, backgroundColor: colors.white, opacity: pressed ? 0.6 : 1 })}>
           <BackIcon />
         </Pressable>
       </View>
@@ -404,14 +407,14 @@ function NativeCategoryScreen({ category, onBack, onOpenProduct }: { category: N
               accessibilityRole="button"
               accessibilityLabel="Compare all models"
               onPress={() => Alert.alert('Compare all models', 'Product comparison will be available soon.')}
-              style={({ pressed }) => ({ minHeight: 66, flexDirection: 'row', alignItems: 'center', gap: 14, borderTopWidth: 1, borderColor: colors.mauveTone92, opacity: pressed ? 0.6 : 1 })}
+              style={({ pressed }) => ({ minHeight: 66, flexDirection: 'row', alignItems: 'center', gap: 14, borderTopWidth: 1, borderColor: NATIVE_SECTION_COLOR, opacity: pressed ? 0.6 : 1 })}
             >
               <Image source={require('../../../assets/compare.png')} contentFit="contain" tintColor={colors.black} style={{ width: 23, height: 23 }} />
-              <Text style={{ flex: 1, fontSize: fontSizes.size16, fontWeight: '600', color: colors.black }}>Compare all models</Text>
+              <Text style={{ flex: 1, fontSize: fontSizes.size16, fontFamily: fontFamilies.semiBold, color: colors.black }}>Compare all models</Text>
               <Text style={{ fontSize: fontSizes.size22, color: colors.black }}>›</Text>
             </Pressable>
             </View>
-            <View style={{ height: 8, backgroundColor: colors.violetTone96_4 }} />
+            <View style={{ height: 8, backgroundColor: NATIVE_SECTION_COLOR }} />
           </View>
         ) : null}
         {data?.categoryDetails.length ? data.categoryDetails.map((section, index) => <NativeCategorySection key={`${category._id}-${section.type}-${section.sort_order}-${index}`} onOpenRelatedImages={setRelatedImages} onOpenVideos={(videos, initialIndex) => setVideoStories({ videos, initialIndex })} section={section} />) : null}
@@ -420,13 +423,13 @@ function NativeCategoryScreen({ category, onBack, onOpenProduct }: { category: N
             <Text style={{ textAlign: 'center', fontSize: fontSizes.size14, lineHeight: 21, color: colors.mauveTone39 }}>No products or category details are available right now.</Text>
           </View>
         ) : null}
-        {!isLoading && errorMessage ? <View style={{ minHeight: 260, padding: 24, alignItems: 'center', justifyContent: 'center', gap: 14 }}><Text style={{ textAlign: 'center', color: colors.mauveTone39 }}>{errorMessage}</Text><Pressable onPress={retry} style={{ paddingHorizontal: 20, paddingVertical: 10, borderRadius: 9, backgroundColor: colors.violetTone58 }}><Text style={{ fontWeight: '700', color: colors.white }}>Retry</Text></Pressable></View> : null}
+        {!isLoading && errorMessage ? <View style={{ minHeight: 260, padding: 24, alignItems: 'center', justifyContent: 'center', gap: 14 }}><Text style={{ textAlign: 'center', color: colors.mauveTone39 }}>{errorMessage}</Text><Pressable onPress={retry} style={{ paddingHorizontal: 20, paddingVertical: 10, borderRadius: 9, backgroundColor: colors.violetTone58 }}><Text style={{ fontFamily: fontFamilies.bold, color: colors.white }}>Retry</Text></Pressable></View> : null}
       </Animated.ScrollView>
       <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, top: 0, height: Math.max(insets.top, 18), backgroundColor: colors.white }} />
       <View pointerEvents="box-none" style={{ position: 'absolute', left: 0, right: 0, top: 0, height: headerHeight, paddingTop: Math.max(insets.top, 18), paddingHorizontal: 20, justifyContent: 'center' }}>
         <Animated.View pointerEvents="none" style={[{ position: 'absolute', inset: 0, backgroundColor: colors.white }, stickyHeaderStyle]} />
         <Pressable accessibilityRole="button" accessibilityLabel="Go back" hitSlop={12} onPress={onBack} style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.6 : 1 })}>
-          <Animated.View pointerEvents="none" style={[{ position: 'absolute', inset: 0, borderRadius: 20, borderWidth: hasBanner ? 0 : 1, borderColor: colors.violetTone93_2, backgroundColor: colors.white }, bannerIconStyle]} />
+          <Animated.View pointerEvents="none" style={[{ position: 'absolute', inset: 0, borderRadius: 20, borderWidth: hasBanner ? 0 : 1, borderColor: NATIVE_SECTION_COLOR, backgroundColor: colors.white }, bannerIconStyle]} />
           <BackIcon />
         </Pressable>
       </View>
@@ -439,13 +442,13 @@ function NativeCategoryScreen({ category, onBack, onOpenProduct }: { category: N
 function ProductCard({ onOpen, product }: { onOpen: (productId: string) => void; product: Product }) {
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={`View ${product.name} details`} onPress={() => onOpen(product.id)} style={({ pressed }) => ({ width: 162, gap: 7, opacity: pressed ? 0.72 : 1 })}>
-      <View style={{ width: 162, height: 145, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderRadius: 10, backgroundColor: colors.slateTone96 }}>{product.imageUrl ? <Image source={{ uri: product.imageUrl }} contentFit="contain" transition={180} style={{ width: '100%', height: '100%' }} /> : <ProductArt kind={product.kind} />}</View>
-      <Text numberOfLines={1} style={{ fontSize: fontSizes.size14, fontWeight: '500', color: colors.mauveTone17 }}>{product.name}</Text>
+      <View style={{ width: 162, height: 145, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderRadius: 10, backgroundColor: NATIVE_PRODUCT_BACKGROUND }}>{product.imageUrl ? <Image source={{ uri: product.imageUrl }} contentFit="contain" transition={180} style={{ width: '100%', height: '100%' }} /> : <ProductArt kind={product.kind} />}</View>
+      <Text numberOfLines={1} style={{ fontSize: fontSizes.size14, fontFamily: fontFamilies.medium, color: colors.mauveTone17 }}>{product.name}</Text>
       <Text style={{ fontSize: fontSizes.size12, color: colors.mauveTone37 }}>★ {product.rating}</Text>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
         <View>
           <Text style={{ fontSize: fontSizes.size11, lineHeight: 14, color: colors.neutralTone54 }}>Starts at</Text>
-          <Text style={{ fontSize: fontSizes.size14, lineHeight: 19, fontWeight: '700', color: colors.neutralTone10 }}>{product.price}</Text>
+          <Text style={{ fontSize: fontSizes.size14, lineHeight: 19, fontFamily: fontFamilies.bold, color: colors.neutralTone10 }}>{product.price}</Text>
         </View>
         <View style={{ width: 72, height: 40, alignItems: 'center' }}>
           <Pressable
@@ -463,9 +466,9 @@ function ProductCard({ onOpen, product }: { onOpen: (productId: string) => void;
               borderRadius: 6,
             })}
           >
-            <Text style={{ fontSize: fontSizes.size14, lineHeight: 18, fontWeight: '700', color: colors.violetTone58 }}>Add</Text>
+            <Text style={{ fontSize: fontSizes.size14, lineHeight: 18, fontFamily: fontFamilies.bold, color: colors.violetTone58 }}>Add</Text>
           </Pressable>
-          <Text style={{ marginTop: -7, paddingHorizontal: 4, fontSize: fontSizes.size10, lineHeight: 13, fontWeight: '400', color: colors.neutralTone54, backgroundColor: colors.white }}>{product.optionsCount ?? 2} options</Text>
+          <Text style={{ marginTop: -7, paddingHorizontal: 4, fontSize: fontSizes.size10, lineHeight: 13, fontFamily: fontFamilies.regular, color: colors.neutralTone54, backgroundColor: colors.white }}>{product.optionsCount ?? 2} options</Text>
         </View>
       </View>
     </Pressable>
@@ -474,8 +477,8 @@ function ProductCard({ onOpen, product }: { onOpen: (productId: string) => void;
 
 function ProductSection({ onOpen, products, showTopDivider = true, subtitle, title }: { onOpen: (productId: string) => void; products: Product[]; showTopDivider?: boolean; subtitle?: string; title: string }) {
   return (
-    <View style={{ paddingVertical: 24, gap: 16, borderTopWidth: showTopDivider ? 8 : 0, borderTopColor: colors.violetTone96_4, backgroundColor: colors.white }}>
-      <View style={{ paddingHorizontal: 20, gap: 4 }}><Text style={{ fontSize: fontSizes.size21, lineHeight: 27, fontWeight: '700' }}>{title}</Text>{subtitle ? <Text style={{ fontSize: fontSizes.size13, color: colors.mauveTone40 }}>{subtitle}</Text> : null}</View>
+    <View style={{ paddingVertical: 24, gap: 16, borderTopWidth: showTopDivider ? 8 : 0, borderTopColor: NATIVE_SECTION_COLOR, backgroundColor: colors.white }}>
+      <View style={{ paddingHorizontal: 20, gap: 4 }}><Text style={{ fontSize: fontSizes.size21, lineHeight: 27, fontFamily: fontFamilies.bold }}>{title}</Text>{subtitle ? <Text style={{ fontSize: fontSizes.size13, color: colors.mauveTone40 }}>{subtitle}</Text> : null}</View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 14 }}>{products.map((product) => <ProductCard key={`${title}-${product.name}`} onOpen={onOpen} product={product} />)}</ScrollView>
     </View>
   );
@@ -492,19 +495,19 @@ function DescriptionImage({ path, slider = false }: { path: string; slider?: boo
         const { height, width } = event.source;
         if (width > 0 && height > 0) setAspectRatio(width / height);
       }}
-      style={{ width: slider ? 200 : '100%', aspectRatio, borderRadius: slider ? 8 : 0, backgroundColor: colors.violetTone96_5 }}
+      style={{ width: slider ? 200 : '100%', aspectRatio, borderRadius: slider ? 8 : 0, backgroundColor: NATIVE_SECTION_COLOR }}
     />
   );
 }
 
 function DescriptionSection({ media, showTopSeparator = true }: { media: NativeDescriptionMedia; showTopSeparator?: boolean }) {
   if (media.type === 'image') {
-    return <View style={{ borderTopWidth: showTopSeparator ? 8 : 0, borderTopColor: colors.violetTone96_4 }}><DescriptionImage path={media.url} /></View>;
+    return <View style={{ borderTopWidth: showTopSeparator ? 8 : 0, borderTopColor: NATIVE_SECTION_COLOR }}><DescriptionImage path={media.url} /></View>;
   }
 
   return (
-    <View style={{ paddingVertical: 22, gap: 16, borderTopWidth: 8, borderTopColor: colors.violetTone96_4 }}>
-      {media.slider_title ? <Text style={{ paddingHorizontal: 20, fontSize: fontSizes.size21, lineHeight: 28, fontWeight: '700', color: colors.mauveTone10 }}>{media.slider_title}</Text> : null}
+    <View style={{ paddingVertical: 22, gap: 16, borderTopWidth: 8, borderTopColor: NATIVE_SECTION_COLOR }}>
+      {media.slider_title ? <Text style={{ paddingHorizontal: 20, fontSize: fontSizes.size21, lineHeight: 28, fontFamily: fontFamilies.bold, color: colors.mauveTone10 }}>{media.slider_title}</Text> : null}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}>
         {media.slider_images.map((image, index) => <DescriptionImage key={`${media.sort_order}-${index}-${image}`} path={image} slider />)}
       </ScrollView>
@@ -556,29 +559,29 @@ export function NativeScreen({ cart, onAddToCart, onCategoryPress, onViewCart }:
   return (
     <View style={{ flex: 1 }}>
     <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} style={{ flex: 1, backgroundColor: colors.white }} contentContainerStyle={{ paddingTop: Math.max(insets.top, 18) + 18, paddingBottom: showCartBar ? 94 : 0 }}>
-      <View style={{ paddingHorizontal: 20, gap: 5 }}><Text style={{ fontSize: fontSizes.size25, lineHeight: 32, fontWeight: '700' }}>Native products</Text><Text style={{ fontSize: fontSizes.size16, lineHeight: 22, fontWeight: '700', color: colors.mauveTone39 }}>Innovative products. Designed in India for India.</Text></View>
-      {!productsLoading && productsError ? <View style={{ minHeight: 220, padding: 24, alignItems: 'center', justifyContent: 'center', gap: 14 }}><Text style={{ textAlign: 'center', fontSize: fontSizes.size14, lineHeight: 21, color: colors.mauveTone39 }}>{productsError}</Text><Pressable accessibilityRole="button" onPress={retryProducts} style={({ pressed }) => ({ paddingHorizontal: 20, paddingVertical: 10, borderRadius: 9, backgroundColor: colors.violetTone58, opacity: pressed ? 0.7 : 1 })}><Text style={{ fontWeight: '700', color: colors.white }}>Retry</Text></Pressable></View> : null}
+      <View style={{ paddingHorizontal: 20, gap: 5 }}><Text style={{ fontSize: fontSizes.size25, lineHeight: 32, fontFamily: fontFamilies.bold }}>Native products</Text><Text style={{ fontSize: fontSizes.size16, lineHeight: 22, fontFamily: fontFamilies.bold, color: colors.mauveTone39 }}>Innovative products. Designed in India for India.</Text></View>
+      {!productsLoading && productsError ? <View style={{ minHeight: 220, padding: 24, alignItems: 'center', justifyContent: 'center', gap: 14 }}><Text style={{ textAlign: 'center', fontSize: fontSizes.size14, lineHeight: 21, color: colors.mauveTone39 }}>{productsError}</Text><Pressable accessibilityRole="button" onPress={retryProducts} style={({ pressed }) => ({ paddingHorizontal: 20, paddingVertical: 10, borderRadius: 9, backgroundColor: colors.violetTone58, opacity: pressed ? 0.7 : 1 })}><Text style={{ fontFamily: fontFamilies.bold, color: colors.white }}>Retry</Text></Pressable></View> : null}
       {!productsLoading && !productsError ? <>
         <View style={{ paddingHorizontal: 20, paddingVertical: 30, flexDirection: 'row', gap: 18 }}>{productsData.categories.map((category) => <CategoryCard key={category._id} imageUrl={category.category_image ? resolveNativeMediaUrl(category.category_image) : undefined} kind={category.name.toLowerCase().includes('lock') ? 'lock' : 'purifier'} onPress={() => onCategoryPress(category)} title={category.name} />)}</View>
         {productsData.newlyLaunched ? <ProductSection onOpen={setSelectedProductId} products={productsData.newlyLaunched.products.map(mapNativeProduct)} title={productsData.newlyLaunched.title} /> : null}
         {productsData.categorySections.map((section, index) => <View key={`${section.title}-${index}`}>
           <ProductSection onOpen={setSelectedProductId} products={section.products.map(mapNativeProduct)} subtitle={section.description} title={section.title} />
-          {index === 0 ? <Pressable onPress={() => Alert.alert('Compare all models', 'Product comparison will be available soon.')} style={({ pressed }) => ({ minHeight: 66, marginHorizontal: 20, flexDirection: 'row', alignItems: 'center', gap: 14, borderTopWidth: 1, borderBottomWidth: 1, borderColor: colors.mauveTone92, opacity: pressed ? .6 : 1 })}><Image source={require('../../../assets/compare.png')} contentFit="contain" tintColor={colors.black} style={{ width: 23, height: 23 }} /><Text style={{ flex: 1, fontSize: fontSizes.size16, fontWeight: '600' }}>Compare all models</Text><Text style={{ fontSize: fontSizes.size22 }}>›</Text></Pressable> : null}
+          {index === 0 ? <Pressable onPress={() => Alert.alert('Compare all models', 'Product comparison will be available soon.')} style={({ pressed }) => ({ minHeight: 66, marginHorizontal: 20, flexDirection: 'row', alignItems: 'center', gap: 14, borderTopWidth: 1, borderBottomWidth: 1, borderColor: NATIVE_SECTION_COLOR, opacity: pressed ? .6 : 1 })}><Image source={require('../../../assets/compare.png')} contentFit="contain" tintColor={colors.black} style={{ width: 23, height: 23 }} /><Text style={{ flex: 1, fontSize: fontSizes.size16, fontFamily: fontFamilies.semiBold }}>Compare all models</Text><Text style={{ fontSize: fontSizes.size22 }}>›</Text></Pressable> : null}
         </View>)}
         {!productsData.categories.length && !productsData.newlyLaunched && !productsData.categorySections.length ? <View style={{ minHeight: 260, padding: 24, alignItems: 'center', justifyContent: 'center' }}><Text style={{ textAlign: 'center', fontSize: fontSizes.size14, lineHeight: 21, color: colors.mauveTone39 }}>No Native products are available right now.</Text></View> : null}
       </> : null}
-      {!isLoading && errorMessage ? <View style={{ minHeight: 180, padding: 24, alignItems: 'center', justifyContent: 'center', gap: 14, borderTopWidth: 8, borderTopColor: colors.violetTone96_4 }}><Text style={{ textAlign: 'center', fontSize: fontSizes.size14, lineHeight: 21, color: colors.mauveTone39 }}>{errorMessage}</Text><Pressable accessibilityRole="button" onPress={retry} style={({ pressed }) => ({ paddingHorizontal: 20, paddingVertical: 10, borderRadius: 9, backgroundColor: colors.violetTone58, opacity: pressed ? 0.7 : 1 })}><Text style={{ fontWeight: '700', color: colors.white }}>Retry</Text></Pressable></View> : null}
+      {!isLoading && errorMessage ? <View style={{ minHeight: 180, padding: 24, alignItems: 'center', justifyContent: 'center', gap: 14, borderTopWidth: 8, borderTopColor: NATIVE_SECTION_COLOR }}><Text style={{ textAlign: 'center', fontSize: fontSizes.size14, lineHeight: 21, color: colors.mauveTone39 }}>{errorMessage}</Text><Pressable accessibilityRole="button" onPress={retry} style={({ pressed }) => ({ paddingHorizontal: 20, paddingVertical: 10, borderRadius: 9, backgroundColor: colors.violetTone58, opacity: pressed ? 0.7 : 1 })}><Text style={{ fontFamily: fontFamilies.bold, color: colors.white }}>Retry</Text></Pressable></View> : null}
       {!isLoading && !errorMessage ? media.map((item, index) => <DescriptionSection key={`${item.type}-${item.sort_order}`} media={item} showTopSeparator={index !== media.length - 1} />) : null}
     </ScrollView>
     {showPageLoader ? <View pointerEvents="none" style={{ position: 'absolute', inset: 0, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.transparent }}><LoadingDots /></View> : null}
     {showCartBar ? (
-      <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, minHeight: 88, paddingHorizontal: 20, paddingVertical: 12, flexDirection: 'row', alignItems: 'center', gap: 16, borderTopWidth: 1, borderTopColor: colors.mauveTone91_3, backgroundColor: colors.white, boxShadow: `0 -5px 16px ${colors.violetTone8Alpha7}` }}>
+      <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, minHeight: 88, paddingHorizontal: 20, paddingVertical: 12, flexDirection: 'row', alignItems: 'center', gap: 16, borderTopWidth: 1, borderTopColor: NATIVE_SECTION_COLOR, backgroundColor: colors.white, boxShadow: `0 -5px 16px ${colors.violetTone8Alpha7}` }}>
         <View style={{ flex: 1, gap: 3 }}>
-          <Text style={{ fontSize: fontSizes.size16, lineHeight: 21, fontWeight: '700', color: colors.mauveTone9_2 }}>{nativeCartSummary.items} {nativeCartSummary.items === 1 ? 'item' : 'items'} added</Text>
+          <Text style={{ fontSize: fontSizes.size16, lineHeight: 21, fontFamily: fontFamilies.bold, color: colors.mauveTone9_2 }}>{nativeCartSummary.items} {nativeCartSummary.items === 1 ? 'item' : 'items'} added</Text>
           <Text style={{ fontSize: fontSizes.size13, lineHeight: 18, color: colors.mauveTone39 }}>From {nativeCartSummary.categories} {nativeCartSummary.categories === 1 ? 'category' : 'categories'}</Text>
         </View>
         <Pressable accessibilityRole="button" onPress={onViewCart} style={({ pressed }) => ({ width: '48%', height: 50, alignItems: 'center', justifyContent: 'center', borderRadius: 8, backgroundColor: pressed ? colors.blueTone50 : colors.violetTone58 })}>
-          <Text style={{ fontSize: fontSizes.size16, fontWeight: '700', color: colors.white }}>View cart</Text>
+          <Text style={{ fontSize: fontSizes.size16, fontFamily: fontFamilies.bold, color: colors.white }}>View cart</Text>
         </Pressable>
       </View>
     ) : null}

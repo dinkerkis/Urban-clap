@@ -1,4 +1,4 @@
-import { colors, fontSizes } from '../../theme';
+import { colors, fontFamilies, fontSizes } from '../../theme';
 import { useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -85,7 +85,7 @@ export function WalletScreen({ onBack, onHelp }: WalletScreenProps) {
           >
             <BackIcon color={colors.violetTone15} />
           </Pressable>
-          <Text style={{ marginLeft: 13, fontSize: fontSizes.size18, lineHeight: 24, fontWeight: '700', color: colors.mauveTone12_2 }}>UC Wallet</Text>
+          <Text style={{ marginLeft: 13, fontSize: fontSizes.size18, lineHeight: 24, fontFamily: fontFamilies.bold, color: colors.mauveTone12_2 }}>UC Wallet</Text>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Help"
@@ -102,7 +102,7 @@ export function WalletScreen({ onBack, onHelp }: WalletScreenProps) {
               opacity: pressed ? 0.6 : 1,
             })}
           >
-            <Text style={{ fontSize: fontSizes.size15, fontWeight: '600', color: colors.mauveTone15 }}>Help</Text>
+            <Text style={{ fontSize: fontSizes.size15, fontFamily: fontFamilies.semiBold, color: colors.mauveTone15 }}>Help</Text>
           </Pressable>
         </View>
       </View>
@@ -116,7 +116,7 @@ export function WalletScreen({ onBack, onHelp }: WalletScreenProps) {
         <View style={{ paddingHorizontal: 20 }}>
         <View style={{ paddingTop: 26, paddingBottom: 30, gap: 7 }}>
           <Text style={{ fontSize: fontSizes.size14, color: colors.neutralTone45 }}>UC Cash</Text>
-          <Text style={{ fontSize: fontSizes.size36, lineHeight: 43, fontWeight: '700', color: colors.mauveTone9 }}>₹0</Text>
+          <Text style={{ fontSize: fontSizes.size36, lineHeight: 43, fontFamily: fontFamilies.bold, color: colors.mauveTone9 }}>₹0</Text>
           <Text style={{ fontSize: fontSizes.size13, lineHeight: 19, color: colors.neutralTone45 }}>Formerly UC Credits. Applicable on all services</Text>
         </View>
         </View>
@@ -124,7 +124,7 @@ export function WalletScreen({ onBack, onHelp }: WalletScreenProps) {
         <View style={{ height: 8, backgroundColor: colors.violetTone96_6 }} />
 
         <View style={{ paddingHorizontal: 20, paddingTop: 22, paddingBottom: 10 }}>
-        <Text style={{ fontSize: fontSizes.size21, lineHeight: 27, fontWeight: '700', color: colors.mauveTone11 }}>Wallet activity</Text>
+        <Text style={{ fontSize: fontSizes.size21, lineHeight: 27, fontFamily: fontFamilies.bold, color: colors.mauveTone11 }}>Wallet activity</Text>
         <View style={{ height: 68, alignItems: 'center', justifyContent: 'center' }}>
           <Text style={{ fontSize: fontSizes.size15, color: colors.neutralTone45, transform: [{ translateY: 8 }] }}>No wallet activity yet.</Text>
         </View>
@@ -133,7 +133,7 @@ export function WalletScreen({ onBack, onHelp }: WalletScreenProps) {
         <View style={{ height: 8, backgroundColor: colors.violetTone96_6 }} />
 
         <View style={{ paddingHorizontal: 20, paddingTop: 26 }}>
-        <Text style={{ paddingBottom: 12, fontSize: fontSizes.size21, lineHeight: 27, fontWeight: '700', color: colors.mauveTone11 }}>Have a question?</Text>
+        <Text style={{ paddingBottom: 12, fontSize: fontSizes.size21, lineHeight: 27, fontFamily: fontFamilies.bold, color: colors.mauveTone11 }}>Have a question?</Text>
         {FAQS.map((faq, index) => {
           const expanded = expandedIndex === index;
           return (
@@ -150,7 +150,7 @@ export function WalletScreen({ onBack, onHelp }: WalletScreenProps) {
               })}
             >
               <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 16 }}>
-                <Text style={{ flex: 1, fontSize: fontSizes.size15, lineHeight: 21, fontWeight: '500', color: colors.black }}>{faq.question}</Text>
+                <Text style={{ flex: 1, fontSize: fontSizes.size15, lineHeight: 21, fontFamily: fontFamilies.medium, color: colors.black }}>{faq.question}</Text>
                 <Chevron expanded={expanded} />
               </View>
               {expanded ? (

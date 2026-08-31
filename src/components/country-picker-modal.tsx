@@ -1,4 +1,4 @@
-import { colors, fontSizes, typography } from '../theme';
+import { colors, fontFamilies, fontSizes, typography } from '../theme';
 import { Modal, Pressable, Text, View } from 'react-native';
 
 import { countries, type Country } from '../config/countries';
@@ -46,7 +46,7 @@ export function CountryPickerModal({ onClose, onSelect, selectedCountry, visible
             boxShadow: `0 8px 26px ${colors.blackAlpha18}`,
           })}
         >
-          <Text style={{ fontSize: fontSizes.size21, lineHeight: 24, fontWeight: '300', color: colors.text }}>×</Text>
+          <Text style={{ fontSize: fontSizes.size21, lineHeight: 24, fontFamily: fontFamilies.light, color: colors.text }}>×</Text>
         </Pressable>
 
         <View

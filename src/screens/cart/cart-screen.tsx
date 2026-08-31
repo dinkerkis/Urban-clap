@@ -1,4 +1,4 @@
-import { colors, fontSizes } from '../../theme';
+import { colors, fontFamilies, fontSizes } from '../../theme';
 import { useState, type ReactNode } from 'react';
 import { Image } from 'expo-image';
 import { Alert, Modal, Pressable, ScrollView, Text, View } from 'react-native';
@@ -164,7 +164,7 @@ export function CartScreen({
             <BackIcon color={colors.mauveTone9} />
           </Pressable>
         ) : null}
-        <Text selectable style={{ fontSize: fontSizes.size20, lineHeight: 26, fontWeight: '600', color: colors.mauveTone9 }}>Your cart</Text>
+        <Text selectable style={{ fontSize: fontSizes.size20, lineHeight: 26, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9 }}>Your cart</Text>
       </View>
 
       <ScrollView
@@ -182,26 +182,26 @@ export function CartScreen({
             <Text style={{ fontSize: fontSizes.size30 }}>⚠️</Text>
             <Text selectable style={{ textAlign: 'center', fontSize: fontSizes.size13, lineHeight: 19, color: colors.violetTone47 }}>{errorMessage}</Text>
             <Pressable onPress={onRetry} style={{ minWidth: 132, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: colors.violetTone58 }}>
-              <Text style={{ fontSize: fontSizes.size13, fontWeight: '600', color: colors.white }}>Try again</Text>
+              <Text style={{ fontSize: fontSizes.size13, fontFamily: fontFamilies.semiBold, color: colors.white }}>Try again</Text>
             </Pressable>
           </View>
         ) : cartItems.length === 0 ? (
           <View style={{ flex: 1, minHeight: 500, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24, backgroundColor: colors.white }}>
             <Text accessibilityLabel="Empty shopping cart" style={{ fontSize: fontSizes.size62, lineHeight: 72 }}>🛒</Text>
-            <Text selectable style={{ paddingTop: 28, fontSize: fontSizes.size18, lineHeight: 24, fontWeight: '600', color: colors.violetTone13 }}>Hey, it feels so empty here.</Text>
+            <Text selectable style={{ paddingTop: 28, fontSize: fontSizes.size18, lineHeight: 24, fontFamily: fontFamilies.semiBold, color: colors.violetTone13 }}>Hey, it feels so empty here.</Text>
             <Text selectable style={{ paddingTop: 12, fontSize: fontSizes.size14, lineHeight: 20, color: colors.violetTone44 }}>Lets add some services</Text>
             <Pressable
               accessibilityRole="button"
               onPress={onExplore}
               style={({ pressed }) => ({ minWidth: 132, height: 38, marginTop: 16, paddingHorizontal: 16, alignItems: 'center', justifyContent: 'center', borderRadius: 7, borderWidth: 0.5, borderColor: colors.violetTone85, backgroundColor: pressed ? colors.violetTone98 : colors.white })}
             >
-              <Text style={{ fontSize: fontSizes.size13, fontWeight: '600', color: colors.violetTone58 }}>Explore services</Text>
+              <Text style={{ fontSize: fontSizes.size13, fontFamily: fontFamilies.semiBold, color: colors.violetTone58 }}>Explore services</Text>
             </Pressable>
           </View>
         ) : (
           <>
             <View style={{ paddingHorizontal: 20, paddingTop: 30, paddingBottom: 18, gap: 16, backgroundColor: colors.white }}>
-              <Text selectable style={{ fontSize: fontSizes.size19, lineHeight: 26, fontWeight: '600', color: colors.mauveTone9 }}>
+              <Text selectable style={{ fontSize: fontSizes.size19, lineHeight: 26, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9 }}>
                 {categoryTitle || 'Selected services'}
               </Text>
 
@@ -217,12 +217,12 @@ export function CartScreen({
                           <Pressable accessibilityLabel="Remove consultation" hitSlop={11} onPress={() => void clearConsultation()} style={{ width: 24, height: 30, alignItems: 'center', justifyContent: 'center' }}>
                             <Text style={{ fontSize: fontSizes.size18, lineHeight: 21, color: colors.violetTone58 }}>−</Text>
                           </Pressable>
-                          <Text selectable style={{ minWidth: 16, textAlign: 'center', fontSize: fontSizes.size14, fontWeight: '700', color: colors.violetTone58, fontVariant: ['tabular-nums'] }}>1</Text>
+                          <Text selectable style={{ minWidth: 16, textAlign: 'center', fontSize: fontSizes.size14, fontFamily: fontFamilies.bold, color: colors.violetTone58, fontVariant: ['tabular-nums'] }}>1</Text>
                           <Pressable accessibilityLabel="Consultation quantity is limited to one" accessibilityState={{ disabled: true }} disabled style={{ width: 24, height: 30, alignItems: 'center', justifyContent: 'center' }}>
                             <Text style={{ fontSize: fontSizes.size17, lineHeight: 21, color: colors.violetTone77 }}>＋</Text>
                           </Pressable>
                         </View>
-                        <Text selectable style={{ minWidth: 38, textAlign: 'right', fontSize: fontSizes.size14, fontWeight: '600', color: colors.mauveTone9, fontVariant: ['tabular-nums'] }}>₹49</Text>
+                        <Text selectable style={{ minWidth: 38, textAlign: 'right', fontSize: fontSizes.size14, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9, fontVariant: ['tabular-nums'] }}>₹49</Text>
                       </View>
                     </View>
                   );
@@ -247,7 +247,7 @@ export function CartScreen({
                         </View>
                       ) : null}
                       <View style={{ flex: 1 }}>
-                        <Text selectable style={{ fontSize: fontSizes.size15, lineHeight: 21, fontWeight: '600', color: colors.violetTone13 }}>{item.title}</Text>
+                        <Text selectable style={{ fontSize: fontSizes.size15, lineHeight: 21, fontFamily: fontFamilies.semiBold, color: colors.violetTone13 }}>{item.title}</Text>
                         <Text selectable numberOfLines={2} style={{ paddingTop: 4, fontSize: fontSizes.size12, lineHeight: 17, color: colors.violetTone44 }}>
                           {item.selectedVariantLabel || item.description || 'At home service'}
                         </Text>
@@ -257,14 +257,14 @@ export function CartScreen({
                     <View style={{ paddingTop: 14, flexDirection: 'row', alignItems: 'center' }}>
                       <View style={{ minWidth: 102, height: 38, paddingHorizontal: 7, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderRadius: 10, borderWidth: 1, borderColor: colors.violetTone86, backgroundColor: colors.violetTone98 }}>
                         <Pressable accessibilityLabel={`Remove one ${item.title}`} hitSlop={11} onPress={() => onRemove(item)} style={{ width: 26, height: 32, alignItems: 'center', justifyContent: 'center' }}>
-                          <Text style={{ fontSize: fontSizes.size19, lineHeight: 22, fontWeight: '400', color: colors.violetTone58 }}>−</Text>
+                          <Text style={{ fontSize: fontSizes.size19, lineHeight: 22, fontFamily: fontFamilies.regular, color: colors.violetTone58 }}>−</Text>
                         </Pressable>
-                        <Text selectable style={{ minWidth: 18, textAlign: 'center', fontSize: fontSizes.size15, fontWeight: '700', color: colors.violetTone58, fontVariant: ['tabular-nums'] }}>{quantity}</Text>
+                        <Text selectable style={{ minWidth: 18, textAlign: 'center', fontSize: fontSizes.size15, fontFamily: fontFamilies.bold, color: colors.violetTone58, fontVariant: ['tabular-nums'] }}>{quantity}</Text>
                         <Pressable accessibilityLabel={`Add one ${item.title}`} hitSlop={11} onPress={() => onAdd(item)} style={{ width: 26, height: 32, alignItems: 'center', justifyContent: 'center' }}>
-                          <Text style={{ fontSize: fontSizes.size18, lineHeight: 22, fontWeight: '400', color: colors.violetTone58 }}>＋</Text>
+                          <Text style={{ fontSize: fontSizes.size18, lineHeight: 22, fontFamily: fontFamilies.regular, color: colors.violetTone58 }}>＋</Text>
                         </Pressable>
                       </View>
-                      <Text selectable style={{ marginLeft: 'auto', fontSize: fontSizes.size15, fontWeight: '600', color: colors.mauveTone9, fontVariant: ['tabular-nums'] }}>
+                      <Text selectable style={{ marginLeft: 'auto', fontSize: fontSizes.size15, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9, fontVariant: ['tabular-nums'] }}>
                         {formatPrice(item.serverLineTotal ?? item.price * quantity)}
                       </Text>
                     </View>
@@ -287,11 +287,11 @@ export function CartScreen({
             >
               <View style={{ width: 28, alignItems: 'flex-start' }}>
                 <View style={{ width: 18, height: 18, alignItems: 'center', justifyContent: 'center', borderRadius: 9, backgroundColor: colors.tealTone26 }}>
-                  <Text style={{ fontSize: fontSizes.size10, lineHeight: 12, fontWeight: '700', color: colors.white }}>%</Text>
+                  <Text style={{ fontSize: fontSizes.size10, lineHeight: 12, fontFamily: fontFamilies.bold, color: colors.white }}>%</Text>
                 </View>
               </View>
               <Text selectable style={{ flex: 1, paddingLeft: 7, fontSize: fontSizes.size14, lineHeight: 20, color: colors.mauveTone15_3 }}>Coupons and offers</Text>
-              <Text style={{ fontSize: fontSizes.size13, lineHeight: 19, fontWeight: '600', color: colors.violetTone58 }}>View all</Text>
+              <Text style={{ fontSize: fontSizes.size13, lineHeight: 19, fontFamily: fontFamilies.semiBold, color: colors.violetTone58 }}>View all</Text>
               <Text style={{ marginLeft: 8, fontSize: fontSizes.size22, lineHeight: 24, color: colors.violetTone58 }}>›</Text>
             </Pressable>
 
@@ -313,7 +313,7 @@ export function CartScreen({
               <Text numberOfLines={1} selectable style={{ flex: 1, paddingLeft: 7, fontSize: fontSizes.size14, lineHeight: 20, color: colors.mauveTone15_3 }}>
                 {displayedContactName}, {displayedContactPhone}
               </Text>
-              <Text style={{ marginLeft: 12, fontSize: fontSizes.size13, lineHeight: 19, fontWeight: '600', color: colors.violetTone58 }}>Change</Text>
+              <Text style={{ marginLeft: 12, fontSize: fontSizes.size13, lineHeight: 19, fontFamily: fontFamilies.semiBold, color: colors.violetTone58 }}>Change</Text>
             </Pressable>
 
             <Pressable
@@ -333,7 +333,7 @@ export function CartScreen({
               </View>
               <View style={{ flex: 1, paddingLeft: 11 }}>
                 <Text selectable style={{ fontSize: fontSizes.size15, lineHeight: 21, color: colors.violetTone13 }}>
-                  Total bill <Text style={{ fontWeight: '600' }}>{formatPrice(displayedTotalPrice)}</Text>
+                  Total bill <Text style={{ fontFamily: fontFamilies.semiBold }}>{formatPrice(displayedTotalPrice)}</Text>
                 </Text>
                 <Text selectable style={{ paddingTop: 3, fontSize: fontSizes.size12, lineHeight: 17, color: colors.violetTone44 }}>Incl. govt. taxes &amp; charges</Text>
               </View>
@@ -352,9 +352,9 @@ export function CartScreen({
                 <>
                   <CheckoutDetailRow icon={<Image source={require('../../../assets/time.png')} contentFit="contain" style={{ width: 16, height: 16 }} />} label={formatCheckoutSlot(selectedSlotDate, selectedSlotTime)} onPress={() => setAddressSheet('slot')} />
                   <Pressable accessibilityRole="button" onPress={() => Alert.alert('Payment', 'Payment flow will be connected here.')} style={({ pressed }) => ({ height: 48, marginTop: 8, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: pressed ? colors.violetTone51 : colors.violetTone58 })}>
-                    <Text style={{ fontSize: fontSizes.size15, fontWeight: '700', color: colors.white }}>Proceed to pay</Text>
+                    <Text style={{ fontSize: fontSizes.size15, fontFamily: fontFamilies.bold, color: colors.white }}>Proceed to pay</Text>
                   </Pressable>
-                  <Text style={{ marginTop: 8, textAlign: 'center', fontSize: fontSizes.size10_5, lineHeight: 15, color: colors.mauveTone38_2 }}>By proceeding, you agree to our <Text style={{ fontWeight: '700', textDecorationLine: 'underline' }}>T&amp;C</Text>, <Text style={{ fontWeight: '700', textDecorationLine: 'underline' }}>Privacy</Text> and <Text style={{ fontWeight: '700', textDecorationLine: 'underline' }}>Cancellation Policy</Text>.</Text>
+                  <Text style={{ marginTop: 8, textAlign: 'center', fontSize: fontSizes.size10_5, lineHeight: 15, color: colors.mauveTone38_2 }}>By proceeding, you agree to our <Text style={{ fontFamily: fontFamilies.bold, textDecorationLine: 'underline' }}>T&amp;C</Text>, <Text style={{ fontFamily: fontFamilies.bold, textDecorationLine: 'underline' }}>Privacy</Text> and <Text style={{ fontFamily: fontFamilies.bold, textDecorationLine: 'underline' }}>Cancellation Policy</Text>.</Text>
                 </>
               ) : (
                 <Pressable
@@ -362,7 +362,7 @@ export function CartScreen({
                   onPress={() => setAddressSheet('slot')}
                   style={({ pressed }) => ({ height: 48, marginTop: 8, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: pressed ? colors.violetTone51 : colors.violetTone58 })}
                 >
-                  <Text style={{ fontSize: fontSizes.size15, fontWeight: '600', color: colors.white }}>Select slot</Text>
+                  <Text style={{ fontSize: fontSizes.size15, fontFamily: fontFamilies.semiBold, color: colors.white }}>Select slot</Text>
                 </Pressable>
               )}
             </>
@@ -373,7 +373,7 @@ export function CartScreen({
               onPress={() => void openAddressAndSlot()}
               style={({ pressed }) => ({ height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: pressed ? colors.violetTone51 : colors.violetTone58 })}
             >
-              {addressState.isLoading ? <LoadingDots color={colors.white} gap={6} size={5} /> : <Text style={{ fontSize: fontSizes.size15, fontWeight: '600', color: colors.white }}>Add address and slot</Text>}
+              {addressState.isLoading ? <LoadingDots color={colors.white} gap={6} size={5} /> : <Text style={{ fontSize: fontSizes.size15, fontFamily: fontFamilies.semiBold, color: colors.white }}>Add address and slot</Text>}
             </Pressable>
           )}
         </View>
@@ -382,17 +382,17 @@ export function CartScreen({
       <Modal animationType="slide" transparent visible={showBillSummary} onRequestClose={() => setShowBillSummary(false)}>
         <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: colors.mauveTone8Alpha80 }}>
           <Pressable accessibilityLabel="Close bill summary" onPress={() => setShowBillSummary(false)} style={{ alignSelf: 'flex-end', width: 40, height: 40, marginRight: 20, marginBottom: 8, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: colors.white }}>
-            <Text style={{ fontSize: fontSizes.size23, lineHeight: 25, fontWeight: '300', color: colors.mauveTone9 }}>×</Text>
+            <Text style={{ fontSize: fontSizes.size23, lineHeight: 25, fontFamily: fontFamilies.light, color: colors.mauveTone9 }}>×</Text>
           </Pressable>
           <View style={{ paddingTop: 24, paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 12), borderTopLeftRadius: 24, borderTopRightRadius: 24, backgroundColor: colors.white }}>
-            <Text selectable style={{ fontSize: fontSizes.size24, lineHeight: 31, fontWeight: '600', color: colors.mauveTone9 }}>Bill summary</Text>
+            <Text selectable style={{ fontSize: fontSizes.size24, lineHeight: 31, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9 }}>Bill summary</Text>
             <BillRow label="Item total" value={displayedTotalPrice} />
             <View style={{ height: 1, backgroundColor: colors.mauveTone89_3 }} />
             <BillRow bold label="Total bill" value={displayedTotalPrice} />
             <View style={{ height: 1, backgroundColor: colors.mauveTone89_3 }} />
             <BillRow bold label="Amount to pay" value={displayedTotalPrice} />
             <Pressable onPress={() => setShowBillSummary(false)} style={({ pressed }) => ({ height: 48, marginTop: 10, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: pressed ? colors.violetTone51 : colors.violetTone58 })}>
-              <Text style={{ fontSize: fontSizes.size15, fontWeight: '600', color: colors.white }}>Okay, got it</Text>
+              <Text style={{ fontSize: fontSizes.size15, fontFamily: fontFamilies.semiBold, color: colors.white }}>Okay, got it</Text>
             </Pressable>
           </View>
         </View>
@@ -498,10 +498,10 @@ function SlotSelectionSheet({ selectedDate, selectedTime, onClose, onDateSelect,
   return (
     <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: colors.mauveTone8Alpha80 }}>
       <Pressable accessibilityLabel="Close slot selection" onPress={onClose} style={{ alignSelf: 'flex-end', width: 36, height: 36, marginRight: 18, marginBottom: 8, alignItems: 'center', justifyContent: 'center', borderRadius: 18, backgroundColor: colors.white }}>
-        <Text style={{ fontSize: fontSizes.size21, lineHeight: 23, fontWeight: '300', color: colors.mauveTone9 }}>×</Text>
+        <Text style={{ fontSize: fontSizes.size21, lineHeight: 23, fontFamily: fontFamilies.light, color: colors.mauveTone9 }}>×</Text>
       </Pressable>
       <View style={{ paddingTop: 22, paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 12) + 8, borderTopLeftRadius: 18, borderTopRightRadius: 18, backgroundColor: colors.white }}>
-        <Text style={{ fontSize: fontSizes.size19, lineHeight: 25, fontWeight: '600', color: colors.mauveTone9 }}>When should the professional arrive?</Text>
+        <Text style={{ fontSize: fontSizes.size19, lineHeight: 25, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9 }}>When should the professional arrive?</Text>
         <Text style={{ marginTop: 7, fontSize: fontSizes.size14, lineHeight: 20, color: colors.mauveTone43 }}>Service will take approx. 1 hr</Text>
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10, paddingVertical: 24 }}>
@@ -510,26 +510,26 @@ function SlotSelectionSheet({ selectedDate, selectedTime, onClose, onDateSelect,
             return (
               <Pressable key={item.value} onPress={() => onDateSelect(item.value)} style={({ pressed }) => ({ width: 74, height: 76, alignItems: 'center', justifyContent: 'center', borderRadius: 9, borderWidth: selected ? 1.5 : 1, borderColor: selected ? colors.violetTone58 : colors.mauveTone88, backgroundColor: selected ? colors.violetTone98 : colors.white, opacity: pressed ? 0.72 : 1 })}>
                 <Text style={{ fontSize: fontSizes.size13, lineHeight: 18, color: colors.mauveTone31 }}>{item.day}</Text>
-                <Text style={{ marginTop: 5, fontSize: fontSizes.size16, lineHeight: 21, fontWeight: '600', color: colors.mauveTone9 }}>{item.date}</Text>
+                <Text style={{ marginTop: 5, fontSize: fontSizes.size16, lineHeight: 21, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9 }}>{item.date}</Text>
               </Pressable>
             );
           })}
         </ScrollView>
 
-        <Text style={{ fontSize: fontSizes.size18, lineHeight: 24, fontWeight: '600', color: colors.mauveTone9 }}>Select start time of service</Text>
+        <Text style={{ fontSize: fontSizes.size18, lineHeight: 24, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9 }}>Select start time of service</Text>
         <View style={{ marginTop: 22, flexDirection: 'row', gap: 12 }}>
           {times.map((time) => {
             const selected = selectedTime === time;
             return (
               <Pressable key={time} onPress={() => onTimeSelect(time)} style={({ pressed }) => ({ width: 126, height: 54, alignItems: 'center', justifyContent: 'center', borderRadius: 9, borderWidth: selected ? 1.5 : 1, borderColor: selected ? colors.violetTone58 : colors.mauveTone88, backgroundColor: selected ? colors.violetTone98 : colors.white, opacity: pressed ? 0.72 : 1 })}>
-                <Text style={{ fontSize: fontSizes.size15, fontWeight: selected ? '600' : '400', color: selected ? colors.violetTone58 : colors.mauveTone31 }}>{time}</Text>
+                <Text style={{ fontSize: fontSizes.size15, fontFamily: selected ? fontFamilies.semiBold : fontFamilies.regular, color: selected ? colors.violetTone58 : colors.mauveTone31 }}>{time}</Text>
               </Pressable>
             );
           })}
         </View>
 
         <Pressable accessibilityRole="button" accessibilityState={{ disabled: !canProceed }} disabled={!canProceed} onPress={onProceed} style={({ pressed }) => ({ height: 48, marginTop: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 8, backgroundColor: canProceed ? colors.violetTone58 : colors.violetTone85_2, opacity: pressed ? 0.72 : 1 })}>
-          <Text style={{ fontSize: fontSizes.size15, fontWeight: '700', color: colors.white }}>Proceed to checkout</Text>
+          <Text style={{ fontSize: fontSizes.size15, fontFamily: fontFamilies.bold, color: colors.white }}>Proceed to checkout</Text>
         </Pressable>
       </View>
     </View>
@@ -541,13 +541,13 @@ function SavedAddressSheet({ addresses, isProceeding, selectedAddressId, onAddAn
   return (
     <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: colors.mauveTone8Alpha80 }}>
       <Pressable accessibilityLabel="Close saved addresses" onPress={onClose} style={{ alignSelf: 'flex-end', width: 36, height: 36, marginRight: 18, marginBottom: 8, alignItems: 'center', justifyContent: 'center', borderRadius: 18, backgroundColor: colors.white }}>
-        <Text style={{ fontSize: fontSizes.size21, lineHeight: 23, fontWeight: '300', color: colors.mauveTone9 }}>×</Text>
+        <Text style={{ fontSize: fontSizes.size21, lineHeight: 23, fontFamily: fontFamilies.light, color: colors.mauveTone9 }}>×</Text>
       </Pressable>
       <View style={{ maxHeight: '68%', paddingTop: 22, paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 12) + 10, borderTopLeftRadius: 18, borderTopRightRadius: 18, backgroundColor: colors.white }}>
-        <Text style={{ fontSize: fontSizes.size20, lineHeight: 27, fontWeight: '600', color: colors.mauveTone9 }}>Saved address</Text>
+        <Text style={{ fontSize: fontSizes.size20, lineHeight: 27, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9 }}>Saved address</Text>
         <Pressable onPress={onAddAnother} style={{ height: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: colors.mauveTone94 }}>
-          <Text style={{ width: 28, fontSize: fontSizes.size22, fontWeight: '300', color: colors.violetTone58 }}>+</Text>
-          <Text style={{ fontSize: fontSizes.size15, fontWeight: '700', color: colors.violetTone58 }}>Add another address</Text>
+          <Text style={{ width: 28, fontSize: fontSizes.size22, fontFamily: fontFamilies.light, color: colors.violetTone58 }}>+</Text>
+          <Text style={{ fontSize: fontSizes.size15, fontFamily: fontFamilies.bold, color: colors.violetTone58 }}>Add another address</Text>
         </Pressable>
         <ScrollView showsVerticalScrollIndicator={false}>
           {addresses.map((address) => {
@@ -558,7 +558,7 @@ function SavedAddressSheet({ addresses, isProceeding, selectedAddressId, onAddAn
                   {selected ? <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: colors.violetTone58 }} /> : null}
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: fontSizes.size16, lineHeight: 21, fontWeight: '700', color: colors.mauveTone12_2 }}>{formatAddressLabel(address.label)}</Text>
+                  <Text style={{ fontSize: fontSizes.size16, lineHeight: 21, fontFamily: fontFamilies.bold, color: colors.mauveTone12_2 }}>{formatAddressLabel(address.label)}</Text>
                   <Text style={{ marginTop: 5, fontSize: fontSizes.size13, lineHeight: 19, color: colors.mauveTone38_2 }}>{formatSavedAddress(address)}</Text>
                   <Text style={{ marginTop: 5, fontSize: fontSizes.size13, color: colors.mauveTone38_2 }}>{address.contactName || 'User'}, {formatContactPhone(address.contactPhone)}</Text>
                 </View>
@@ -567,7 +567,7 @@ function SavedAddressSheet({ addresses, isProceeding, selectedAddressId, onAddAn
           })}
         </ScrollView>
         <Pressable disabled={!selectedAddressId || isProceeding} onPress={onProceed} style={({ pressed }) => ({ height: 48, marginTop: 14, alignItems: 'center', justifyContent: 'center', borderRadius: 8, backgroundColor: selectedAddressId ? colors.violetTone58 : colors.violetTone85_2, opacity: pressed ? 0.72 : 1 })}>
-          {isProceeding ? <LoadingDots color={colors.white} gap={6} size={5} /> : <Text style={{ fontSize: fontSizes.size15, fontWeight: '700', color: colors.white }}>Proceed</Text>}
+          {isProceeding ? <LoadingDots color={colors.white} gap={6} size={5} /> : <Text style={{ fontSize: fontSizes.size15, fontFamily: fontFamilies.bold, color: colors.white }}>Proceed</Text>}
         </Pressable>
       </View>
     </View>
@@ -577,8 +577,8 @@ function SavedAddressSheet({ addresses, isProceeding, selectedAddressId, onAddAn
 function BillRow({ bold = false, label, value }: { bold?: boolean; label: string; value: number }) {
   return (
     <View style={{ minHeight: 58, flexDirection: 'row', alignItems: 'center' }}>
-      <Text selectable style={{ flex: 1, fontSize: fontSizes.size15, fontWeight: bold ? '700' : '500', color: colors.mauveTone9 }}>{label}</Text>
-      <Text selectable style={{ fontSize: fontSizes.size15, fontWeight: '600', color: colors.mauveTone9, fontVariant: ['tabular-nums'] }}>{formatPrice(value)}</Text>
+      <Text selectable style={{ flex: 1, fontSize: fontSizes.size15, fontFamily: bold ? fontFamilies.bold : fontFamilies.medium, color: colors.mauveTone9 }}>{label}</Text>
+      <Text selectable style={{ fontSize: fontSizes.size15, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9, fontVariant: ['tabular-nums'] }}>{formatPrice(value)}</Text>
     </View>
   );
 }

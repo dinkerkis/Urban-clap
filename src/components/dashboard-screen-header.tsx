@@ -1,4 +1,4 @@
-import { colors, fontSizes } from '../theme';
+import { colors, fontFamilies, fontSizes } from '../theme';
 import { Pressable, Text, View } from 'react-native';
 
 import { BackIcon } from './back-icon';
@@ -44,7 +44,7 @@ export function DashboardScreenHeader({ title, subtitle, onBack }: DashboardScre
         </Pressable>
       )}
       <View style={{ flex: 1, gap: 2 }}>
-        <Text selectable style={{ fontSize: fontSizes.size21, lineHeight: 27, fontWeight: '600', color: colors.violetTone12 }}>
+        <Text selectable style={{ fontSize: fontSizes.size21, lineHeight: 27, fontFamily: fontFamilies.semiBold, color: colors.violetTone12 }}>
           {title}
         </Text>
         {subtitle && (

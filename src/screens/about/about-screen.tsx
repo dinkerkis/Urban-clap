@@ -1,4 +1,4 @@
-import { colors, fontSizes } from '../../theme';
+import { colors, fontFamilies, fontSizes } from '../../theme';
 import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -18,7 +18,7 @@ function TermsIcon() {
       <View style={{ position: 'absolute', left: 1, top: 0, width: 16, height: 22, borderWidth: 1.4, borderColor: colors.mauveTone22, borderRadius: 2 }} />
       <View style={{ position: 'absolute', left: 5, top: 6, width: 7, height: 1.4, backgroundColor: colors.mauveTone22 }} />
       <View style={{ position: 'absolute', left: 5, top: 10, width: 7, height: 1.4, backgroundColor: colors.mauveTone22 }} />
-      <Text style={{ position: 'absolute', right: 0, bottom: -2, fontSize: fontSizes.size15, lineHeight: 17, fontWeight: '600', color: colors.mauveTone22 }}>+</Text>
+      <Text style={{ position: 'absolute', right: 0, bottom: -2, fontSize: fontSizes.size15, lineHeight: 17, fontFamily: fontFamilies.semiBold, color: colors.mauveTone22 }}>+</Text>
     </View>
   );
 }
@@ -44,10 +44,10 @@ export function AboutScreen({ onBack }: AboutScreenProps) {
 
       <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 24, paddingBottom: Math.max(insets.bottom, 20) + 28 }}>
         <View style={{ width: 82, height: 82, alignItems: 'center', justifyContent: 'center', borderRadius: 17, backgroundColor: colors.violetTone58 }}>
-          <Text style={{ fontSize: fontSizes.size34, lineHeight: 40, fontWeight: '800', letterSpacing: 1, color: colors.white }}>UC</Text>
+          <Text style={{ fontSize: fontSizes.size34, lineHeight: 40, fontFamily: fontFamilies.extraBold, letterSpacing: 1, color: colors.white }}>UC</Text>
         </View>
 
-        <Text style={{ paddingTop: 18, fontSize: fontSizes.size24, lineHeight: 30, fontWeight: '700', color: colors.mauveTone11 }}>Urban Company</Text>
+        <Text style={{ paddingTop: 18, fontSize: fontSizes.size24, lineHeight: 30, fontFamily: fontFamilies.bold, color: colors.mauveTone11 }}>Urban Company</Text>
         <Text style={{ paddingTop: 3, fontSize: fontSizes.size13, lineHeight: 19, color: colors.neutralTone45 }}>Version 1.0.0</Text>
 
         <Text style={{ paddingTop: 24, fontSize: fontSizes.size15, lineHeight: 24, color: colors.mauveTone19_3 }}>

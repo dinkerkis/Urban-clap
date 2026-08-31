@@ -1,4 +1,4 @@
-import { colors, fontSizes, typography } from '../../theme';
+import { colors, fontFamilies, fontSizes, typography } from '../../theme';
 import { useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -98,7 +98,7 @@ export function PhoneLoginScreen({ onContinue }: Props) {
                   style={{ height: '100%', minWidth: 122, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 }}
                 >
                   <Text style={{ fontSize: fontSizes.size17 }}>{country.flag}</Text>
-                  <Text selectable style={{ ...typography.input, fontWeight: '600', color: colors.text }}>{country.callingCode}</Text>
+                  <Text selectable style={{ ...typography.input, fontFamily: fontFamilies.semiBold, color: colors.text }}>{country.callingCode}</Text>
                   <View
                     accessibilityElementsHidden
                     importantForAccessibility="no"

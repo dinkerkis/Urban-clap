@@ -1,4 +1,4 @@
-import { colors, fontSizes } from '../../theme';
+import { colors, fontFamilies, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
 import { useState } from 'react';
 import { Alert, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Switch, Text, TextInput, View } from 'react-native';
@@ -36,7 +36,7 @@ function ScreenHeader({ onBack, title }: { onBack: () => void; title: string }) 
         >
           <BackIcon color={colors.violetTone15} />
         </Pressable>
-        <Text style={{ marginLeft: 13, fontSize: fontSizes.size18, lineHeight: 24, fontWeight: '700', color: colors.mauveTone12_2 }}>{title}</Text>
+        <Text style={{ marginLeft: 13, fontSize: fontSizes.size18, lineHeight: 24, fontFamily: fontFamilies.bold, color: colors.mauveTone12_2 }}>{title}</Text>
       </View>
     </View>
   );
@@ -68,9 +68,9 @@ function DownloadDataModal({ initialEmail, visible, onClose }: { initialEmail?: 
             onPress={onClose}
             style={({ pressed }) => ({ position: 'absolute', right: 14, top: -54, width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 19, backgroundColor: colors.white, opacity: pressed ? 0.65 : 1 })}
           >
-            <Text style={{ fontSize: fontSizes.size24, lineHeight: 27, fontWeight: '300', color: colors.mauveTone19_2 }}>×</Text>
+            <Text style={{ fontSize: fontSizes.size24, lineHeight: 27, fontFamily: fontFamilies.light, color: colors.mauveTone19_2 }}>×</Text>
           </Pressable>
-          <Text style={{ fontSize: fontSizes.size21, lineHeight: 27, fontWeight: '700', color: colors.mauveTone11 }}>Add email address</Text>
+          <Text style={{ fontSize: fontSizes.size21, lineHeight: 27, fontFamily: fontFamilies.bold, color: colors.mauveTone11 }}>Add email address</Text>
           <Text style={{ paddingTop: 7, fontSize: fontSizes.size15, lineHeight: 22, color: colors.neutralTone45 }}>All your details will be shared on the email.</Text>
           <TextInput
             autoCapitalize="none"
@@ -92,7 +92,7 @@ function DownloadDataModal({ initialEmail, visible, onClose }: { initialEmail?: 
             onPress={submit}
             style={({ pressed }) => ({ height: 46, marginTop: 24, alignItems: 'center', justifyContent: 'center', borderRadius: 9, backgroundColor: isValid ? colors.violetTone58 : colors.mauveTone94_3, opacity: pressed ? 0.72 : 1 })}
           >
-            <Text style={{ fontSize: fontSizes.size15, fontWeight: '600', color: isValid ? colors.white : colors.mauveTone66_5 }}>Submit</Text>
+            <Text style={{ fontSize: fontSizes.size15, fontFamily: fontFamilies.semiBold, color: isValid ? colors.white : colors.mauveTone66_5 }}>Submit</Text>
           </Pressable>
         </View>
       </KeyboardAvoidingView>
@@ -111,7 +111,7 @@ export function SettingsScreen({ email, onBack, onDeleteAccount }: SettingsScree
       <ScreenHeader title="Settings" onBack={onBack} />
       <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} style={{ backgroundColor: colors.transparent }} contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: Math.max(insets.bottom, 20) + 28 }}>
         <View style={{ paddingHorizontal: 20, paddingTop: 26 }}>
-          <Text style={{ paddingBottom: 10, fontSize: fontSizes.size21, lineHeight: 27, fontWeight: '700', color: colors.mauveTone11 }}>Notifications & reminders</Text>
+          <Text style={{ paddingBottom: 10, fontSize: fontSizes.size21, lineHeight: 27, fontFamily: fontFamilies.bold, color: colors.mauveTone11 }}>Notifications & reminders</Text>
           {NOTIFICATIONS.map((item) => (
             <View key={item.key} style={{ minHeight: 54, flexDirection: 'row', alignItems: 'center', borderBottomWidth: item.key === 'calls' ? 0 : 1, borderBottomColor: colors.mauveTone94 }}>
               <View style={{ width: 34, alignItems: 'flex-start', justifyContent: 'center' }}>
@@ -134,14 +134,14 @@ export function SettingsScreen({ email, onBack, onDeleteAccount }: SettingsScree
         </View>
 
         <View style={{ marginHorizontal: 20, marginTop: 18, paddingHorizontal: 16, paddingVertical: 12, borderRadius: 12, backgroundColor: colors.violetTone96_6 }}>
-          <Text style={{ fontSize: fontSizes.size15, lineHeight: 21, fontWeight: '600', color: colors.mauveTone16_2 }}>Order related messages</Text>
+          <Text style={{ fontSize: fontSizes.size15, lineHeight: 21, fontFamily: fontFamilies.semiBold, color: colors.mauveTone16_2 }}>Order related messages</Text>
           <Text style={{ paddingTop: 5, fontSize: fontSizes.size13, lineHeight: 21, color: colors.neutralTone45 }}>Order related messages can’t be turned off as they are important for service experience</Text>
         </View>
 
         <View style={{ height: 8, marginTop: 24, backgroundColor: colors.violetTone96_6 }} />
 
         <View style={{ paddingHorizontal: 20, paddingTop: 26 }}>
-          <Text style={{ paddingBottom: 8, fontSize: fontSizes.size21, lineHeight: 27, fontWeight: '700', color: colors.mauveTone11 }}>Privacy & data</Text>
+          <Text style={{ paddingBottom: 8, fontSize: fontSizes.size21, lineHeight: 27, fontFamily: fontFamilies.bold, color: colors.mauveTone11 }}>Privacy & data</Text>
           <Pressable onPress={() => setDownloadVisible(true)} style={({ pressed }) => ({ minHeight: 44, flexDirection: 'row', alignItems: 'center', opacity: pressed ? 0.6 : 1 })}>
             <Text style={{ flex: 1, fontSize: fontSizes.size15, lineHeight: 22, color: colors.mauveTone19_3 }}>Download data</Text>
             <ChevronRight />
@@ -172,7 +172,7 @@ export function PrivacyCenterScreen({ onBack }: { onBack: () => void }) {
     <View style={{ flex: 1, backgroundColor: colors.white }}>
       <ScreenHeader title="Privacy Center" onBack={onBack} />
       <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingTop: headerHeight + 28, paddingBottom: Math.max(insets.bottom, 20) + 28 }}>
-        <Text style={{ fontSize: fontSizes.size21, lineHeight: 27, fontWeight: '700', color: colors.mauveTone11 }}>Account Deletion Policy</Text>
+        <Text style={{ fontSize: fontSizes.size21, lineHeight: 27, fontFamily: fontFamilies.bold, color: colors.mauveTone11 }}>Account Deletion Policy</Text>
         <View style={{ paddingTop: 18, gap: 12 }}>
           {policies.map((policy) => (
             <View key={policy} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10 }}>
@@ -186,7 +186,7 @@ export function PrivacyCenterScreen({ onBack }: { onBack: () => void }) {
           onPress={() => Alert.alert('Delete account?', 'This action is irreversible.', [{ text: 'Cancel', style: 'cancel' }, { text: 'Delete Account', style: 'destructive' }])}
           style={({ pressed }) => ({ alignSelf: 'flex-start', minWidth: 138, height: 40, marginTop: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 8, borderWidth: 1, borderColor: colors.mauveTone87, opacity: pressed ? 0.65 : 1 })}
         >
-          <Text style={{ fontSize: fontSizes.size14, fontWeight: '600', color: colors.redTone44 }}>Delete Account</Text>
+          <Text style={{ fontSize: fontSizes.size14, fontFamily: fontFamilies.semiBold, color: colors.redTone44 }}>Delete Account</Text>
         </Pressable>
       </ScrollView>
     </View>

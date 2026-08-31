@@ -1,4 +1,4 @@
-import { colors, fontSizes } from '../../theme';
+import { colors, fontFamilies, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, TextInput, useWindowDimensions, View } from 'react-native';
@@ -135,7 +135,11 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
   const stickySearchThreshold = useSharedValue(10_000);
   const stickyWhiteThreshold = useSharedValue(10_000);
   const { width } = useWindowDimensions();
-  const categoryWidth = Math.max(92, Math.floor((width - 32 - 24) / 3));
+  const categoryWidth = Math.min(125, Math.max(88, Math.floor((width - 32 - 24) / 3)));
+  const categoryScale = Math.min(1, categoryWidth / 125);
+  const categoryHeight = Math.round(64 * categoryScale);
+  const categoryImageWidth = Math.round(64 * categoryScale);
+  const categoryImageHeight = Math.round(48 * categoryScale);
   const normalizedSearch = search.trim().toLowerCase();
   const bannerSlides = promotionalBanner?.slides ?? [];
   const headerBackgroundUrl = promotionalBanner?.backgroundImageUrl;
@@ -247,10 +251,10 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
           >
             <LocationPinIcon />
             <View style={{ flex: 1, gap: 2 }}>
-              <Text style={{ fontSize: fontSizes.size16, lineHeight: 21, fontWeight: '600', color: colors.whiteAlpha90 }}>{locationHeading}</Text>
+              <Text style={{ fontSize: fontSizes.size16, lineHeight: 21, fontFamily: fontFamilies.semiBold, color: colors.whiteAlpha90 }}>{locationHeading}</Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                 {!locationSubtitle && currentLocation.status === 'loading' && <LoadingDots color={colors.white} gap={5} size={5} />}
-                <Text selectable numberOfLines={1} ellipsizeMode="tail" style={{ flexShrink: 1, fontSize: fontSizes.size12, lineHeight: 17, fontWeight: '500', color: colors.whiteAlpha90 }}>
+                <Text selectable numberOfLines={1} ellipsizeMode="tail" style={{ flexShrink: 1, fontSize: fontSizes.size12, lineHeight: 17, fontFamily: fontFamilies.medium, color: colors.whiteAlpha90 }}>
                   {locationLine}
                 </Text>
                 <ChevronDownIcon />
@@ -281,7 +285,7 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
       <View style={{ paddingHorizontal: 16, paddingTop: 16, gap: 25 }}>
         <View style={{ gap: 15 }}>
           {normalizedSearch ? (
-            <Text selectable style={{ fontSize: fontSizes.size19, lineHeight: 25, fontWeight: '600', color: colors.violetTone13 }}>
+            <Text selectable style={{ fontSize: fontSizes.size19, lineHeight: 25, fontFamily: fontFamilies.semiBold, color: colors.violetTone13 }}>
               Search results
             </Text>
           ) : null}
@@ -295,11 +299,11 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
               <Text style={{ fontSize: fontSizes.size28 }}>⚠️</Text>
               <Text selectable style={{ textAlign: 'center', fontSize: fontSizes.size12, lineHeight: 17, color: colors.violetTone47 }}>{errorMessage}</Text>
               <Pressable accessibilityRole="button" onPress={onRetry} style={{ paddingHorizontal: 18, paddingVertical: 9, borderRadius: 999, backgroundColor: colors.violetTone58 }}>
-                <Text style={{ fontSize: fontSizes.size12, fontWeight: '600', color: colors.white }}>Try again</Text>
+                <Text style={{ fontSize: fontSizes.size12, fontFamily: fontFamilies.semiBold, color: colors.white }}>Try again</Text>
               </Pressable>
             </View>
           ) : visibleCategories.length > 0 ? (
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 12 }}>
               {visibleCategories.map((category) => (
                 <Pressable
                   key={category.id}
@@ -307,14 +311,14 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
                   onPress={() => onCategoryPress(category)}
                   style={({ pressed }) => ({ width: categoryWidth, alignItems: 'center', gap: 6, opacity: pressed ? 0.62 : 1 })}
                 >
-                  <View style={{ width: categoryWidth, height: 64, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderRadius: 12, borderCurve: 'continuous', backgroundColor: colors.neutralTone95 }}>
-                    <Text style={{ fontSize: fontSizes.size22 }}>{category.icon}</Text>
+                  <View style={{ width: categoryWidth, height: categoryHeight, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderRadius: 12, borderCurve: 'continuous', backgroundColor: colors.violetTone98_3 }}>
+                    <Text style={{ fontSize: Math.round(fontSizes.size22 * categoryScale) }}>{category.icon}</Text>
                     {category.imageUrl ? (
                       <Image
                         source={category.imageUrl}
                         contentFit="contain"
                         transition={180}
-                        style={{ position: 'absolute', inset: 12 }}
+                        style={{ position: 'absolute', width: categoryImageWidth, height: categoryImageHeight }}
                       />
                     ) : null}
                   </View>
@@ -327,7 +331,7 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
                       textAlign: 'center',
                       fontSize: fontSizes.size13,
                       lineHeight: 17,
-                      fontWeight: '400',
+                      fontFamily: fontFamilies.regular,
                       color: colors.violetTone17,
                     }}
                   >
@@ -339,7 +343,7 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
           ) : (
             <View style={{ paddingVertical: 24, alignItems: 'center', gap: 7 }}>
               <Text style={{ fontSize: fontSizes.size28 }}>🔎</Text>
-              <Text selectable style={{ fontSize: fontSizes.size14, fontWeight: '700', color: colors.violetTone32 }}>No service found</Text>
+              <Text selectable style={{ fontSize: fontSizes.size14, fontFamily: fontFamilies.bold, color: colors.violetTone32 }}>No service found</Text>
               <Text style={{ fontSize: fontSizes.size11, color: colors.violetTone54_3 }}>Try searching for cleaning, salon or repairs.</Text>
             </View>
           )}
@@ -348,7 +352,7 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
         {!normalizedSearch && spotlights && spotlights.spotlightContent.length > 0 ? (
           <View style={{ marginHorizontal: -16, gap: 18, paddingTop: 10, paddingBottom: 2 }}>
             <View style={{ width: '100%', height: 8, backgroundColor: colors.violetTone96_4 }} />
-            <Text style={{ marginTop: 8, paddingHorizontal: 16, fontSize: fontSizes.size21, lineHeight: 27, fontWeight: '700', color: colors.violetTone13 }}>
+            <Text style={{ marginTop: 8, paddingHorizontal: 16, fontSize: fontSizes.size21, lineHeight: 27, fontFamily: fontFamilies.bold, color: colors.violetTone13 }}>
               {spotlights.sectionTitle}
             </Text>
             <ScrollView

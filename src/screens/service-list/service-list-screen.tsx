@@ -1,4 +1,4 @@
-import { colors, fontSizes } from '../../theme';
+import { colors, fontFamilies, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Modal, Pressable, ScrollView, Share, Text, View, useWindowDimensions } from 'react-native';
@@ -69,7 +69,9 @@ function ServiceListSkeleton({ onBack }: { onBack: () => void }) {
   const { width: screenWidth } = useWindowDimensions();
   const reducedMotion = useReducedMotion();
   const progress = useSharedValue(0);
-  const cardWidth = Math.floor((Math.min(screenWidth, 520) - 80) / 3);
+  const cardWidth = Math.floor((Math.min(screenWidth, 520) - 68) / 4);
+  const categoryImageSize = Math.min(64, cardWidth);
+  const productImageSize = 128;
 
   useEffect(() => {
     cancelAnimation(progress);
@@ -91,10 +93,10 @@ function ServiceListSkeleton({ onBack }: { onBack: () => void }) {
           <ServiceSkeletonBlock height={18} progress={progress} radius={5} screenWidth={screenWidth} width="46%" />
         </View>
         <View style={{ height: 8, backgroundColor: colors.mauveTone96 }} />
-        <View style={{ paddingHorizontal: 20, paddingVertical: 25, flexDirection: 'row', flexWrap: 'wrap', columnGap: 16, rowGap: 22 }}>
+        <View style={{ paddingHorizontal: 16, paddingVertical: 25, flexDirection: 'row', flexWrap: 'wrap', columnGap: 12, rowGap: 22 }}>
           {[0, 1, 2, 3, 4, 5].map((index) => (
             <View key={`service-skeleton-category-${index}`} style={{ width: cardWidth, alignItems: 'center', gap: 8 }}>
-              <ServiceSkeletonBlock height={cardWidth} progress={progress} radius={8} screenWidth={screenWidth} width={cardWidth} />
+              <ServiceSkeletonBlock height={categoryImageSize} progress={progress} radius={8} screenWidth={screenWidth} width={categoryImageSize} />
               <ServiceSkeletonBlock height={16} progress={progress} radius={5} screenWidth={screenWidth} width="86%" />
               <ServiceSkeletonBlock height={16} progress={progress} radius={5} screenWidth={screenWidth} width="68%" />
             </View>
@@ -110,7 +112,7 @@ function ServiceListSkeleton({ onBack }: { onBack: () => void }) {
                 <ServiceSkeletonBlock height={15} progress={progress} radius={5} screenWidth={screenWidth} width="60%" />
                 <ServiceSkeletonBlock height={15} progress={progress} radius={5} screenWidth={screenWidth} width="72%" />
               </View>
-              <ServiceSkeletonBlock height={132} progress={progress} radius={13} screenWidth={screenWidth} width={132} />
+              <ServiceSkeletonBlock height={productImageSize} progress={progress} radius={13} screenWidth={screenWidth} width={productImageSize} />
             </View>
           ))}
         </View>
@@ -131,11 +133,13 @@ function ServiceListSkeleton({ onBack }: { onBack: () => void }) {
 }
 
 function ProductRow({ item, quantity, onAdd, onPress, onRemove }: { item: ServiceItem; quantity: number; onAdd: (item: ServiceItem) => void; onPress: (item: ServiceItem) => void; onRemove: (item: ServiceItem) => void }) {
+  const productImageSize = 128;
+
   return (
     <Pressable onPress={() => onPress(item)} style={({ pressed }) => ({ paddingVertical: 22, opacity: pressed ? 0.72 : 1 })}>
       <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 16 }}>
         <View style={{ flex: 1, gap: 7 }}>
-          <Text selectable numberOfLines={3} style={{ fontSize: fontSizes.size18, lineHeight: 25, fontWeight: '600', color: colors.mauveTone9_2 }}>{item.title}</Text>
+          <Text selectable numberOfLines={3} style={{ fontSize: fontSizes.size18, lineHeight: 25, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9_2 }}>{item.title}</Text>
           {item.rating > 0 ? (
             <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 4 }}>
               <Text style={{ fontSize: fontSizes.size12, lineHeight: 18, color: colors.mauveTone38_2 }}>★</Text>
@@ -146,7 +150,7 @@ function ProductRow({ item, quantity, onAdd, onPress, onRemove }: { item: Servic
           ) : null}
           <DottedUnderline fullWidth lineMarginTop={10} dotColor={colors.mauveTone86}>
             <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 7 }}>
-              <Text selectable style={{ fontSize: fontSizes.size13, lineHeight: 19, fontWeight: '600', color: colors.mauveTone9_2 }}>{item.variants?.length ? 'Starts at ' : ''}₹{item.price.toLocaleString('en-IN')}</Text>
+              <Text selectable style={{ fontSize: fontSizes.size13, lineHeight: 19, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9_2 }}>{item.variants?.length ? 'Starts at ' : ''}₹{item.price.toLocaleString('en-IN')}</Text>
               {item.duration ? (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                   <Text style={{ fontSize: fontSizes.size16, lineHeight: 18, color: colors.mauveTone38_2 }}>•</Text>
@@ -156,11 +160,11 @@ function ProductRow({ item, quantity, onAdd, onPress, onRemove }: { item: Servic
             </View>
           </DottedUnderline>
           {item.description ? <Text selectable numberOfLines={3} style={{ fontSize: fontSizes.size13, lineHeight: 19, color: colors.mauveTone38_2 }}>{item.description}</Text> : null}
-          <Text style={{ paddingTop: 5, fontSize: fontSizes.size14, lineHeight: 19, fontWeight: '600', color: colors.violetTone58 }}>View details and estimate</Text>
+          <Text style={{ paddingTop: 5, fontSize: fontSizes.size14, lineHeight: 19, fontFamily: fontFamilies.semiBold, color: colors.violetTone58 }}>View details and estimate</Text>
         </View>
 
-        <View style={{ width: 132, alignItems: 'center' }}>
-          <View style={{ width: 132, height: 132, overflow: 'hidden', borderRadius: 13, borderCurve: 'continuous', backgroundColor: colors.violetTone95_2 }}>
+        <View style={{ width: productImageSize, height: productImageSize + 16, alignItems: 'center' }}>
+          <View style={{ width: productImageSize, height: productImageSize, overflow: 'hidden', borderRadius: 13, borderCurve: 'continuous', backgroundColor: colors.violetTone95_2 }}>
             {item.imageUrl ? <Image source={item.imageUrl} contentFit="cover" transition={180} style={{ position: 'absolute', inset: 0 }} /> : null}
           </View>
           {quantity === 0 ? (
@@ -171,14 +175,14 @@ function ProductRow({ item, quantity, onAdd, onPress, onRemove }: { item: Servic
                 if (item.variants?.length) onPress(item);
                 else onAdd(item);
               }}
-              style={({ pressed }) => ({ width: 78, height: 32, marginTop: -20, alignItems: 'center', justifyContent: 'center', borderRadius: 10, borderCurve: 'continuous', backgroundColor: pressed ? colors.violetTone97 : colors.white, boxShadow: `0 1px 6px ${colors.mauveTone9Alpha16}` })}
+              style={({ pressed }) => ({ position: 'absolute', bottom: 0, alignSelf: 'center', width: 78, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 10, borderCurve: 'continuous', backgroundColor: pressed ? colors.violetTone97 : colors.white, boxShadow: `0 1px 6px ${colors.mauveTone9Alpha16}` })}
             >
-              <Text style={{ fontSize: fontSizes.size16, fontWeight: '500', color: colors.violetTone58 }}>Add</Text>
+              <Text style={{ fontSize: fontSizes.size16, fontFamily: fontFamilies.medium, color: colors.violetTone58 }}>Add</Text>
             </Pressable>
           ) : (
-            <View style={{ width: 78, height: 32, marginTop: -20, flexDirection: 'row', alignItems: 'center', overflow: 'hidden', borderRadius: 10, backgroundColor: colors.violetTone58 }}>
+            <View style={{ position: 'absolute', bottom: 0, alignSelf: 'center', width: 78, height: 32, flexDirection: 'row', alignItems: 'center', overflow: 'hidden', borderRadius: 10, backgroundColor: colors.violetTone58 }}>
               <Pressable onPress={(event) => { event.stopPropagation(); onRemove(item); }} style={{ width: 26, height: 32, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: fontSizes.size20, color: colors.white }}>−</Text></Pressable>
-              <Text style={{ flex: 1, textAlign: 'center', fontSize: fontSizes.size14, fontWeight: '600', color: colors.white, fontVariant: ['tabular-nums'] }}>{quantity}</Text>
+              <Text style={{ flex: 1, textAlign: 'center', fontSize: fontSizes.size14, fontFamily: fontFamilies.semiBold, color: colors.white, fontVariant: ['tabular-nums'] }}>{quantity}</Text>
               <Pressable onPress={(event) => { event.stopPropagation(); onAdd(item); }} style={{ width: 26, height: 32, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: fontSizes.size20, color: colors.white }}>+</Text></Pressable>
             </View>
           )}
@@ -266,9 +270,10 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
   const productCount = sections.reduce((total, section) => total + section.products.length, 0);
   const ratedProducts = sections.flatMap((section) => section.products).filter((item) => item.rating > 0);
   const averageRating = ratedProducts.length ? ratedProducts.reduce((total, item) => total + item.rating, 0) / ratedProducts.length : 0;
-  const sectionCardWidth = Math.floor((Math.min(width, 520) - 80) / 3);
-  const modalCardWidth = Math.floor((Math.min(width, 520) - 80) / 3);
-  const modalImageSize = Math.floor(modalCardWidth * 0.82);
+  const sectionCardWidth = Math.floor((Math.min(width, 520) - 68) / 4);
+  const sectionImageSize = Math.min(64, sectionCardWidth);
+  const modalCardWidth = Math.floor((Math.min(width, 520) - 92) / 4);
+  const modalImageSize = Math.min(64, modalCardWidth);
 
   const scrollToSection = (section: ProductSection) => {
     closeMenu();
@@ -283,7 +288,7 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
   }
 
   if (errorMessage) {
-    return <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, padding: 24, backgroundColor: colors.white }}><Text selectable style={{ textAlign: 'center', fontSize: fontSizes.size13, lineHeight: 19, color: colors.mauveTone38_2 }}>{errorMessage}</Text><Pressable onPress={retry} style={{ paddingHorizontal: 20, paddingVertical: 11, borderRadius: 999, backgroundColor: colors.violetTone58 }}><Text style={{ fontWeight: '600', color: colors.white }}>Try again</Text></Pressable></View>;
+    return <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, padding: 24, backgroundColor: colors.white }}><Text selectable style={{ textAlign: 'center', fontSize: fontSizes.size13, lineHeight: 19, color: colors.mauveTone38_2 }}>{errorMessage}</Text><Pressable onPress={retry} style={{ paddingHorizontal: 20, paddingVertical: 11, borderRadius: 999, backgroundColor: colors.violetTone58 }}><Text style={{ fontFamily: fontFamilies.semiBold, color: colors.white }}>Try again</Text></Pressable></View>;
   }
 
   return (
@@ -319,13 +324,13 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
             </Animated.View>
           ) : null}
 
-          {heroItems[heroIndex] ? <View style={{ position: 'absolute', left: 28, right: 28, bottom: 43, gap: 5 }}><Text selectable numberOfLines={2} style={{ maxWidth: '82%', fontSize: fontSizes.size23, lineHeight: 29, fontWeight: '600', color: colors.white }}>{heroItems[heroIndex].title}</Text><Text selectable numberOfLines={2} style={{ maxWidth: '82%', fontSize: fontSizes.size13, lineHeight: 18, color: colors.whiteAlpha88 }}>{heroItems[heroIndex].subtitle}</Text></View> : null}
+          {heroItems[heroIndex] ? <View style={{ position: 'absolute', left: 28, right: 28, bottom: 43, gap: 5 }}><Text selectable numberOfLines={2} style={{ maxWidth: '82%', fontSize: fontSizes.size23, lineHeight: 29, fontFamily: fontFamilies.semiBold, color: colors.white }}>{heroItems[heroIndex].title}</Text><Text selectable numberOfLines={2} style={{ maxWidth: '82%', fontSize: fontSizes.size13, lineHeight: 18, color: colors.whiteAlpha88 }}>{heroItems[heroIndex].subtitle}</Text></View> : null}
 
           {heroItems.length > 1 ? <View style={{ position: 'absolute', left: 20, right: 20, bottom: 17, flexDirection: 'row', gap: 5 }}>{heroItems.map((item, index) => <View key={`${item.imageUrl}-${index}`} style={{ flex: 1, height: 3, overflow: 'hidden', borderRadius: 2, backgroundColor: colors.whiteAlpha38 }}>{index < heroIndex ? <View style={{ flex: 1, backgroundColor: colors.white }} /> : index === heroIndex ? <Animated.View style={[{ flex: 1, backgroundColor: colors.white, transformOrigin: 'left' }, activeProgressStyle]} /> : null}</View>)}</View> : null}
         </View>
 
         <View style={{ paddingHorizontal: 20, paddingTop: 25, paddingBottom: 22, gap: 7 }}>
-          <Text selectable style={{ fontSize: fontSizes.size25, lineHeight: 32, fontWeight: '600', color: colors.mauveTone9_2 }}>{categoryTitle}</Text>
+          <Text selectable style={{ fontSize: fontSizes.size25, lineHeight: 32, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9_2 }}>{categoryTitle}</Text>
           <View style={{ flexDirection: 'row', alignItems: 'flex-start', flexWrap: 'wrap', gap: 4 }}>
             {averageRating > 0 ? (
               <>
@@ -342,10 +347,10 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
 
         <View style={{ height: 8, backgroundColor: colors.mauveTone96 }} />
 
-        <View style={{ paddingHorizontal: 20, paddingVertical: 25, flexDirection: 'row', flexWrap: 'wrap', columnGap: 16, rowGap: 22 }}>
+        <View style={{ paddingHorizontal: 16, paddingVertical: 25, flexDirection: 'row', flexWrap: 'wrap', columnGap: 12, rowGap: 22 }}>
           {sections.map((section) => (
             <Pressable key={section.id} onPress={() => scrollToSection(section)} style={({ pressed }) => ({ width: sectionCardWidth, alignItems: 'center', gap: 8, opacity: pressed ? 0.65 : 1 })}>
-              <View style={{ width: sectionCardWidth, height: sectionCardWidth, overflow: 'hidden', borderRadius: 8, borderCurve: 'continuous', backgroundColor: colors.neutralTone93 }}>{section.imageUrl ? <Image source={section.imageUrl} contentFit="cover" style={{ position: 'absolute', inset: 0 }} /> : null}</View>
+              <View style={{ width: sectionImageSize, height: sectionImageSize, overflow: 'hidden', borderRadius: 8, borderCurve: 'continuous', backgroundColor: colors.neutralTone93 }}>{section.imageUrl ? <Image source={section.imageUrl} contentFit="cover" style={{ position: 'absolute', inset: 0 }} /> : null}</View>
               <Text selectable numberOfLines={3} style={{ minHeight: 37, textAlign: 'center', fontSize: fontSizes.size13, lineHeight: 18, color: colors.mauveTone9_2 }}>{section.title}</Text>
             </Pressable>
           ))}
@@ -355,7 +360,7 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
 
         {visibleSections.map((section, sectionIndex) => (
           <View key={section.id} onLayout={(event) => { sectionOffsets.current[section.id] = event.nativeEvent.layout.y; }} style={{ paddingHorizontal: 20 }}>
-            <Text selectable style={{ paddingTop: 30, paddingBottom: 4, fontSize: fontSizes.size23, lineHeight: 30, fontWeight: '600', color: colors.mauveTone9_2 }}>{section.title}</Text>
+            <Text selectable style={{ paddingTop: 30, paddingBottom: 4, fontSize: fontSizes.size23, lineHeight: 30, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9_2 }}>{section.title}</Text>
             {section.products.length > 0 ? section.products.map((item, index) => <View key={item.id} onLayout={(event) => { productOffsets.current[item.id] = event.nativeEvent.layout.y + (sectionOffsets.current[section.id] ?? 0); }}><ProductRow item={item} quantity={cart[item.id] ?? 0} onAdd={onAdd} onPress={onProductPress} onRemove={onRemove} />{index < section.products.length - 1 ? <View style={{ height: 1, backgroundColor: colors.mauveTone89_4 }} /> : null}</View>) : <Text selectable style={{ paddingVertical: 24, fontSize: fontSizes.size14, color: colors.violetTone47 }}>Products coming soon</Text>}
             {sectionIndex < visibleSections.length - 1 ? <View style={{ height: 8, marginHorizontal: -20, backgroundColor: colors.mauveTone96 }} /> : null}
           </View>
@@ -387,7 +392,7 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
             </Pressable>
 
             {stickyHeaderVisible ? (
-              <Text selectable numberOfLines={1} ellipsizeMode="tail" style={{ flex: 1, fontSize: fontSizes.size18, lineHeight: 24, fontWeight: '600', color: colors.mauveTone9_2 }}>
+              <Text selectable numberOfLines={1} ellipsizeMode="tail" style={{ flex: 1, fontSize: fontSizes.size18, lineHeight: 24, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9_2 }}>
                 {categoryTitle}
               </Text>
             ) : <View style={{ flex: 1 }} />}
@@ -414,14 +419,14 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
           </View>
           {stickySection ? (
             <View style={{ height: SECTION_HEADER_HEIGHT, paddingHorizontal: 20, justifyContent: 'center', backgroundColor: colors.white, borderBottomWidth: 1, borderBottomColor: colors.mauveTone90_3 }}>
-              <Text selectable numberOfLines={1} ellipsizeMode="tail" style={{ fontSize: fontSizes.size14, lineHeight: 20, fontWeight: '700', color: colors.mauveTone9_2 }}>
+              <Text selectable numberOfLines={1} ellipsizeMode="tail" style={{ fontSize: fontSizes.size14, lineHeight: 20, fontFamily: fontFamilies.bold, color: colors.mauveTone9_2 }}>
                 {stickySection.title}
               </Text>
             </View>
           ) : null}
       </View>
 
-      {sections.length > 0 ? <Pressable onPress={openMenu} style={({ pressed }) => ({ position: 'absolute', bottom: insets.bottom + 130, alignSelf: 'center', height: 36, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', gap: 6, borderRadius: 18, backgroundColor: colors.violetTone15_3, boxShadow: `0 5px 16px ${colors.blackAlpha22}`, opacity: pressed ? 0.78 : 1 })}><Text style={{ fontSize: fontSizes.size19, color: colors.white }}>☰</Text><Text style={{ fontSize: fontSizes.size17, fontWeight: '600', color: colors.white }}>Menu</Text></Pressable> : null}
+      {sections.length > 0 ? <Pressable onPress={openMenu} style={({ pressed }) => ({ position: 'absolute', bottom: insets.bottom + 130, alignSelf: 'center', height: 36, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', gap: 6, borderRadius: 18, backgroundColor: colors.violetTone15_3, boxShadow: `0 5px 16px ${colors.blackAlpha22}`, opacity: pressed ? 0.78 : 1 })}><Text style={{ fontSize: fontSizes.size19, color: colors.white }}>☰</Text><Text style={{ fontSize: fontSizes.size17, fontFamily: fontFamilies.semiBold, color: colors.white }}>Menu</Text></Pressable> : null}
 
       <View
         style={{
@@ -438,7 +443,7 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
       >
         <View style={{ minHeight: 38, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: colors.yellowTone95 }}>
           <EstimateNoteIcon />
-          <Text selectable numberOfLines={2} style={{ flex: 1, fontSize: fontSizes.size12, lineHeight: 17, fontWeight: '700', color: colors.yellowTone30 }}>
+          <Text selectable numberOfLines={2} style={{ flex: 1, fontSize: fontSizes.size12, lineHeight: 17, fontFamily: fontFamilies.bold, color: colors.yellowTone30 }}>
             Please generate an estimate first from the list above
           </Text>
         </View>
@@ -448,7 +453,7 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
             accessibilityState={{ disabled: true }}
             style={{ height: 54, alignItems: 'center', justifyContent: 'center', borderRadius: 12, borderCurve: 'continuous', backgroundColor: colors.neutralTone93 }}
           >
-            <Text style={{ fontSize: fontSizes.size17, fontWeight: '700', color: colors.neutralTone72 }}>Book Consultation at ₹49</Text>
+            <Text style={{ fontSize: fontSizes.size17, fontFamily: fontFamilies.bold, color: colors.neutralTone72 }}>Book Consultation at ₹49</Text>
           </View>
         </View>
       </View>
@@ -467,7 +472,7 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
                 ))}
               </View>
             </View>
-            <Pressable accessibilityLabel="Close menu" onPress={closeMenu} style={({ pressed }) => ({ width: 44, height: 44, marginTop: 22, alignSelf: 'center', alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: colors.white, opacity: pressed ? 0.72 : 1 })}><Text style={{ fontSize: fontSizes.size28, lineHeight: 30, fontWeight: '300', color: colors.mauveTone9_2 }}>×</Text></Pressable>
+            <Pressable accessibilityLabel="Close menu" onPress={closeMenu} style={({ pressed }) => ({ width: 44, height: 44, marginTop: 22, alignSelf: 'center', alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: colors.white, opacity: pressed ? 0.72 : 1 })}><Text style={{ fontSize: fontSizes.size28, lineHeight: 30, fontFamily: fontFamilies.light, color: colors.mauveTone9_2 }}>×</Text></Pressable>
           </Animated.View>
         </View>
       </Modal>

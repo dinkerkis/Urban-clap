@@ -1,4 +1,4 @@
-import { colors, fontSizes } from '../../theme';
+import { colors, fontFamilies, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 
@@ -33,13 +33,13 @@ export function CategoriesScreen({ categories, errorMessage, isLoading, onCatego
             <Text style={{ fontSize: fontSizes.size30 }}>⚠️</Text>
             <Text selectable style={{ textAlign: 'center', fontSize: fontSizes.size12, lineHeight: 18, color: colors.violetTone47 }}>{errorMessage}</Text>
             <Pressable accessibilityRole="button" onPress={onRetry} style={{ paddingHorizontal: 18, paddingVertical: 10, borderRadius: 999, backgroundColor: colors.violetTone58 }}>
-              <Text style={{ fontSize: fontSizes.size12, fontWeight: '600', color: colors.white }}>Try again</Text>
+              <Text style={{ fontSize: fontSizes.size12, fontFamily: fontFamilies.semiBold, color: colors.white }}>Try again</Text>
             </Pressable>
           </View>
         ) : categories.length === 0 ? (
           <View style={{ minHeight: 260, alignItems: 'center', justifyContent: 'center', gap: 8 }}>
             <Text style={{ fontSize: fontSizes.size30 }}>📂</Text>
-            <Text selectable style={{ fontSize: fontSizes.size13, fontWeight: '700', color: colors.violetTone32 }}>No categories available</Text>
+            <Text selectable style={{ fontSize: fontSizes.size13, fontFamily: fontFamilies.bold, color: colors.violetTone32 }}>No categories available</Text>
           </View>
         ) : categories.map((category) => (
           <Pressable
@@ -67,9 +67,9 @@ export function CategoriesScreen({ categories, errorMessage, isLoading, onCatego
               ) : null}
             </View>
             <View style={{ flex: 1, gap: 4 }}>
-              <Text selectable style={{ fontSize: fontSizes.size15, lineHeight: 20, fontWeight: '600', color: colors.violetTone13 }}>{category.title}</Text>
+              <Text selectable style={{ fontSize: fontSizes.size15, lineHeight: 20, fontFamily: fontFamilies.semiBold, color: colors.violetTone13 }}>{category.title}</Text>
               <Text selectable style={{ fontSize: fontSizes.size11, lineHeight: 16, color: colors.violetTone47 }}>{category.subtitle}</Text>
-              <Text style={{ fontSize: fontSizes.size10, fontWeight: '700', color: colors.violetTone58 }}>{category.subcategories.length} service types</Text>
+              <Text style={{ fontSize: fontSizes.size10, fontFamily: fontFamilies.bold, color: colors.violetTone58 }}>{category.subcategories.length} service types</Text>
             </View>
             <Text style={{ fontSize: fontSizes.size26, color: colors.violetTone64 }}>›</Text>
           </Pressable>

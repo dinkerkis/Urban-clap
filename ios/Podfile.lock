@@ -33,7 +33,7 @@ PODS:
     - ExpoModulesCore
   - ExpoFileSystem (57.0.2):
     - ExpoModulesCore
-  - ExpoFont (57.0.1):
+  - ExpoFont (57.0.2):
     - ExpoModulesCore
   - ExpoImage (57.0.0):
     - ExpoModulesCore
@@ -78,6 +78,11 @@ PODS:
   - ExpoModulesWorklets (57.0.12):
     - ExpoModulesCore
     - ExpoModulesJSI
+  - ExpoModulesWorkletsAdapter (57.0.12):
+    - ExpoModulesCore
+    - ExpoModulesJSI
+    - ExpoModulesWorklets
+    - RNWorklets
   - ExpoSecureStore (57.0.0):
     - ExpoModulesCore
   - ExpoSplashScreen (57.0.2):
@@ -2285,6 +2290,7 @@ DEPENDENCIES:
   - ExpoModulesCore (from `../node_modules/expo-modules-core`)
   - ExpoModulesJSI (from `../node_modules/expo-modules-jsi/apple`)
   - ExpoModulesWorklets (from `../node_modules/expo-modules-core`)
+  - ExpoModulesWorkletsAdapter (from `../node_modules/expo-modules-core`)
   - ExpoSecureStore (from `../node_modules/expo-secure-store/ios`)
   - ExpoSplashScreen (from `../node_modules/expo-splash-screen/ios`)
   - ExpoVideo (from `../node_modules/expo-video/ios`)
@@ -2406,6 +2412,8 @@ EXTERNAL SOURCES:
   ExpoModulesJSI:
     :path: "../node_modules/expo-modules-jsi/apple"
   ExpoModulesWorklets:
+    :path: "../node_modules/expo-modules-core"
+  ExpoModulesWorkletsAdapter:
     :path: "../node_modules/expo-modules-core"
   ExpoSecureStore:
     :path: "../node_modules/expo-secure-store/ios"
@@ -2581,7 +2589,7 @@ SPEC CHECKSUMS:
   ExpoAsset: fc429c61615141b81faabdb5b0c4f8f2861c7449
   ExpoDomWebView: fa9c72fe29dd4649197a7ecb07ddd870d55c4eda
   ExpoFileSystem: 5f22d602c86c37460df3b954cf1ceb00a5e5ca75
-  ExpoFont: 17668fb7b4e06edf35e015183eb7bc09d83be637
+  ExpoFont: ffe06b81b7743d2c65c68991bc6502bf5bc4a462
   ExpoImage: f58218d46b32b3b1a0c023e416f33da95dd4e7c8
   ExpoKeepAwake: c5a7e46e8f52c093370ea89457d73c060d0b2a2e
   ExpoLocation: a808bb82b56940bfe207730941c5d3518985960e
@@ -2589,6 +2597,7 @@ SPEC CHECKSUMS:
   ExpoModulesCore: fecf3c992357de793242779dbbcaa7bcb3d600f0
   ExpoModulesJSI: f7b9fe1e0e5e38b2b9a133c7eb5a409be178da1c
   ExpoModulesWorklets: e539f9940e89dd7abfc37dbb1d964d1110658589
+  ExpoModulesWorkletsAdapter: 48b4b237bce8eef54ecf0e8ae2945600f5753dca
   ExpoSecureStore: 8e3efc4a558e43fbbd80b61b0106b8521a409545
   ExpoSplashScreen: 30410cb4714241e37bedee927e572335f591042f
   ExpoVideo: 5e8b2e059c9db48c4c639f7e84d07647b59ffca0
@@ -2678,8 +2687,8 @@ SPEC CHECKSUMS:
   SDWebImageAVIFCoder: afe194a084e851f70228e4be35ef651df0fc5c57
   SDWebImageSVGCoder: 15a300a97ec1c8ac958f009c02220ac0402e936c
   SDWebImageWebPCoder: e38c0a70396191361d60c092933e22c20d5b1380
-  Yoga: 94172d87dd5d83fc929bf1ee53121b5d4490b5f2
+  Yoga: fe50ab299e578f397fef753cf309c6703a4db29b
 
-PODFILE CHECKSUM: 691d565a66456755755e30c8ee29eed829c6b567
+PODFILE CHECKSUM: fb3e0f8c6df5bebd835db49cd20da6707e340cb1
 
 COCOAPODS: 1.16.2

@@ -12,7 +12,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { colors, fontSizes } from '../theme';
+import { colors, fontFamilies, fontSizes } from '../theme';
 import type { BannerHeadingColor, PromotionalBannerSlide } from '../services/home-promotional-banner-api';
 
 const AUTO_SCROLL_INTERVAL_MS = 4_500;
@@ -70,7 +70,7 @@ function BannerHeading({
 
   if (!stacked) {
     return (
-      <Text selectable style={{ fontSize: fontSizes.size30, lineHeight: 32, fontWeight: '700', color: accent }}>
+      <Text selectable style={{ fontSize: fontSizes.size30, lineHeight: 32, fontFamily: fontFamilies.bold, color: accent }}>
         {heading}
       </Text>
     );
@@ -84,7 +84,7 @@ function BannerHeading({
           fontFamily: DISPLAY_SERIF,
           fontSize: fontSizes.size12,
           lineHeight: 16,
-          fontWeight: '700',
+          fontFamily: fontFamilies.bold,
           letterSpacing: 2.4,
           color: accent,
         }}
@@ -100,7 +100,7 @@ function BannerHeading({
               fontFamily: DISPLAY_SERIF,
               fontSize: fontSizes.size34 - 2,
               lineHeight: 34,
-              fontWeight: '700',
+              fontFamily: fontFamilies.bold,
               letterSpacing: 0.4,
               color: accent,
             }}
@@ -263,12 +263,12 @@ export function OfferCarousel({ embeddedOnPurple = false, slides }: OfferCarouse
           >
             <BannerHeading heading={activeSlide.mainHeading} color={activeSlide.mainHeadingColor} />
             {activeSlide.label ? (
-              <Text style={{ fontSize: fontSizes.size13, lineHeight: 18, fontWeight: '600', color: activeSlide.textColor }}>
+              <Text style={{ fontSize: fontSizes.size13, lineHeight: 18, fontFamily: fontFamilies.semiBold, color: activeSlide.textColor }}>
                 {activeSlide.label}
               </Text>
             ) : null}
             {actionLabel ? (
-              <Text selectable style={{ marginTop: 18, fontSize: fontSizes.size14, lineHeight: 19, fontWeight: '700', color: activeSlide.textColor }}>
+              <Text selectable style={{ marginTop: 18, fontSize: fontSizes.size14, lineHeight: 19, fontFamily: fontFamilies.bold, color: activeSlide.textColor }}>
                 {actionLabel}
               </Text>
             ) : null}

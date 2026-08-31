@@ -1,4 +1,13 @@
 import { colors } from './theme';
+import {
+  OpenSans_300Light,
+  OpenSans_400Regular,
+  OpenSans_500Medium,
+  OpenSans_600SemiBold,
+  OpenSans_700Bold,
+  OpenSans_800ExtraBold,
+} from '@expo-google-fonts/open-sans';
+import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
@@ -22,12 +31,22 @@ void SplashScreen.preventAutoHideAsync();
 SplashScreen.setOptions({ duration: 0, fade: false });
 
 export default function App() {
+  const [fontsLoaded, fontError] = useFonts({
+    os_light: OpenSans_300Light,
+    os_regular: OpenSans_400Regular,
+    os_medium: OpenSans_500Medium,
+    os_semibold: OpenSans_600SemiBold,
+    os_bold: OpenSans_700Bold,
+    os_extrabold: OpenSans_800ExtraBold,
+  });
   const [screen, setScreen] = useState<Screen>('loading');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [callingCode, setCallingCode] = useState('+91');
   const [session, setSession] = useState<AuthSession | null>(null);
 
   useEffect(() => {
+    if (!fontsLoaded && !fontError) return;
+
     let active = true;
 
     void SplashScreen.hide();
@@ -49,7 +68,7 @@ export default function App() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [fontError, fontsLoaded]);
 
   useEffect(() => {
     const token = session?.token;
@@ -72,6 +91,8 @@ export default function App() {
 
     return () => controller.abort();
   }, [screen, session?.token]);
+
+  if (!fontsLoaded && !fontError) return null;
 
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>

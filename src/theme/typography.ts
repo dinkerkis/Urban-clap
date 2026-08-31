@@ -34,11 +34,20 @@ export const fontSizes = {
   size67: 67,
 } as const;
 
+export const fontFamilies = {
+  light: 'os_light',
+  regular: 'os_regular',
+  medium: 'os_medium',
+  semiBold: 'os_semibold',
+  bold: 'os_bold',
+  extraBold: 'os_extrabold',
+} as const;
+
 export const typography = {
-  hero: { fontSize: fontSizes.size26, lineHeight: 32, fontWeight: '700' as const, letterSpacing: -0.5 },
-  title: { fontSize: fontSizes.size23, lineHeight: 29, fontWeight: '700' as const, letterSpacing: -0.35 },
-  body: { fontSize: fontSizes.size14, lineHeight: 24, fontWeight: '400' as const },
-  input: { fontSize: fontSizes.size16, lineHeight: 21, fontWeight: '400' as const },
-  button: { fontSize: fontSizes.size16, lineHeight: 21, fontWeight: '600' as const },
-  caption: { fontSize: fontSizes.size13, lineHeight: 19, fontWeight: '400' as const },
+  hero: { fontSize: fontSizes.size26, lineHeight: 32, fontFamily: fontFamilies.bold, letterSpacing: -0.5 },
+  title: { fontSize: fontSizes.size23, lineHeight: 29, fontFamily: fontFamilies.bold, letterSpacing: -0.35 },
+  body: { fontSize: fontSizes.size14, lineHeight: 24, fontFamily: fontFamilies.regular },
+  input: { fontSize: fontSizes.size16, lineHeight: 21, fontFamily: fontFamilies.regular },
+  button: { fontSize: fontSizes.size16, lineHeight: 21, fontFamily: fontFamilies.semiBold },
+  caption: { fontSize: fontSizes.size13, lineHeight: 19, fontFamily: fontFamilies.regular },
 } as const;

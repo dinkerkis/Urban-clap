@@ -1,4 +1,4 @@
-import { colors, fontSizes } from '../theme';
+import { colors, fontFamilies, fontSizes } from '../theme';
 import { Image } from 'expo-image';
 import { Pressable, Text, View } from 'react-native';
 
@@ -59,7 +59,7 @@ export function ServiceCard({ item, quantity = 0, onAdd, onPress, onRemove }: Se
       </View>
 
       <View style={{ flex: 1, gap: 5 }}>
-        <Text selectable numberOfLines={2} style={{ fontSize: fontSizes.size15, lineHeight: 20, fontWeight: '600', color: colors.violetTone13 }}>
+        <Text selectable numberOfLines={2} style={{ fontSize: fontSizes.size15, lineHeight: 20, fontFamily: fontFamilies.semiBold, color: colors.violetTone13 }}>
           {item.title}
         </Text>
         <Text selectable numberOfLines={2} style={{ fontSize: fontSizes.size11, lineHeight: 16, color: colors.violetTone47 }}>
@@ -68,7 +68,7 @@ export function ServiceCard({ item, quantity = 0, onAdd, onPress, onRemove }: Se
         {item.rating > 0 || item.duration ? (
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
             {item.rating > 0 ? <Text style={{ fontSize: fontSizes.size11, color: colors.orangeTone55 }}>★</Text> : null}
-            <Text selectable style={{ fontSize: fontSizes.size10, fontWeight: '700', color: colors.violetTone32 }}>
+            <Text selectable style={{ fontSize: fontSizes.size10, fontFamily: fontFamilies.bold, color: colors.violetTone32 }}>
               {item.rating > 0 ? `${item.rating} (${item.reviews})` : ''}
               {item.rating > 0 && item.duration ? ' · ' : ''}
               {item.duration}
@@ -77,18 +77,18 @@ export function ServiceCard({ item, quantity = 0, onAdd, onPress, onRemove }: Se
         ) : null}
         {item.selectedVariantLabel ? (
           <View style={{ alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 5, borderRadius: 8, backgroundColor: colors.violetTone96_2 }}>
-            <Text selectable style={{ fontSize: fontSizes.size9, fontWeight: '700', color: colors.violetTone38 }}>{item.selectedVariantLabel}</Text>
+            <Text selectable style={{ fontSize: fontSizes.size9, fontFamily: fontFamilies.bold, color: colors.violetTone38 }}>{item.selectedVariantLabel}</Text>
           </View>
         ) : item.variants?.length ? (
           <View style={{ alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 5, borderRadius: 8, backgroundColor: colors.violetTone96_2 }}>
-            <Text selectable style={{ fontSize: fontSizes.size9, fontWeight: '700', color: colors.violetTone38 }}>
+            <Text selectable style={{ fontSize: fontSizes.size9, fontFamily: fontFamilies.bold, color: colors.violetTone38 }}>
               {item.variantLabel || 'Choose an option'} · {item.variants.length} options
             </Text>
           </View>
         ) : null}
         <View style={{ minHeight: 34, flexDirection: 'row', alignItems: 'flex-end', gap: 7 }}>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'baseline', gap: 5 }}>
-            <Text selectable style={{ fontSize: fontSizes.size16, fontWeight: '600', color: colors.violetTone13, fontVariant: ['tabular-nums'] }}>
+            <Text selectable style={{ fontSize: fontSizes.size16, fontFamily: fontFamilies.semiBold, color: colors.violetTone13, fontVariant: ['tabular-nums'] }}>
               {item.variants?.length ? 'From ' : ''}₹{item.price}
             </Text>
             {item.originalPrice > item.price ? (
@@ -116,7 +116,7 @@ export function ServiceCard({ item, quantity = 0, onAdd, onPress, onRemove }: Se
                 backgroundColor: pressed ? colors.violetTone95 : colors.violetTone99,
               })}
             >
-              <Text style={{ fontSize: fontSizes.size12, fontWeight: '600', color: colors.violetTone58 }}>{item.variants?.length && onPress ? 'OPTIONS' : 'ADD'}</Text>
+              <Text style={{ fontSize: fontSizes.size12, fontFamily: fontFamilies.semiBold, color: colors.violetTone58 }}>{item.variants?.length && onPress ? 'OPTIONS' : 'ADD'}</Text>
             </Pressable>
           ) : (
             <View style={{ height: 34, flexDirection: 'row', alignItems: 'center', borderRadius: 11, backgroundColor: colors.violetTone58, overflow: 'hidden' }}>
@@ -131,7 +131,7 @@ export function ServiceCard({ item, quantity = 0, onAdd, onPress, onRemove }: Se
               >
                 <Text style={{ fontSize: fontSizes.size18, color: colors.white }}>−</Text>
               </Pressable>
-              <Text style={{ minWidth: 22, textAlign: 'center', fontSize: fontSizes.size12, fontWeight: '600', color: colors.white, fontVariant: ['tabular-nums'] }}>
+              <Text style={{ minWidth: 22, textAlign: 'center', fontSize: fontSizes.size12, fontFamily: fontFamilies.semiBold, color: colors.white, fontVariant: ['tabular-nums'] }}>
                 {quantity}
               </Text>
               <Pressable

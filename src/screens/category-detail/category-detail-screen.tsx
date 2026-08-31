@@ -1,4 +1,4 @@
-import { colors, fontSizes } from '../../theme';
+import { colors, fontFamilies, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
 import { Pressable, ScrollView, Share, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -39,7 +39,7 @@ export function CategoryDetailScreen({ category, onBack, onSubcategoryPress }: C
             <BackIcon />
           </Pressable>
 
-          <Text selectable numberOfLines={2} style={{ flex: 1, fontSize: fontSizes.size20, lineHeight: 26, fontWeight: '600', color: colors.mauveTone9_2 }}>
+          <Text selectable numberOfLines={2} style={{ flex: 1, fontSize: fontSizes.size20, lineHeight: 26, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9_2 }}>
             {category.title}
           </Text>
 
@@ -66,7 +66,7 @@ export function CategoryDetailScreen({ category, onBack, onSubcategoryPress }: C
         contentContainerStyle={{ paddingBottom: Math.max(28, insets.bottom + 16) }}
       >
         <View style={{ paddingHorizontal: 20, paddingTop: 30, paddingBottom: 30, gap: 8 }}>
-          <Text selectable style={{ fontSize: fontSizes.size23, lineHeight: 30, fontWeight: '600', color: colors.mauveTone9_2 }}>
+          <Text selectable style={{ fontSize: fontSizes.size23, lineHeight: 30, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9_2 }}>
             {category.title}
           </Text>
           <Text selectable style={{ fontSize: fontSizes.size18, lineHeight: 25, color: colors.mauveTone38_2 }}>
@@ -111,7 +111,7 @@ export function CategoryDetailScreen({ category, onBack, onSubcategoryPress }: C
                 </View>
 
                 <View style={{ flex: 1, gap: 7 }}>
-                  <Text selectable numberOfLines={2} style={{ fontSize: fontSizes.size18, lineHeight: 24, fontWeight: '700', color: colors.mauveTone9_2 }}>
+                  <Text selectable numberOfLines={2} style={{ fontSize: fontSizes.size18, lineHeight: 24, fontFamily: fontFamilies.bold, color: colors.mauveTone9_2 }}>
                     {subcategory.title}
                   </Text>
                   {subcategory.subtitle ? (
@@ -121,7 +121,7 @@ export function CategoryDetailScreen({ category, onBack, onSubcategoryPress }: C
                   ) : null}
                 </View>
 
-                <Text style={{ fontSize: fontSizes.size31, lineHeight: 34, fontWeight: '300', color: colors.neutralTone46_2 }}>›</Text>
+                <Text style={{ fontSize: fontSizes.size31, lineHeight: 34, fontFamily: fontFamilies.light, color: colors.neutralTone46_2 }}>›</Text>
               </Pressable>
             ))}
           </View>

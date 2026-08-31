@@ -1,4 +1,4 @@
-import { colors, fontSizes } from '../../theme';
+import { colors, fontFamilies, fontSizes } from '../../theme';
 import { useEffect } from 'react';
 import { Text, View } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated';
@@ -59,12 +59,12 @@ export function CustomSplashScreen() {
             logoAnimatedStyle,
           ]}
         >
-          <Text style={{ color: splashColor, fontSize: fontSizes.size45, lineHeight: 52, fontWeight: '600', letterSpacing: -2.2 }}>UC</Text>
+          <Text style={{ color: splashColor, fontSize: fontSizes.size45, lineHeight: 52, fontFamily: fontFamilies.semiBold, letterSpacing: -2.2 }}>UC</Text>
         </Animated.View>
 
         <Animated.View style={[{ alignItems: 'center', gap: 8 }, textAnimatedStyle]}>
-          <Text style={{ color: colors.white, fontSize: fontSizes.size44, lineHeight: 52, fontWeight: '600', letterSpacing: -1 }}>Urban Clap</Text>
-          <Text style={{ color: colors.whiteAlpha76, fontSize: fontSizes.size18, lineHeight: 25, fontWeight: '400', letterSpacing: 0.1 }}>
+          <Text style={{ color: colors.white, fontSize: fontSizes.size44, lineHeight: 52, fontFamily: fontFamilies.semiBold, letterSpacing: -1 }}>Urban Clap</Text>
+          <Text style={{ color: colors.whiteAlpha76, fontSize: fontSizes.size18, lineHeight: 25, fontFamily: fontFamilies.regular, letterSpacing: 0.1 }}>
             Trusted services at your doorstep
           </Text>
         </Animated.View>
