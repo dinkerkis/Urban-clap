@@ -1,8 +1,8 @@
 import { colors, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Modal, Pressable, ScrollView, Share, Text, TextInput, View, useWindowDimensions } from 'react-native';
-import Animated, { Easing, FadeIn, interpolate, runOnJS, useAnimatedStyle, useSharedValue, withDelay, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
+import { Modal, Pressable, ScrollView, Share, Text, View, useWindowDimensions } from 'react-native';
+import Animated, { cancelAnimation, Easing, FadeIn, interpolate, runOnJS, type SharedValue, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BackIcon } from '../../components/back-icon';
@@ -19,50 +19,14 @@ type ServiceListScreenProps = {
   onBack: () => void;
   onProductPress: (item: ServiceItem) => void;
   onRemove: (item: ServiceItem) => void;
+  onSearchPress?: () => void;
+  scrollTarget?: { productId: string; requestKey: number };
 };
 
 const HERO_DURATION = 4_500;
 const NAV_HEIGHT = 66;
 const SECTION_HEADER_HEIGHT = 46;
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
-function LoadingDot({ delay }: { delay: number }) {
-  const progress = useSharedValue(0);
-
-  useEffect(() => {
-    progress.value = withDelay(
-      delay,
-      withRepeat(
-        withSequence(
-          withTiming(1, { duration: 260, easing: Easing.out(Easing.quad) }),
-          withTiming(0, { duration: 260, easing: Easing.in(Easing.quad) }),
-          withTiming(0, { duration: 180 }),
-        ),
-        -1,
-      ),
-    );
-  }, [delay, progress]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(progress.value, [0, 1], [0.42, 1]),
-    transform: [
-      { translateY: interpolate(progress.value, [0, 1], [0, -5]) },
-      { scale: interpolate(progress.value, [0, 1], [0.86, 1]) },
-    ],
-  }));
-
-    return <Animated.View style={[{ width: 7, height: 7, borderRadius: 999, backgroundColor: colors.violetTone58 }, animatedStyle]} />;
-}
-
-function ThreeDotLoader() {
-  return (
-    <View accessibilityLabel="Loading services" accessibilityRole="progressbar" style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-      <LoadingDot delay={0} />
-      <LoadingDot delay={130} />
-      <LoadingDot delay={260} />
-    </View>
-  );
-}
 
 function SearchIcon() {
   return (
@@ -83,6 +47,86 @@ function ShareIcon() {
       tintColor={colors.mauveTone9_2}
       style={{ width: 18, height: 18 }}
     />
+  );
+}
+
+function ServiceSkeletonBlock({ height, progress, radius = 8, screenWidth, width = '100%' }: { height: number; progress: SharedValue<number>; radius?: number; screenWidth: number; width?: number | `${number}%` }) {
+  const shimmerStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: interpolate(progress.get(), [0, 1], [-screenWidth, screenWidth]) },
+      { skewX: '-18deg' },
+    ],
+  }));
+  return (
+    <View style={{ width, height, overflow: 'hidden', borderRadius: radius, backgroundColor: colors.slateTone90 }}>
+      <Animated.View style={[{ position: 'absolute', top: 0, bottom: 0, width: screenWidth * 0.35, backgroundColor: colors.whiteAlpha72 }, shimmerStyle]} />
+    </View>
+  );
+}
+
+function ServiceListSkeleton({ onBack }: { onBack: () => void }) {
+  const insets = useSafeAreaInsets();
+  const { width: screenWidth } = useWindowDimensions();
+  const reducedMotion = useReducedMotion();
+  const progress = useSharedValue(0);
+  const cardWidth = Math.floor((Math.min(screenWidth, 520) - 80) / 3);
+
+  useEffect(() => {
+    cancelAnimation(progress);
+    if (reducedMotion) {
+      progress.set(0.45);
+      return;
+    }
+    progress.set(0);
+    progress.set(withRepeat(withTiming(1, { duration: 1200, easing: Easing.linear }), -1, false));
+    return () => cancelAnimation(progress);
+  }, [progress, reducedMotion]);
+
+  return (
+    <View accessibilityLabel="Loading category details" accessibilityRole="progressbar" style={{ flex: 1, backgroundColor: colors.white }}>
+      <ScrollView scrollEnabled={false} contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 118 + insets.bottom }}>
+        <ServiceSkeletonBlock height={310} progress={progress} radius={0} screenWidth={screenWidth} />
+        <View style={{ paddingHorizontal: 20, paddingTop: 25, paddingBottom: 22, gap: 10 }}>
+          <ServiceSkeletonBlock height={32} progress={progress} screenWidth={screenWidth} width="72%" />
+          <ServiceSkeletonBlock height={18} progress={progress} radius={5} screenWidth={screenWidth} width="46%" />
+        </View>
+        <View style={{ height: 8, backgroundColor: colors.mauveTone96 }} />
+        <View style={{ paddingHorizontal: 20, paddingVertical: 25, flexDirection: 'row', flexWrap: 'wrap', columnGap: 16, rowGap: 22 }}>
+          {[0, 1, 2, 3, 4, 5].map((index) => (
+            <View key={`service-skeleton-category-${index}`} style={{ width: cardWidth, alignItems: 'center', gap: 8 }}>
+              <ServiceSkeletonBlock height={cardWidth} progress={progress} radius={8} screenWidth={screenWidth} width={cardWidth} />
+              <ServiceSkeletonBlock height={16} progress={progress} radius={5} screenWidth={screenWidth} width="86%" />
+              <ServiceSkeletonBlock height={16} progress={progress} radius={5} screenWidth={screenWidth} width="68%" />
+            </View>
+          ))}
+        </View>
+        <View style={{ height: 8, backgroundColor: colors.mauveTone96 }} />
+        <View style={{ padding: 20, gap: 18 }}>
+          <ServiceSkeletonBlock height={28} progress={progress} screenWidth={screenWidth} width="62%" />
+          {[0, 1].map((index) => (
+            <View key={`service-skeleton-product-${index}`} style={{ flexDirection: 'row', gap: 16 }}>
+              <View style={{ flex: 1, gap: 10 }}>
+                <ServiceSkeletonBlock height={22} progress={progress} screenWidth={screenWidth} width="88%" />
+                <ServiceSkeletonBlock height={15} progress={progress} radius={5} screenWidth={screenWidth} width="60%" />
+                <ServiceSkeletonBlock height={15} progress={progress} radius={5} screenWidth={screenWidth} width="72%" />
+              </View>
+              <ServiceSkeletonBlock height={132} progress={progress} radius={13} screenWidth={screenWidth} width={132} />
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+
+      <View pointerEvents="box-none" style={{ position: 'absolute', left: 0, right: 0, top: 0, height: insets.top + NAV_HEIGHT, paddingTop: insets.top, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Go back" hitSlop={8} onPress={onBack} style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: colors.white, opacity: pressed ? 0.58 : 1 })}><BackIcon /></Pressable>
+        <View style={{ flex: 1 }} />
+        <ServiceSkeletonBlock height={40} progress={progress} radius={20} screenWidth={screenWidth} width={40} />
+        <ServiceSkeletonBlock height={40} progress={progress} radius={20} screenWidth={screenWidth} width={40} />
+      </View>
+
+      <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 20, paddingTop: 10, paddingBottom: Math.max(insets.bottom, 10), borderTopWidth: 1, borderTopColor: colors.mauveTone93_2, backgroundColor: colors.white }}>
+        <ServiceSkeletonBlock height={54} progress={progress} radius={12} screenWidth={screenWidth} />
+      </View>
+    </View>
   );
 }
 
@@ -144,16 +188,15 @@ function ProductRow({ item, quantity, onAdd, onPress, onRemove }: { item: Servic
   );
 }
 
-export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onBack, onProductPress, onRemove }: ServiceListScreenProps) {
+export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onBack, onProductPress, onRemove, onSearchPress, scrollTarget }: ServiceListScreenProps) {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const { errorMessage, isLoading, retry, sections } = useCategoryProducts(subcategory.id);
   const scrollRef = useRef<ScrollView>(null);
   const sectionOffsets = useRef<Record<string, number>>({});
+  const productOffsets = useRef<Record<string, number>>({});
   const [heroIndex, setHeroIndex] = useState(0);
   const [menuVisible, setMenuVisible] = useState(false);
-  const [searchVisible, setSearchVisible] = useState(false);
-  const [search, setSearch] = useState('');
   const [stickyHeaderVisible, setStickyHeaderVisible] = useState(false);
   const [stickySection, setStickySection] = useState<ProductSection | null>(null);
   const heroProgress = useSharedValue(0);
@@ -166,13 +209,23 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
     return subcategory.imageUrl ? [{ imageUrl: subcategory.imageUrl, title: categoryTitle, subtitle: subcategory.subtitle }] : [];
   }, [categoryTitle, sections, subcategory.imageUrl, subcategory.subtitle]);
 
-  const normalizedSearch = search.trim().toLowerCase();
-  const visibleSections = useMemo(
-    () => sections
-      .map((section) => ({ ...section, products: normalizedSearch ? section.products.filter((item) => `${item.title} ${item.description}`.toLowerCase().includes(normalizedSearch)) : section.products }))
-      .filter((section) => !normalizedSearch || section.title.toLowerCase().includes(normalizedSearch) || section.products.length > 0),
-    [normalizedSearch, sections],
-  );
+  const visibleSections = sections;
+
+  useEffect(() => {
+    if (!scrollTarget || isLoading || errorMessage) return;
+    let attempts = 0;
+    const scrollToProduct = () => {
+      const offset = productOffsets.current[scrollTarget.productId];
+      if (offset !== undefined) {
+        scrollRef.current?.scrollTo({ y: Math.max(0, offset - (insets.top + NAV_HEIGHT + SECTION_HEADER_HEIGHT) + 10), animated: true });
+        return;
+      }
+      attempts += 1;
+      if (attempts < 6) timer = setTimeout(scrollToProduct, 80);
+    };
+    let timer = setTimeout(scrollToProduct, 120);
+    return () => clearTimeout(timer);
+  }, [errorMessage, insets.top, isLoading, scrollTarget?.productId, scrollTarget?.requestKey]);
 
   useEffect(() => {
     if (heroItems.length <= 1) return;
@@ -226,7 +279,7 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
   const share = () => void Share.share({ message: `Explore ${categoryTitle} services on Urban Clap.` });
 
   if (isLoading) {
-    return <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.white }}><ThreeDotLoader /></View>;
+    return <ServiceListSkeleton onBack={onBack} />;
   }
 
   if (errorMessage) {
@@ -303,7 +356,7 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
         {visibleSections.map((section, sectionIndex) => (
           <View key={section.id} onLayout={(event) => { sectionOffsets.current[section.id] = event.nativeEvent.layout.y; }} style={{ paddingHorizontal: 20 }}>
             <Text selectable style={{ paddingTop: 30, paddingBottom: 4, fontSize: fontSizes.size23, lineHeight: 30, fontWeight: '600', color: colors.mauveTone9_2 }}>{section.title}</Text>
-            {section.products.length > 0 ? section.products.map((item, index) => <View key={item.id}><ProductRow item={item} quantity={cart[item.id] ?? 0} onAdd={onAdd} onPress={onProductPress} onRemove={onRemove} />{index < section.products.length - 1 ? <View style={{ height: 1, backgroundColor: colors.mauveTone89_4 }} /> : null}</View>) : <Text selectable style={{ paddingVertical: 24, fontSize: fontSizes.size14, color: colors.violetTone47 }}>Products coming soon</Text>}
+            {section.products.length > 0 ? section.products.map((item, index) => <View key={item.id} onLayout={(event) => { productOffsets.current[item.id] = event.nativeEvent.layout.y + (sectionOffsets.current[section.id] ?? 0); }}><ProductRow item={item} quantity={cart[item.id] ?? 0} onAdd={onAdd} onPress={onProductPress} onRemove={onRemove} />{index < section.products.length - 1 ? <View style={{ height: 1, backgroundColor: colors.mauveTone89_4 }} /> : null}</View>) : <Text selectable style={{ paddingVertical: 24, fontSize: fontSizes.size14, color: colors.violetTone47 }}>Products coming soon</Text>}
             {sectionIndex < visibleSections.length - 1 ? <View style={{ height: 8, marginHorizontal: -20, backgroundColor: colors.mauveTone96 }} /> : null}
           </View>
         ))}
@@ -333,18 +386,7 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
               <BackIcon />
             </Pressable>
 
-            {searchVisible ? (
-              <View style={{ flex: 1, height: 40, paddingHorizontal: 12, justifyContent: 'center', borderRadius: 10, backgroundColor: colors.violetTone96_4 }}>
-                <TextInput
-                  autoFocus
-                  value={search}
-                  onChangeText={setSearch}
-                  placeholder="Search services"
-                  placeholderTextColor={colors.violetTone57}
-                  style={{ flex: 1, fontSize: fontSizes.size14, color: colors.mauveTone9_2 }}
-                />
-              </View>
-            ) : stickyHeaderVisible ? (
+            {stickyHeaderVisible ? (
               <Text selectable numberOfLines={1} ellipsizeMode="tail" style={{ flex: 1, fontSize: fontSizes.size18, lineHeight: 24, fontWeight: '600', color: colors.mauveTone9_2 }}>
                 {categoryTitle}
               </Text>
@@ -352,29 +394,23 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
 
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel={searchVisible ? 'Close search' : 'Search services'}
+              accessibilityLabel="Search services"
               hitSlop={8}
-              onPress={() => setSearchVisible((current) => !current)}
+              onPress={onSearchPress}
               style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, borderWidth: stickyHeaderVisible ? 1 : 0, borderColor: colors.mauveTone89_4, backgroundColor: colors.white, opacity: pressed ? 0.62 : 1 })}
             >
-              {searchVisible ? (
-                <Text style={{ fontSize: fontSizes.size25, lineHeight: 27, fontWeight: '300', color: colors.mauveTone9_2 }}>×</Text>
-              ) : (
-                <SearchIcon />
-              )}
+              <SearchIcon />
             </Pressable>
 
-            {!searchVisible ? (
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={`Share ${categoryTitle}`}
-                hitSlop={8}
-                onPress={share}
-                style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, borderWidth: stickyHeaderVisible ? 1 : 0, borderColor: colors.mauveTone89_4, backgroundColor: colors.white, opacity: pressed ? 0.62 : 1 })}
-              >
-                <ShareIcon />
-              </Pressable>
-            ) : null}
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`Share ${categoryTitle}`}
+              hitSlop={8}
+              onPress={share}
+              style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, borderWidth: stickyHeaderVisible ? 1 : 0, borderColor: colors.mauveTone89_4, backgroundColor: colors.white, opacity: pressed ? 0.62 : 1 })}
+            >
+              <ShareIcon />
+            </Pressable>
           </View>
           {stickySection ? (
             <View style={{ height: SECTION_HEADER_HEIGHT, paddingHorizontal: 20, justifyContent: 'center', backgroundColor: colors.white, borderBottomWidth: 1, borderBottomColor: colors.mauveTone90_3 }}>

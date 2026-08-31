@@ -34,21 +34,9 @@ function formatReviewCount(count?: number): string {
 
 export function useCategoryProducts(categoryId: string) {
   const [requestKey, setRequestKey] = useState(0);
-  const [state, setState] = useState<ProductsState>(() => {
-    const cachedSections = productsCache.get(categoryId);
-    return cachedSections
-      ? { errorMessage: '', isLoading: false, sections: cachedSections }
-      : { errorMessage: '', isLoading: true, sections: [] };
-  });
+  const [state, setState] = useState<ProductsState>({ errorMessage: '', isLoading: true, sections: [] });
 
   useEffect(() => {
-    const cachedSections = productsCache.get(categoryId);
-    if (requestKey === 0 && cachedSections) {
-      if (__DEV__) console.log(`[Products API] Using cached products for category ${categoryId}`);
-      setState({ errorMessage: '', isLoading: false, sections: cachedSections });
-      return;
-    }
-
     const controller = new AbortController();
     setState({ errorMessage: '', isLoading: true, sections: [] });
 

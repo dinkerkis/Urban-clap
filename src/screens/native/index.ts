@@ -1,1 +1,1 @@
-export { NativeScreen } from './native-screen';
+export { NativeCategoryDetailsScreen, NativeScreen } from './native-screen';

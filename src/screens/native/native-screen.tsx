@@ -18,8 +18,15 @@ import type { NativeCartSelection } from './native-product-detail-modal';
 type NativeScreenProps = {
   cart: Record<string, number>;
   onAddToCart: (selections: NativeCartSelection[]) => Promise<boolean>;
-  onCategoryVisibilityChange?: (visible: boolean) => void;
+  onCategoryPress: (category: NativeProductCategory) => void;
   onViewCart: () => void;
+};
+
+type NativeCategoryDetailsScreenProps = {
+  cart: Record<string, number>;
+  category: NativeProductCategory;
+  onAddToCart: (selections: NativeCartSelection[]) => Promise<boolean>;
+  onBack: () => void;
 };
 
 type Product = { id: string; imageUrl?: string; kind: 'lock' | 'purifier'; name: string; optionsCount?: number; price: string; rating: string };
@@ -288,6 +295,74 @@ function RelatedImagesScreen({ images, onBack }: { images: string[]; onBack: () 
   );
 }
 
+function SkeletonBlock({ height, progress, radius = 8, screenWidth, width = '100%' }: { height: number; progress: SharedValue<number>; radius?: number; screenWidth: number; width?: number | `${number}%` }) {
+  const shimmerStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: interpolate(progress.get(), [0, 1], [-screenWidth, screenWidth], Extrapolation.CLAMP) },
+      { skewX: '-18deg' },
+    ],
+  }));
+  return (
+    <View style={{ width, height, overflow: 'hidden', borderRadius: radius, backgroundColor: colors.slateTone90 }}>
+      <Animated.View style={[{ position: 'absolute', top: 0, bottom: 0, width: screenWidth * 0.35, backgroundColor: colors.whiteAlpha72 }, shimmerStyle]} />
+    </View>
+  );
+}
+
+function CategoryDetailSkeleton({ onBack }: { onBack: () => void }) {
+  const insets = useSafeAreaInsets();
+  const { width: screenWidth } = useWindowDimensions();
+  const reducedMotion = useReducedMotion();
+  const progress = useSharedValue(0);
+  const headerHeight = Math.max(insets.top, 18) + 54;
+
+  useEffect(() => {
+    cancelAnimation(progress);
+    if (reducedMotion) {
+      progress.set(0.45);
+      return;
+    }
+    progress.set(0);
+    progress.set(withRepeat(withTiming(1, { duration: 1200, easing: Easing.linear }), -1, false));
+    return () => cancelAnimation(progress);
+  }, [progress, reducedMotion]);
+
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.white }}>
+      <ScrollView scrollEnabled={false} contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: 30 }}>
+        <SkeletonBlock height={224} progress={progress} radius={0} screenWidth={screenWidth} />
+        <SkeletonBlock height={42} progress={progress} radius={0} screenWidth={screenWidth} />
+        <View style={{ paddingHorizontal: 20, paddingVertical: 26, gap: 18 }}>
+          <SkeletonBlock height={28} progress={progress} screenWidth={screenWidth} width="58%" />
+          <View style={{ flexDirection: 'row', gap: 16 }}>
+            {[0, 1, 2].map((index) => (
+              <View key={`category-skeleton-card-${index}`} style={{ width: 162, gap: 9 }}>
+                <SkeletonBlock height={145} progress={progress} radius={10} screenWidth={screenWidth} width={162} />
+                <SkeletonBlock height={18} progress={progress} radius={5} screenWidth={screenWidth} width="78%" />
+                <SkeletonBlock height={14} progress={progress} radius={4} screenWidth={screenWidth} width="55%" />
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <SkeletonBlock height={32} progress={progress} radius={5} screenWidth={screenWidth} width={70} />
+                  <SkeletonBlock height={34} progress={progress} radius={7} screenWidth={screenWidth} width={72} />
+                </View>
+              </View>
+            ))}
+          </View>
+        </View>
+        <View style={{ height: 8, backgroundColor: colors.violetTone96_4 }} />
+        <View style={{ padding: 20, gap: 18 }}>
+          <SkeletonBlock height={28} progress={progress} screenWidth={screenWidth} width="66%" />
+          <SkeletonBlock height={250} progress={progress} radius={10} screenWidth={screenWidth} />
+        </View>
+      </ScrollView>
+      <View style={{ position: 'absolute', left: 0, right: 0, top: 0, height: headerHeight, paddingTop: Math.max(insets.top, 18), paddingHorizontal: 20, justifyContent: 'center', backgroundColor: colors.white }}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Go back" hitSlop={12} onPress={onBack} style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, borderWidth: 1, borderColor: colors.violetTone93_2, backgroundColor: colors.white, opacity: pressed ? 0.6 : 1 })}>
+          <BackIcon />
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+
 function NativeCategoryScreen({ category, onBack, onOpenProduct }: { category: NativeProductCategory; onBack: () => void; onOpenProduct: (id: string) => void }) {
   const insets = useSafeAreaInsets();
   const { data, errorMessage, isLoading, retry } = useNativeCategoryProducts(category._id);
@@ -296,22 +371,32 @@ function NativeCategoryScreen({ category, onBack, onOpenProduct }: { category: N
   const [bannerHeight, setBannerHeight] = useState(0);
   const scrollOffset = useSharedValue(0);
   const headerHeight = Math.max(insets.top, 18) + 54;
+  const hasBanner = Boolean(data?.bannerImage);
+
+  useEffect(() => {
+    setRelatedImages(undefined);
+    setVideoStories(undefined);
+    setBannerHeight(0);
+    scrollOffset.set(0);
+  }, [category._id, scrollOffset]);
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => scrollOffset.set(event.contentOffset.y),
   });
   const stickyHeaderStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(scrollOffset.get(), [Math.max(0, bannerHeight - headerHeight - 20), Math.max(1, bannerHeight - headerHeight)], [0, 1], Extrapolation.CLAMP),
+    opacity: hasBanner ? interpolate(scrollOffset.get(), [Math.max(0, bannerHeight - headerHeight - 20), Math.max(1, bannerHeight - headerHeight)], [0, 1], Extrapolation.CLAMP) : 1,
   }));
   const bannerIconStyle = useAnimatedStyle(() => ({
-    opacity: 1 - interpolate(scrollOffset.get(), [Math.max(0, bannerHeight - headerHeight - 20), Math.max(1, bannerHeight - headerHeight)], [0, 1], Extrapolation.CLAMP),
+    opacity: hasBanner ? 1 - interpolate(scrollOffset.get(), [Math.max(0, bannerHeight - headerHeight - 20), Math.max(1, bannerHeight - headerHeight)], [0, 1], Extrapolation.CLAMP) : 1,
   }));
+
+  if (isLoading) return <CategoryDetailSkeleton onBack={onBack} />;
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.white }}>
-      <Animated.ScrollView onScroll={scrollHandler} scrollEventThrottle={16} contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} style={{ backgroundColor: colors.black }} contentContainerStyle={{ paddingTop: Math.max(insets.top, 18), paddingBottom: 0 }}>
+      <Animated.ScrollView onScroll={scrollHandler} scrollEventThrottle={16} contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} style={{ backgroundColor: hasBanner ? colors.black : colors.white }} contentContainerStyle={{ paddingTop: hasBanner ? Math.max(insets.top, 18) : headerHeight, paddingBottom: 0 }}>
         {data?.bannerImage ? <View onLayout={(event) => setBannerHeight(event.nativeEvent.layout.height)} style={{ marginHorizontal: -2, overflow: 'hidden', backgroundColor: colors.black }}><DescriptionImage path={data.bannerImage} /></View> : null}
         {data?.marqueeContent.length ? <CategoryMarquee items={data.marqueeContent} /> : null}
-        {data?.products.length ? <ProductSection onOpen={onOpenProduct} products={data.products.map(mapNativeProduct)} title={category.name} /> : null}
+        {data?.products.length ? <ProductSection onOpen={onOpenProduct} products={data.products.map(mapNativeProduct)} showTopDivider={hasBanner || Boolean(data.marqueeContent.length)} title={category.name} /> : null}
         {data?.products.length ? (
           <View style={{ backgroundColor: colors.white }}>
             <View style={{ paddingHorizontal: 20 }}>
@@ -329,18 +414,22 @@ function NativeCategoryScreen({ category, onBack, onOpenProduct }: { category: N
             <View style={{ height: 8, backgroundColor: colors.violetTone96_4 }} />
           </View>
         ) : null}
-        {data?.categoryDetails.map((section, index) => <NativeCategorySection key={`${section.type}-${section.sort_order}-${index}`} onOpenRelatedImages={setRelatedImages} onOpenVideos={(videos, initialIndex) => setVideoStories({ videos, initialIndex })} section={section} />)}
+        {data?.categoryDetails.length ? data.categoryDetails.map((section, index) => <NativeCategorySection key={`${category._id}-${section.type}-${section.sort_order}-${index}`} onOpenRelatedImages={setRelatedImages} onOpenVideos={(videos, initialIndex) => setVideoStories({ videos, initialIndex })} section={section} />) : null}
+        {data && !data.bannerImage && !data.marqueeContent.length && !data.products.length && !data.categoryDetails.length ? (
+          <View style={{ minHeight: 280, padding: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.white }}>
+            <Text style={{ textAlign: 'center', fontSize: fontSizes.size14, lineHeight: 21, color: colors.mauveTone39 }}>No products or category details are available right now.</Text>
+          </View>
+        ) : null}
         {!isLoading && errorMessage ? <View style={{ minHeight: 260, padding: 24, alignItems: 'center', justifyContent: 'center', gap: 14 }}><Text style={{ textAlign: 'center', color: colors.mauveTone39 }}>{errorMessage}</Text><Pressable onPress={retry} style={{ paddingHorizontal: 20, paddingVertical: 10, borderRadius: 9, backgroundColor: colors.violetTone58 }}><Text style={{ fontWeight: '700', color: colors.white }}>Retry</Text></Pressable></View> : null}
       </Animated.ScrollView>
       <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, top: 0, height: Math.max(insets.top, 18), backgroundColor: colors.white }} />
       <View pointerEvents="box-none" style={{ position: 'absolute', left: 0, right: 0, top: 0, height: headerHeight, paddingTop: Math.max(insets.top, 18), paddingHorizontal: 20, justifyContent: 'center' }}>
         <Animated.View pointerEvents="none" style={[{ position: 'absolute', inset: 0, backgroundColor: colors.white }, stickyHeaderStyle]} />
         <Pressable accessibilityRole="button" accessibilityLabel="Go back" hitSlop={12} onPress={onBack} style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.6 : 1 })}>
-          <Animated.View pointerEvents="none" style={[{ position: 'absolute', inset: 0, borderRadius: 20, backgroundColor: colors.white }, bannerIconStyle]} />
+          <Animated.View pointerEvents="none" style={[{ position: 'absolute', inset: 0, borderRadius: 20, borderWidth: hasBanner ? 0 : 1, borderColor: colors.violetTone93_2, backgroundColor: colors.white }, bannerIconStyle]} />
           <BackIcon />
         </Pressable>
       </View>
-      {isLoading ? <View pointerEvents="none" style={{ position: 'absolute', inset: 0, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.white }}><LoadingDots /></View> : null}
       {relatedImages ? <RelatedImagesScreen images={relatedImages} onBack={() => setRelatedImages(undefined)} /> : null}
       {videoStories ? <VideoStoriesScreen initialIndex={videoStories.initialIndex} onClose={() => setVideoStories(undefined)} videos={videoStories.videos} /> : null}
     </View>
@@ -383,9 +472,9 @@ function ProductCard({ onOpen, product }: { onOpen: (productId: string) => void;
   );
 }
 
-function ProductSection({ onOpen, products, subtitle, title }: { onOpen: (productId: string) => void; products: Product[]; subtitle?: string; title: string }) {
+function ProductSection({ onOpen, products, showTopDivider = true, subtitle, title }: { onOpen: (productId: string) => void; products: Product[]; showTopDivider?: boolean; subtitle?: string; title: string }) {
   return (
-    <View style={{ paddingVertical: 24, gap: 16, borderTopWidth: 8, borderTopColor: colors.violetTone96_4, backgroundColor: colors.white }}>
+    <View style={{ paddingVertical: 24, gap: 16, borderTopWidth: showTopDivider ? 8 : 0, borderTopColor: colors.violetTone96_4, backgroundColor: colors.white }}>
       <View style={{ paddingHorizontal: 20, gap: 4 }}><Text style={{ fontSize: fontSizes.size21, lineHeight: 27, fontWeight: '700' }}>{title}</Text>{subtitle ? <Text style={{ fontSize: fontSizes.size13, color: colors.mauveTone40 }}>{subtitle}</Text> : null}</View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 14 }}>{products.map((product) => <ProductCard key={`${title}-${product.name}`} onOpen={onOpen} product={product} />)}</ScrollView>
     </View>
@@ -423,16 +512,22 @@ function DescriptionSection({ media, showTopSeparator = true }: { media: NativeD
   );
 }
 
-export function NativeScreen({ cart, onAddToCart, onCategoryVisibilityChange, onViewCart }: NativeScreenProps) {
+export function NativeCategoryDetailsScreen({ category, onAddToCart, onBack }: NativeCategoryDetailsScreenProps) {
+  const [selectedProductId, setSelectedProductId] = useState<string>();
+
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.white }}>
+      <NativeCategoryScreen category={category} onBack={onBack} onOpenProduct={setSelectedProductId} />
+      <NativeProductDetailModal onAddToCart={onAddToCart} onClose={() => setSelectedProductId(undefined)} productId={selectedProductId} />
+    </View>
+  );
+}
+
+export function NativeScreen({ cart, onAddToCart, onCategoryPress, onViewCart }: NativeScreenProps) {
   const insets = useSafeAreaInsets();
   const { errorMessage, isLoading, media, retry } = useNativeDescription();
   const { data: productsData, errorMessage: productsError, isLoading: productsLoading, retry: retryProducts } = useNativeProducts();
   const [selectedProductId, setSelectedProductId] = useState<string>();
-  const [selectedCategory, setSelectedCategory] = useState<NativeProductCategory>();
-  useEffect(() => {
-    onCategoryVisibilityChange?.(Boolean(selectedCategory));
-    return () => onCategoryVisibilityChange?.(false);
-  }, [onCategoryVisibilityChange, selectedCategory]);
   const showPageLoader = productsLoading || isLoading;
   const nativeCartSummary = useMemo(() => {
     const categoryByProductId = new Map<string, string>();
@@ -458,26 +553,19 @@ export function NativeScreen({ cart, onAddToCart, onCategoryVisibilityChange, on
     return { categories: categories.size, items };
   }, [cart, productsData.categories, productsData.categorySections, productsData.newlyLaunched]);
   const showCartBar = nativeCartSummary.items > 0;
-  if (selectedCategory) {
-    return (
-      <View style={{ flex: 1 }}>
-        <NativeCategoryScreen category={selectedCategory} onBack={() => setSelectedCategory(undefined)} onOpenProduct={setSelectedProductId} />
-        <NativeProductDetailModal onAddToCart={onAddToCart} onClose={() => setSelectedProductId(undefined)} productId={selectedProductId} />
-      </View>
-    );
-  }
   return (
     <View style={{ flex: 1 }}>
     <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} style={{ flex: 1, backgroundColor: colors.white }} contentContainerStyle={{ paddingTop: Math.max(insets.top, 18) + 18, paddingBottom: showCartBar ? 94 : 0 }}>
       <View style={{ paddingHorizontal: 20, gap: 5 }}><Text style={{ fontSize: fontSizes.size25, lineHeight: 32, fontWeight: '700' }}>Native products</Text><Text style={{ fontSize: fontSizes.size16, lineHeight: 22, fontWeight: '700', color: colors.mauveTone39 }}>Innovative products. Designed in India for India.</Text></View>
       {!productsLoading && productsError ? <View style={{ minHeight: 220, padding: 24, alignItems: 'center', justifyContent: 'center', gap: 14 }}><Text style={{ textAlign: 'center', fontSize: fontSizes.size14, lineHeight: 21, color: colors.mauveTone39 }}>{productsError}</Text><Pressable accessibilityRole="button" onPress={retryProducts} style={({ pressed }) => ({ paddingHorizontal: 20, paddingVertical: 10, borderRadius: 9, backgroundColor: colors.violetTone58, opacity: pressed ? 0.7 : 1 })}><Text style={{ fontWeight: '700', color: colors.white }}>Retry</Text></Pressable></View> : null}
       {!productsLoading && !productsError ? <>
-        <View style={{ paddingHorizontal: 20, paddingVertical: 30, flexDirection: 'row', gap: 18 }}>{productsData.categories.map((category) => <CategoryCard key={category._id} imageUrl={category.category_image ? resolveNativeMediaUrl(category.category_image) : undefined} kind={category.name.toLowerCase().includes('lock') ? 'lock' : 'purifier'} onPress={() => setSelectedCategory(category)} title={category.name} />)}</View>
+        <View style={{ paddingHorizontal: 20, paddingVertical: 30, flexDirection: 'row', gap: 18 }}>{productsData.categories.map((category) => <CategoryCard key={category._id} imageUrl={category.category_image ? resolveNativeMediaUrl(category.category_image) : undefined} kind={category.name.toLowerCase().includes('lock') ? 'lock' : 'purifier'} onPress={() => onCategoryPress(category)} title={category.name} />)}</View>
         {productsData.newlyLaunched ? <ProductSection onOpen={setSelectedProductId} products={productsData.newlyLaunched.products.map(mapNativeProduct)} title={productsData.newlyLaunched.title} /> : null}
         {productsData.categorySections.map((section, index) => <View key={`${section.title}-${index}`}>
           <ProductSection onOpen={setSelectedProductId} products={section.products.map(mapNativeProduct)} subtitle={section.description} title={section.title} />
           {index === 0 ? <Pressable onPress={() => Alert.alert('Compare all models', 'Product comparison will be available soon.')} style={({ pressed }) => ({ minHeight: 66, marginHorizontal: 20, flexDirection: 'row', alignItems: 'center', gap: 14, borderTopWidth: 1, borderBottomWidth: 1, borderColor: colors.mauveTone92, opacity: pressed ? .6 : 1 })}><Image source={require('../../../assets/compare.png')} contentFit="contain" tintColor={colors.black} style={{ width: 23, height: 23 }} /><Text style={{ flex: 1, fontSize: fontSizes.size16, fontWeight: '600' }}>Compare all models</Text><Text style={{ fontSize: fontSizes.size22 }}>›</Text></Pressable> : null}
         </View>)}
+        {!productsData.categories.length && !productsData.newlyLaunched && !productsData.categorySections.length ? <View style={{ minHeight: 260, padding: 24, alignItems: 'center', justifyContent: 'center' }}><Text style={{ textAlign: 'center', fontSize: fontSizes.size14, lineHeight: 21, color: colors.mauveTone39 }}>No Native products are available right now.</Text></View> : null}
       </> : null}
       {!isLoading && errorMessage ? <View style={{ minHeight: 180, padding: 24, alignItems: 'center', justifyContent: 'center', gap: 14, borderTopWidth: 8, borderTopColor: colors.violetTone96_4 }}><Text style={{ textAlign: 'center', fontSize: fontSizes.size14, lineHeight: 21, color: colors.mauveTone39 }}>{errorMessage}</Text><Pressable accessibilityRole="button" onPress={retry} style={({ pressed }) => ({ paddingHorizontal: 20, paddingVertical: 10, borderRadius: 9, backgroundColor: colors.violetTone58, opacity: pressed ? 0.7 : 1 })}><Text style={{ fontWeight: '700', color: colors.white }}>Retry</Text></Pressable></View> : null}
       {!isLoading && !errorMessage ? media.map((item, index) => <DescriptionSection key={`${item.type}-${item.sort_order}`} media={item} showTopSeparator={index !== media.length - 1} />) : null}

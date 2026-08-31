@@ -16,6 +16,7 @@ export function useNativeCategoryProducts(categoryId?: string) {
     }
 
     const controller = new AbortController();
+    setData(null);
     setErrorMessage('');
     setIsLoading(true);
     void fetchNativeProductsByCategory(categoryId, controller.signal)

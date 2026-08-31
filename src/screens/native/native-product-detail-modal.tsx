@@ -271,12 +271,14 @@ function OptionCard({
 }) {
   return (
     <View style={{ width: 156, overflow: 'hidden', borderWidth: 1, borderColor: colors.mauveTone88_3, borderRadius: 10, borderCurve: 'continuous', backgroundColor: colors.white }}>
-      <View style={{ height: 145, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.violetTone96_5 }}>
-        {option.image ? <Image source={{ uri: resolveNativeMediaUrl(option.image) }} contentFit="contain" transition={180} style={{ width: '100%', height: '100%' }} /> : null}
-      </View>
+      {option.image ? (
+        <View style={{ height: 145, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.violetTone96_5 }}>
+          <Image source={{ uri: resolveNativeMediaUrl(option.image) }} contentFit="contain" transition={180} style={{ width: '100%', height: '100%' }} />
+        </View>
+      ) : null}
       <View style={{ padding: 12, gap: 5 }}>
         <Text selectable numberOfLines={2} style={{ fontSize: fontSizes.size14, lineHeight: 19, fontWeight: '600', color: colors.mauveTone9_2 }}>{option.label}</Text>
-        <Text selectable style={{ fontSize: fontSizes.size12, color: colors.mauveTone39 }}>★ {option.rating?.average ?? 0} ({formatCount(option.rating?.count)} reviews)</Text>
+        {option.rating ? <Text selectable style={{ fontSize: fontSizes.size12, color: colors.mauveTone39 }}>★ {option.rating.average ?? 0} ({formatCount(option.rating.count)} reviews)</Text> : null}
         <Text selectable style={{ fontSize: fontSizes.size14, fontWeight: '700', color: colors.mauveTone9_2, fontVariant: ['tabular-nums'] }}>₹{option.price.toLocaleString('en-IN')}</Text>
         <OptionAction quantity={quantity} onAdd={onAdd} onRemove={onRemove} />
       </View>
@@ -692,16 +694,20 @@ export function NativeProductDetailModal({ onAddToCart, onClose, productId }: Na
                 onScroll={(event) => setDetailScrollY(event.nativeEvent.contentOffset.y)}
                 contentContainerStyle={{ paddingBottom: Math.max(insets.bottom, 16) + bottomBarHeight }}
               >
-                <BannerCarousel items={bannerMedia} fallbackImage={data.main_image} width={contentWidth} />
+                {bannerMedia.length > 0 || data.main_image ? (
+                  <BannerCarousel items={bannerMedia} fallbackImage={data.main_image} width={contentWidth} />
+                ) : null}
 
                 <View style={{ paddingHorizontal: 20, paddingVertical: 22, gap: 5 }}>
                   <Text selectable style={{ fontSize: fontSizes.size22, lineHeight: 29, fontWeight: '700', color: colors.mauveTone9_2 }}>{data.product_name}</Text>
-                  <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 4 }}>
-                    <Text style={{ fontSize: fontSizes.size13, lineHeight: 19, color: colors.mauveTone38_2 }}>★</Text>
-                    <DottedUnderline>
-                      <Text selectable style={{ fontSize: fontSizes.size13, lineHeight: 19, color: colors.mauveTone38_2 }}>{data.rating?.average ?? 0} ({formatCount(data.rating?.count)} reviews)</Text>
-                    </DottedUnderline>
-                  </View>
+                  {data.rating ? (
+                    <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 4 }}>
+                      <Text style={{ fontSize: fontSizes.size13, lineHeight: 19, color: colors.mauveTone38_2 }}>★</Text>
+                      <DottedUnderline>
+                        <Text selectable style={{ fontSize: fontSizes.size13, lineHeight: 19, color: colors.mauveTone38_2 }}>{data.rating.average ?? 0} ({formatCount(data.rating.count)} reviews)</Text>
+                      </DottedUnderline>
+                    </View>
+                  ) : null}
                 </View>
 
                 {data.options.length ? (
@@ -721,7 +727,9 @@ export function NativeProductDetailModal({ onAddToCart, onClose, productId }: Na
                   </View>
                 ) : null}
 
-                <HowExchangeRow onPress={() => setExchangeInfoVisible(true)} />
+                {data.exchange_steps.length > 0 ? (
+                  <HowExchangeRow onPress={() => setExchangeInfoVisible(true)} />
+                ) : null}
 
                 {data.product_details.map((item) => {
                   if (item.type === 'image') return <DetailImage key={`detail-${item.sort_order}`} path={item.url} width={contentWidth} />;

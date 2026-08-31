@@ -58,6 +58,72 @@ type ProductsWithCategoryResponse = {
   success: boolean;
 };
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+function cleanString(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const cleaned = value.trim();
+  return cleaned || undefined;
+}
+
+function finiteNumber(value: unknown): number | undefined {
+  return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+}
+
+function cleanStringArray(value: unknown): string[] {
+  return Array.isArray(value) ? value.flatMap((item) => cleanString(item) ?? []) : [];
+}
+
+function normalizeProduct(value: unknown): ApiProduct | null {
+  if (!isRecord(value)) return null;
+  const id = cleanString(value._id);
+  const name = cleanString(value.name);
+  const basePrice = finiteNumber(value.basePrice);
+  if (!id || !name || basePrice == null) return null;
+  const rating = isRecord(value.rating)
+    ? { average: finiteNumber(value.rating.average), count: finiteNumber(value.rating.count) }
+    : undefined;
+  const variants: ApiProductVariant[] = Array.isArray(value.variants) ? value.variants.flatMap((variant) => {
+    if (!isRecord(variant)) return [];
+    const label = cleanString(variant.label);
+    const price = finiteNumber(variant.price);
+    if (!label || price == null) return [];
+    return [{ label, price: Math.max(0, price), key: cleanString(variant.key), image: cleanString(variant.image) }];
+  }) : [];
+  return {
+    _id: id,
+    name,
+    basePrice: Math.max(0, basePrice),
+    description: cleanString(value.description),
+    shortDescription: cleanString(value.shortDescription),
+    durationMinutes: finiteNumber(value.durationMinutes),
+    mainImage: cleanString(value.mainImage),
+    images: cleanStringArray(value.images),
+    includes: cleanStringArray(value.includes),
+    maxQuantity: finiteNumber(value.maxQuantity),
+    rating: rating && (rating.average != null || rating.count != null) ? rating : undefined,
+    slug: cleanString(value.slug),
+    status: cleanString(value.status),
+    variantLabel: cleanString(value.variantLabel),
+    variants: variants.length ? variants : undefined,
+  };
+}
+
+function normalizeProductCategory(value: unknown): ApiProductCategory | null {
+  if (!isRecord(value)) return null;
+  const id = cleanString(value._id);
+  const name = cleanString(value.name);
+  if (!id || !name) return null;
+  return {
+    _id: id,
+    name,
+    category_image: cleanString(value.category_image),
+    products: Array.isArray(value.products) ? value.products.flatMap((product) => normalizeProduct(product) ?? []) : [],
+  };
+}
+
 export function resolveProductCategoryImage(path?: string): string | undefined {
   if (!path) return undefined;
   if (path.includes('/')) return getCategoryImageUrl(path);
@@ -76,8 +142,16 @@ export async function fetchProductsWithCategory(categoryId: string, signal?: Abo
     defaultErrorMessage: 'Unable to load products. Please try again.',
   });
   const result = payload.data ?? payload;
-  if (!payload.success || !result.category || !Array.isArray(result.product_details)) {
+  const category = isRecord(result.category) ? {
+    _id: cleanString(result.category._id),
+    name: cleanString(result.category.name),
+    category_image: cleanString(result.category.category_image),
+  } : undefined;
+  if (!payload.success || !category?._id || !category.name || !Array.isArray(result.product_details)) {
     throw new ApiClientError(payload.message || 'The products response is invalid. Please try again.', 200, 'INVALID_RESPONSE');
   }
-  return { category: result.category, productDetails: result.product_details };
+  return {
+    category: { _id: category._id, name: category.name, category_image: category.category_image },
+    productDetails: result.product_details.flatMap((section) => normalizeProductCategory(section) ?? []),
+  };
 }

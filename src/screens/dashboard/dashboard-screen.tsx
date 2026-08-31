@@ -1,7 +1,7 @@
 import { colors, fontSizes } from '../../theme';
 import { useEffect, useRef, useState } from 'react';
 import { Alert, Text, View } from 'react-native';
-import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
+import { NavigationContainer, StackActions, createNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Animated, { Easing, FadeIn, FadeOut, SlideInLeft, SlideInRight, SlideOutLeft, SlideOutRight } from 'react-native-reanimated';
 
@@ -19,8 +19,9 @@ import { CategoryDetailScreen } from '../category-detail';
 import { HomeScreen } from '../home';
 import { LocationPickerScreen } from '../location-picker';
 import { ManageAddressesScreen } from '../manage-addresses';
-import { NativeScreen } from '../native';
+import { NativeCategoryDetailsScreen, NativeScreen } from '../native';
 import type { NativeCartSelection } from '../native/native-product-detail-modal';
+import type { NativeProductCategory } from '../../services/native-products-api';
 import type { HomeSpotlight } from '../../services/home-spotlights-api';
 import { PaymentMethodsScreen } from '../payment-methods';
 import { ProfileDetailsScreen, ProfileEntryScreen, type CompletedProfile } from '../profile';
@@ -28,6 +29,7 @@ import { ProductDetailScreen } from '../product-detail';
 import { AccountArticleScreen, AccountHelpScreen, ChangePhoneHelpScreen, GettingStartedArticleScreen, GettingStartedHelpScreen, HelpSupportScreen, MembershipArticleScreen, MembershipHelpScreen, MyPlansScreen, MyRatingScreen, NativeDevicesScreen, PassesMembershipScreen, PaymentCreditsArticleScreen, PaymentCreditsHelpScreen, ProfileMyBookingsScreen, SafetyArticleScreen, WarrantyArticleScreen, WarrantyHelpScreen, type GettingStartedArticleKey, type MembershipArticleKey, type PaymentCreditsArticleKey, type WarrantyArticleKey } from '../profile-options';
 import { RewardsScreen } from '../rewards';
 import { ServiceListScreen } from '../service-list';
+import { ServiceSearchScreen } from '../service-search';
 import { PrivacyCenterScreen, SettingsScreen } from '../settings';
 import { WalletScreen } from '../wallet';
 
@@ -38,8 +40,10 @@ const STACK_SLIDE_OUT = SlideOutRight.duration(260).easing(Easing.out(Easing.cub
 
 type CategoryStackParams = {
   DashboardRoot: undefined;
+  NativeCategory: { category: NativeProductCategory };
   CategoryDetail: { category: ServiceCategory };
-  ServiceList: { category: ServiceCategory; subcategory: ServiceSubcategory };
+  ServiceList: { category: ServiceCategory; scrollRequestKey?: number; scrollToProductId?: string; subcategory: ServiceSubcategory };
+  ServiceSearch: { category: ServiceCategory; subcategory: ServiceSubcategory };
   ProductDetail: { category: ServiceCategory; subcategory: ServiceSubcategory; item: ServiceItem };
   CheckoutCart: { category: ServiceCategory; consultationMode?: boolean; subcategory: ServiceSubcategory };
 };
@@ -104,7 +108,6 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
   const [sheetCategory, setSheetCategory] = useState<ServiceCategory | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<{ subtitle: string; title: string } | null>(null);
   const [isConsultationLoading, setIsConsultationLoading] = useState(false);
-  const [isNativeCategoryOpen, setIsNativeCategoryOpen] = useState(false);
   const [profileTransition, setProfileTransition] = useState<'pop' | 'push'>('push');
   const productNavigationPendingRef = useRef(false);
   const cartState = useCart(authToken);
@@ -329,7 +332,10 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
   } else if (activeTab === 'rewards') {
     content = <RewardsScreen />;
   } else if (activeTab === 'native') {
-    content = <NativeScreen cart={cartState.quantities} onAddToCart={addNativeSelectionsToCart} onCategoryVisibilityChange={setIsNativeCategoryOpen} onViewCart={() => changeTab('cart')} />;
+    content = <NativeScreen cart={cartState.quantities} onAddToCart={addNativeSelectionsToCart} onCategoryPress={(category) => {
+      if (!categoryNavigationRef.isReady()) return;
+      categoryNavigationRef.dispatch(StackActions.push('NativeCategory', { category }));
+    }} onViewCart={() => changeTab('cart')} />;
   } else if (activeTab === 'categories') {
     content = (
       <CategoriesScreen
@@ -383,7 +389,7 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
   const dashboardRoot = (
     <View style={{ flex: 1, backgroundColor: colors.violetTone98_2 }}>
       {content}
-      {page.type === 'root' && !isNativeCategoryOpen ? <BottomTabBar activeTab={activeTab} cartCount={cartState.totalItems} onChange={changeTab} /> : null}
+      {page.type === 'root' ? <BottomTabBar activeTab={activeTab} cartCount={cartState.totalItems} onChange={changeTab} /> : null}
       {page.type === 'profile-details' ? (
         <Animated.View
           entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN}
@@ -648,6 +654,16 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
     <NavigationContainer ref={categoryNavigationRef}>
       <CategoryStack.Navigator screenOptions={{ animation: 'slide_from_right', headerShown: false }}>
         <CategoryStack.Screen name="DashboardRoot">{() => dashboardRoot}</CategoryStack.Screen>
+        <CategoryStack.Screen name="NativeCategory">
+          {({ navigation, route }) => (
+            <NativeCategoryDetailsScreen
+              cart={cartState.quantities}
+              category={route.params.category}
+              onAddToCart={addNativeSelectionsToCart}
+              onBack={navigation.goBack}
+            />
+          )}
+        </CategoryStack.Screen>
         <CategoryStack.Screen name="CategoryDetail">
           {({ navigation, route }) => (
             <CategoryDetailScreen
@@ -673,6 +689,23 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
                 navigation.push('ProductDetail', { ...route.params, item });
               }}
               onBack={navigation.goBack}
+              onSearchPress={() => navigation.push('ServiceSearch', { category: route.params.category, subcategory: route.params.subcategory })}
+              scrollTarget={route.params.scrollToProductId && route.params.scrollRequestKey ? { productId: route.params.scrollToProductId, requestKey: route.params.scrollRequestKey } : undefined}
+            />
+          )}
+        </CategoryStack.Screen>
+        <CategoryStack.Screen name="ServiceSearch">
+          {({ navigation, route }) => (
+            <ServiceSearchScreen
+              categoryTitle={route.params.category.title}
+              subcategory={route.params.subcategory}
+              onBack={navigation.goBack}
+              onResultPress={(item) => navigation.popTo('ServiceList', {
+                category: route.params.category,
+                subcategory: route.params.subcategory,
+                scrollToProductId: item.id,
+                scrollRequestKey: Date.now(),
+              })}
             />
           )}
         </CategoryStack.Screen>

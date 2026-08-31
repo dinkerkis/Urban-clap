@@ -116,12 +116,113 @@ type NativeDescriptionData = {
   descriptionMedia?: unknown[];
 };
 
-function isDescriptionMedia(value: unknown): value is NativeDescriptionMedia {
-  if (!value || typeof value !== 'object') return false;
-  const media = value as Record<string, unknown>;
-  if (typeof media.sort_order !== 'number') return false;
-  if (media.type === 'image') return typeof media.url === 'string' && media.url.length > 0;
-  return media.type === 'slider' && Array.isArray(media.slider_images) && media.slider_images.every((image) => typeof image === 'string');
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+function cleanString(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const cleaned = value.trim();
+  return cleaned || undefined;
+}
+
+function finiteNumber(value: unknown, fallback = 0): number {
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+}
+
+function optionalFiniteNumber(value: unknown): number | undefined {
+  return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+}
+
+function stringArray(value: unknown): string[] {
+  return Array.isArray(value) ? value.flatMap((item) => cleanString(item) ?? []) : [];
+}
+
+function normalizeRating(value: unknown): NativeProductRating | undefined {
+  if (!isRecord(value)) return undefined;
+  const average = finiteNumber(value.average);
+  const count = Math.max(0, finiteNumber(value.count));
+  return average || count ? { average, count } : undefined;
+}
+
+function normalizeProduct(value: unknown): NativeProduct | null {
+  if (!isRecord(value)) return null;
+  const id = cleanString(value._id);
+  const name = cleanString(value.product_name);
+  if (!id || !name) return null;
+  return {
+    _id: id,
+    product_name: name,
+    base_price: Math.max(0, finiteNumber(value.base_price)),
+    main_image: cleanString(value.main_image),
+    options_count: typeof value.options_count === 'number' && Number.isFinite(value.options_count) ? Math.max(0, value.options_count) : undefined,
+    rating: normalizeRating(value.rating),
+  };
+}
+
+function normalizeProducts(value: unknown): NativeProduct[] {
+  return Array.isArray(value) ? value.flatMap((item) => normalizeProduct(item) ?? []) : [];
+}
+
+function normalizeDescriptionMedia(value: unknown, index: number): NativeDescriptionMedia | null {
+  if (!isRecord(value)) return null;
+  const sortOrder = finiteNumber(value.sort_order, index);
+  if (value.type === 'image') {
+    const url = cleanString(value.url);
+    return url ? { type: 'image', sort_order: sortOrder, url } : null;
+  }
+  if (value.type !== 'slider') return null;
+  const images = stringArray(value.slider_images);
+  if (!images.length) return null;
+  return { type: 'slider', sort_order: sortOrder, slider_images: images, slider_title: cleanString(value.slider_title) };
+}
+
+function normalizeCategoryDetail(value: unknown, index: number): NativeCategoryDetailSection | null {
+  if (!isRecord(value)) return null;
+  const sortOrder = finiteNumber(value.sort_order, index);
+  if (value.type === 'image') {
+    const url = cleanString(value.url);
+    return url ? { type: 'image', sort_order: sortOrder, url, relatedImages: stringArray(value.relatedImages) } : null;
+  }
+  if (value.type !== 'slider') return null;
+  const sliderImageDetails: NativeCategorySliderImage[] = Array.isArray(value.sliderImageDetails)
+    ? value.sliderImageDetails.flatMap((item, itemIndex) => {
+        if (!isRecord(item)) return [];
+        const image = cleanString(item.image);
+        return image ? [{ image, sortOrder: finiteNumber(item.sortOrder, itemIndex), relatedImages: stringArray(item.relatedImages) }] : [];
+      })
+    : [];
+  const sliderVideos: NativeCategorySliderVideo[] = Array.isArray(value.slider_videos)
+    ? value.slider_videos.flatMap((item, itemIndex) => {
+        if (!isRecord(item)) return [];
+        const video = cleanString(item.video);
+        return video ? [{ video, sortOrder: finiteNumber(item.sortOrder, itemIndex), relatedVideos: stringArray(item.relatedVideos) }] : [];
+      })
+    : [];
+  const sliderImages = stringArray(value.slider_images);
+  if (!sliderImageDetails.length && !sliderImages.length && !sliderVideos.length) return null;
+  return {
+    type: 'slider',
+    sort_order: sortOrder,
+    slider_title: cleanString(value.slider_title),
+    slider_description: cleanString(value.slider_description),
+    slider_images: sliderImages,
+    sliderImageDetails,
+    slider_videos: sliderVideos,
+  };
+}
+
+function normalizeProductMedia(value: unknown, index: number): NativeProductDetailMedia | null {
+  if (!isRecord(value)) return null;
+  const sortOrder = finiteNumber(value.sort_order, index);
+  if (value.type === 'image' || value.type === 'video') {
+    const url = cleanString(value.url);
+    return url ? { type: value.type, sort_order: sortOrder, url } : null;
+  }
+  if (value.type !== 'slider') return null;
+  const images = stringArray(value.slider_images);
+  if (!images.length) return null;
+  return { type: 'slider', sort_order: sortOrder, slider_images: images, slider_title: cleanString(value.slider_title) };
 }
 
 export async function fetchNativeDescription(signal?: AbortSignal): Promise<NativeDescriptionMedia[]> {
@@ -134,7 +235,9 @@ export async function fetchNativeDescription(signal?: AbortSignal): Promise<Nati
     console.log(`[Native Description API] Parsed Response\n${JSON.stringify(response, null, 2)}`);
   }
   const data = requireApiData(response);
-  return (data.descriptionMedia ?? []).filter(isDescriptionMedia).sort((left, right) => left.sort_order - right.sort_order);
+  return (Array.isArray(data.descriptionMedia) ? data.descriptionMedia : [])
+    .flatMap((item, index) => normalizeDescriptionMedia(item, index) ?? [])
+    .sort((left, right) => left.sort_order - right.sort_order);
 }
 
 type NativeProductsPayload = Record<string, unknown> & { categories?: NativeProductCategory[]; newly_launched?: NativeProductSection };
@@ -146,18 +249,30 @@ export async function fetchNativeProducts(signal?: AbortSignal): Promise<NativeP
     signal,
   });
   const data = requireApiData(response);
-  const categories = Array.isArray(data.categories) ? data.categories : [];
+  const categories: NativeProductCategory[] = Array.isArray(data.categories)
+    ? data.categories.flatMap((value) => {
+        if (!isRecord(value)) return [];
+        const id = cleanString(value._id);
+        const name = cleanString(value.name);
+        return id && name ? [{ _id: id, name, category_image: cleanString(value.category_image) }] : [];
+      })
+    : [];
   const categorySections = categories.flatMap((category) => {
     const section = data[category.name];
     if (!section || typeof section !== 'object') return [];
     const candidate = section as Partial<NativeProductSection>;
-    if (typeof candidate.title !== 'string' || !Array.isArray(candidate.products)) return [];
-    return [{ title: candidate.title, description: typeof candidate.description === 'string' ? candidate.description : undefined, products: candidate.products }];
+    const title = cleanString(candidate.title);
+    const products = normalizeProducts(candidate.products);
+    if (!title || !products.length) return [];
+    return [{ title, description: cleanString(candidate.description), products }];
   });
+  const newlyLaunched = isRecord(data.newly_launched) ? data.newly_launched : undefined;
+  const newlyLaunchedTitle = cleanString(newlyLaunched?.title);
+  const newlyLaunchedProducts = normalizeProducts(newlyLaunched?.products);
   return {
     categories,
     categorySections,
-    newlyLaunched: data.newly_launched && Array.isArray(data.newly_launched.products) ? data.newly_launched : undefined,
+    newlyLaunched: newlyLaunchedTitle && newlyLaunchedProducts.length ? { title: newlyLaunchedTitle, description: cleanString(newlyLaunched?.description), products: newlyLaunchedProducts } : undefined,
   };
 }
 
@@ -170,19 +285,15 @@ export async function fetchNativeProductsByCategory(categoryId: string, signal?:
   const data = requireApiData(response);
   const details = Array.isArray(data.category_details)
     ? data.category_details
-        .filter((item): item is NativeCategoryDetailSection => {
-          if (!item || typeof item !== 'object') return false;
-          const section = item as Partial<NativeCategoryDetailSection>;
-          return (section.type === 'image' || section.type === 'slider') && typeof section.sort_order === 'number';
-        })
+        .flatMap((item, index) => normalizeCategoryDetail(item, index) ?? [])
         .sort((left, right) => left.sort_order - right.sort_order)
     : [];
 
   return {
-    bannerImage: typeof data.bannerImage === 'string' ? data.bannerImage : undefined,
-    marqueeContent: Array.isArray(data.marqueeContent) ? data.marqueeContent.filter((item): item is string => typeof item === 'string') : [],
+    bannerImage: cleanString(data.bannerImage),
+    marqueeContent: stringArray(data.marqueeContent),
     categoryDetails: details,
-    products: Array.isArray(data.products) ? (data.products as NativeProduct[]) : [],
+    products: normalizeProducts(data.products),
   };
 }
 
@@ -192,16 +303,58 @@ export async function fetchNativeProductDetail(productId: string, signal?: Abort
     logScope: 'Native Product Detail API',
     signal,
   });
-  const data = requireApiData(response);
+  const data = requireApiData(response) as unknown;
+  if (!isRecord(data)) throw new Error('Native product details are unavailable.');
+  const id = cleanString(data._id) ?? productId;
+  const name = cleanString(data.product_name) ?? 'Native product';
+  const options: NativeProductOption[] = Array.isArray(data.options)
+    ? data.options.flatMap((value) => {
+        if (!isRecord(value)) return [];
+        const label = cleanString(value.label);
+        const price = optionalFiniteNumber(value.price);
+        if (!label || price == null) return [];
+        return [{
+          label,
+          key: cleanString(value.key),
+          image: cleanString(value.image),
+          price: Math.max(0, price),
+          rating: normalizeRating(value.rating),
+        }];
+      })
+    : [];
+  const fullDescription = isRecord(data.product_specification) && Array.isArray(data.product_specification.full_desc_content)
+    ? data.product_specification.full_desc_content.flatMap((value, index) => {
+        if (!isRecord(value)) return [];
+        const image = cleanString(value.image);
+        return image ? [{ image, sort_order: finiteNumber(value.sort_order, index) }] : [];
+      })
+    : [];
   return {
-    ...data,
-    banner_gallery: Array.isArray(data.banner_gallery) ? [...data.banner_gallery].sort((left, right) => left.sort_order - right.sort_order) : [],
-    exchange_steps: Array.isArray(data.exchange_steps) ? data.exchange_steps : [],
-    options: Array.isArray(data.options) ? data.options : [],
-    product_details: Array.isArray(data.product_details) ? [...data.product_details].sort((left, right) => left.sort_order - right.sort_order) : [],
+    _id: id,
+    product_name: name,
+    base_price: Math.max(0, finiteNumber(data.base_price)),
+    main_image: cleanString(data.main_image),
+    options_count: typeof data.options_count === 'number' && Number.isFinite(data.options_count) ? Math.max(0, data.options_count) : undefined,
+    rating: normalizeRating(data.rating),
+    slug: cleanString(data.slug),
+    banner_gallery: Array.isArray(data.banner_gallery) ? data.banner_gallery.flatMap((value, index) => {
+      const media = normalizeProductMedia(value, index);
+      return media && media.type !== 'slider' ? [media] : [];
+    }).sort((left, right) => left.sort_order - right.sort_order) : [],
+    exchange_steps: Array.isArray(data.exchange_steps)
+      ? data.exchange_steps.filter((value) => isRecord(value) || Boolean(cleanString(value)))
+      : [],
+    options,
+    product_details: Array.isArray(data.product_details) ? data.product_details.flatMap((value, index) => normalizeProductMedia(value, index) ?? []).sort((left, right) => left.sort_order - right.sort_order) : [],
+    product_specification: isRecord(data.product_specification) ? {
+      short_desc_image: cleanString(data.product_specification.short_desc_image),
+      full_desc_content: fullDescription.sort((left, right) => left.sort_order - right.sort_order),
+    } : undefined,
   };
 }
 
-export function resolveNativeMediaUrl(path: string): string {
-  return getApiAssetUrl(path) ?? path;
+export function resolveNativeMediaUrl(path?: string | null): string {
+  const cleaned = cleanString(path);
+  if (!cleaned) return '';
+  return getApiAssetUrl(cleaned) ?? cleaned;
 }
