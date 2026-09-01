@@ -1,13 +1,16 @@
-import { colors, fontSizes } from '../../theme';
+import { colors, fontFamilies, fontSizes } from '../../theme';
 import { useEffect, useRef, useState } from 'react';
-import { Alert, View } from 'react-native';
+import { Alert, Modal, Pressable, View } from 'react-native';
 import { Text } from '../../components/app-text';
+import { Image } from 'expo-image';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NavigationContainer, StackActions, createNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Animated, { Easing, FadeIn, FadeOut, SlideInLeft, SlideInRight, SlideOutLeft, SlideOutRight } from 'react-native-reanimated';
 
 import { BottomTabBar, type DashboardTab } from '../../components/bottom-tab-bar';
 import { CategorySubcategoriesSheet, isFullPageCategory } from '../../components/category-subcategories-sheet';
+import { CloseButton } from '../../components/close-icon';
 import { LoadingDots } from '../../components/loading-dots';
 import type { ServiceCategory, ServiceItem, ServiceSubcategory } from '../../data/service-catalog';
 import { useCart } from '../../hooks/use-cart';
@@ -103,17 +106,104 @@ type DashboardScreenProps = {
   onProfileUpdated: (profile: CompletedProfile) => void;
 };
 
+function CartSummaryBar({ categoryCount, itemCount, onClose, onView }: { categoryCount: number; itemCount: number; onClose: () => void; onView: () => void }) {
+  const insets = useSafeAreaInsets();
+
+  return (
+    <View
+      style={{
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        bottom: 64 + insets.bottom,
+        zIndex: 20,
+        minHeight: 68,
+        paddingHorizontal: 20,
+        paddingVertical: 8,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 13,
+        backgroundColor: colors.white,
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderColor: colors.violetTone94,
+        boxShadow: `0 -3px 14px ${colors.violetTone15Alpha6}`,
+      }}
+    >
+      <View style={{ width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 8, borderCurve: 'continuous', backgroundColor: colors.neutralTone96 }}>
+        <Image source={require('../../../assets/cart.png')} contentFit="contain" tintColor={colors.mauveTone31} style={{ width: 21, height: 21 }} />
+      </View>
+
+      <View style={{ flex: 1, gap: 3 }}>
+        <Text selectable style={{ fontSize: fontSizes.size14, lineHeight: 20, fontFamily: fontFamilies.bold, color: colors.mauveTone15_3 }}>
+          {itemCount} {itemCount === 1 ? 'item' : 'items'} in cart
+        </Text>
+        <Text selectable style={{ fontSize: fontSizes.size12, lineHeight: 17, color: colors.mauveTone43 }}>
+          From {categoryCount} {categoryCount === 1 ? 'category' : 'categories'}
+        </Text>
+      </View>
+
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+        <Pressable accessibilityRole="button" onPress={onView} style={({ pressed }) => ({ minWidth: 64, height: 40, paddingHorizontal: 14, alignItems: 'center', justifyContent: 'center', borderRadius: 9, borderCurve: 'continuous', backgroundColor: pressed ? colors.violetTone51 : colors.violetTone58 })}>
+          <Text style={{ fontSize: fontSizes.size14, lineHeight: 20, fontFamily: fontFamilies.bold, color: colors.white }}>View</Text>
+        </Pressable>
+
+        <Pressable accessibilityLabel="Dismiss cart summary" accessibilityRole="button" hitSlop={10} onPress={onClose} style={({ pressed }) => ({ width: 22, height: 40, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.5 : 1 })}>
+          <Image source={require('../../../assets/cancel.png')} contentFit="contain" tintColor={colors.mauveTone31} style={{ width: 16, height: 16 }} />
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+
+function RemoveAllCartItemsModal({ isRemoving, onCancel, onConfirm, visible }: { isRemoving: boolean; onCancel: () => void; onConfirm: () => void; visible: boolean }) {
+  const insets = useSafeAreaInsets();
+
+  return (
+    <Modal animationType="slide" transparent visible={visible} onRequestClose={isRemoving ? undefined : onCancel}>
+      <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: colors.mauveTone8Alpha80 }}>
+        <CloseButton accessibilityLabel="Close remove cart confirmation" color={colors.mauveTone9} floating onPress={isRemoving ? () => undefined : onCancel} />
+
+        <View style={{ minHeight: 318, paddingTop: 24, paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 12) + 14, borderTopLeftRadius: 18, borderTopRightRadius: 18, borderCurve: 'continuous', backgroundColor: colors.white }}>
+          <Image source={require('../../../assets/empty-cart.png')} contentFit="contain" style={{ width: 92, height: 92 }} />
+          <Text selectable style={{ paddingTop: 12, fontSize: fontSizes.size22, lineHeight: 29, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9 }}>
+            Remove all items from cart?
+          </Text>
+          <Text selectable style={{ paddingTop: 8, fontSize: fontSizes.size14, lineHeight: 21, color: colors.mauveTone43 }}>
+            Once removed, you'll have to add all the items again to your cart
+          </Text>
+
+          <View style={{ paddingTop: 24, flexDirection: 'row', gap: 12 }}>
+            <Pressable accessibilityRole="button" disabled={isRemoving} onPress={onCancel} style={({ pressed }) => ({ flex: 1, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 9, borderWidth: 1, borderColor: colors.mauveTone89_3, backgroundColor: colors.white, opacity: pressed ? 0.65 : 1 })}>
+              <Text style={{ fontSize: fontSizes.size14, lineHeight: 20, fontFamily: fontFamilies.semiBold, color: colors.mauveTone24 }}>No, don't remove</Text>
+            </Pressable>
+            <Pressable accessibilityRole="button" disabled={isRemoving} onPress={onConfirm} style={({ pressed }) => ({ flex: 1, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 9, borderWidth: 1, borderColor: colors.mauveTone89_3, backgroundColor: colors.white, opacity: pressed ? 0.65 : 1 })}>
+              {isRemoving ? <LoadingDots color={colors.redTone47} gap={5} size={4} /> : <Text style={{ fontSize: fontSizes.size14, lineHeight: 20, fontFamily: fontFamilies.semiBold, color: colors.redTone47 }}>Yes, remove</Text>}
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
 export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, phone, profilePicture, onLogout, onProfileUpdated }: DashboardScreenProps) {
   const [activeTab, setActiveTab] = useState<DashboardTab>('home');
   const [page, setPage] = useState<DashboardPage>({ type: 'root' });
   const [sheetCategory, setSheetCategory] = useState<ServiceCategory | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<{ subtitle: string; title: string } | null>(null);
   const [isConsultationLoading, setIsConsultationLoading] = useState(false);
+  const [isRemoveCartModalVisible, setIsRemoveCartModalVisible] = useState(false);
+  const [isRemovingAllCartItems, setIsRemovingAllCartItems] = useState(false);
+  const [cartOpenedFromProfile, setCartOpenedFromProfile] = useState(false);
   const [profileTransition, setProfileTransition] = useState<'pop' | 'push'>('push');
   const productNavigationPendingRef = useRef(false);
   const cartState = useCart(authToken);
   const { categories, errorMessage: categoriesError, isLoading: categoriesLoading, retry: retryCategories } = useServiceCategories();
-  const isCartScreenVisible = page.type === 'root' && activeTab === 'cart';
+  const isCartScreenVisible =
+    (page.type === 'root' && activeTab === 'cart') || page.type === 'checkout-cart';
+  const cartCategoryCount = new Set(cartState.items.map((item) => item.cartCategoryId).filter(Boolean)).size || (cartState.items.length > 0 ? 1 : 0);
+  const showCartSummary = page.type === 'root' && activeTab !== 'cart' && cartState.totalItems > 0 && !cartState.isLoading;
 
   useEffect(() => {
     if (!isCartScreenVisible || !authToken) return;
@@ -149,7 +239,21 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
     }
   };
 
+  const removeAllCartItems = async () => {
+    if (isRemovingAllCartItems) return;
+    setIsRemovingAllCartItems(true);
+    try {
+      await cartState.clear();
+      setIsRemoveCartModalVisible(false);
+    } catch (error) {
+      Alert.alert('Could not empty cart', error instanceof Error ? error.message : 'Please try again.');
+    } finally {
+      setIsRemovingAllCartItems(false);
+    }
+  };
+
   const changeTab = (tab: DashboardTab) => {
+    setCartOpenedFromProfile(false);
     setActiveTab(tab);
     setSheetCategory(null);
     setPage({ type: 'root' });
@@ -190,6 +294,31 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
     openCategory(category);
   };
 
+  const openCartCategory = (categoryId: string) => {
+    const category = categories.find((item) => item.id === categoryId);
+    const categoryWithSubcategory = categories.find((item) =>
+      item.subcategories.some((subcategory) => subcategory.id === categoryId),
+    );
+    const subcategory = categoryWithSubcategory?.subcategories.find((item) => item.id === categoryId);
+
+    if (!categoryNavigationRef.isReady()) return;
+
+    if (categoryWithSubcategory && subcategory) {
+      categoryNavigationRef.dispatch(StackActions.push('ServiceList', {
+        category: categoryWithSubcategory,
+        subcategory,
+      }));
+      return;
+    }
+
+    if (category) {
+      categoryNavigationRef.dispatch(StackActions.push('CategoryDetail', { category }));
+      return;
+    }
+
+    changeTab('categories');
+  };
+
   let content;
 
   if (page.type === 'location') {
@@ -223,6 +352,11 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
           onManageAddresses={() => { setProfileTransition('push'); setPage({ type: 'manage-addresses' }); }}
           onManagePaymentMethods={() => { setProfileTransition('push'); setPage({ type: 'payment-methods' }); }}
           onMyBookings={() => { setProfileTransition('push'); setPage({ type: 'my-bookings' }); }}
+          onMyCart={() => {
+            setCartOpenedFromProfile(true);
+            setActiveTab('cart');
+            setPage({ type: 'root' });
+          }}
           onMyPlans={() => { setProfileTransition('push'); setPage({ type: 'my-plans' }); }}
           onMyRating={() => { setProfileTransition('push'); setPage({ type: 'my-rating' }); }}
           onNativeDevices={() => { setProfileTransition('push'); setPage({ type: 'native-devices' }); }}
@@ -241,11 +375,14 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
         consultationMode={page.consultationMode}
         errorMessage={cartState.errorMessage}
         isLoading={cartState.isLoading}
+        itemsSubtotal={cartState.itemsSubtotal}
         items={cartState.items}
         name={name}
         totalItems={cartState.totalItems}
         totalPrice={cartState.totalPrice}
+        grandTotal={cartState.grandTotal}
         onAdd={addToCart}
+        onAddMoreItems={openCartCategory}
         onBack={() => {
           if (page.category && page.subcategory) {
             setPage({ type: 'services', category: page.category, subcategory: page.subcategory });
@@ -284,7 +421,7 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
         categoryTitle={page.category.title}
         item={page.item}
         subcategoryTitle={page.subcategory.title}
-        onAdd={tryAddToCart}
+        onAdd={(item) => tryAddToCart({ ...item, cartCategoryId: page.category.id, cartCategoryName: page.category.title })}
         onRemove={removeFromCart}
         onViewCart={() => setPage({
           type: 'checkout-cart',
@@ -305,8 +442,9 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
         cartItemsById={cartState.itemsById}
         categoryTitle={page.category.title}
         subcategory={page.subcategory}
+        totalCartCategories={cartCategoryCount}
         totalCartItems={cartState.totalItems}
-        onAdd={addToCart}
+        onAdd={(item) => addToCart({ ...item, cartCategoryId: page.category.id, cartCategoryName: page.category.title })}
         onRemove={removeFromCart}
         onProductPress={(item) => setPage({ type: 'product', category: page.category, subcategory: page.subcategory, item })}
         onBack={() => {
@@ -350,17 +488,28 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
         cart={cartState.quantities}
         errorMessage={cartState.errorMessage}
         isLoading={cartState.isLoading}
+        itemsSubtotal={cartState.itemsSubtotal}
         items={cartState.items}
         name={name}
         totalItems={cartState.totalItems}
         totalPrice={cartState.totalPrice}
+        grandTotal={cartState.grandTotal}
         onAdd={addToCart}
+        onAddMoreItems={openCartCategory}
+        onBack={() => {
+          if (cartOpenedFromProfile) {
+            setCartOpenedFromProfile(false);
+            setActiveTab('home');
+            setPage({ type: 'profile' });
+            return;
+          }
+          changeTab('home');
+        }}
         onRemove={removeFromCart}
         onProductPress={(item) => setPage({ type: 'cart-product', item })}
         onExplore={() => changeTab('home')}
         onRetry={() => void cartState.refresh().catch(() => undefined)}
         phone={phone}
-        showBottomTab
       />
     );
   } else {
@@ -384,7 +533,21 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
   const dashboardRoot = (
     <View style={{ flex: 1, backgroundColor: colors.violetTone98_2 }}>
       {content}
-      {page.type === 'root' ? <BottomTabBar activeTab={activeTab} cartCount={cartState.totalItems} onChange={changeTab} /> : null}
+      {showCartSummary ? (
+        <CartSummaryBar
+          categoryCount={cartCategoryCount}
+          itemCount={cartState.totalItems}
+          onClose={() => setIsRemoveCartModalVisible(true)}
+          onView={() => changeTab('cart')}
+        />
+      ) : null}
+      {page.type === 'root' && activeTab !== 'cart' ? <BottomTabBar activeTab={activeTab} cartCount={cartState.totalItems} onChange={changeTab} /> : null}
+      <RemoveAllCartItemsModal
+        isRemoving={isRemovingAllCartItems}
+        visible={isRemoveCartModalVisible}
+        onCancel={() => setIsRemoveCartModalVisible(false)}
+        onConfirm={() => void removeAllCartItems()}
+      />
       {page.type === 'profile-details' ? (
         <Animated.View
           entering={profileTransition === 'pop' ? STACK_POP_IN : STACK_SLIDE_IN}
@@ -677,8 +840,9 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
               cartItemsById={cartState.itemsById}
               categoryTitle={route.params.category.title}
               subcategory={route.params.subcategory}
+              totalCartCategories={cartCategoryCount}
               totalCartItems={cartState.totalItems}
-              onAdd={addToCart}
+              onAdd={(item) => addToCart({ ...item, cartCategoryId: route.params.category.id, cartCategoryName: route.params.category.title })}
               onRemove={removeFromCart}
               onProductPress={(item) => {
                 if (productNavigationPendingRef.current) return;
@@ -733,7 +897,7 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
               categoryTitle={route.params.category.title}
               item={route.params.item}
               subcategoryTitle={route.params.subcategory.title}
-              onAdd={tryAddToCart}
+              onAdd={(item) => tryAddToCart({ ...item, cartCategoryId: route.params.category.id, cartCategoryName: route.params.category.title })}
               onRemove={removeFromCart}
               onViewCart={() => {
                 navigation.push('CheckoutCart', {
@@ -748,7 +912,16 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
             />
           )}
         </CategoryStack.Screen>
-        <CategoryStack.Screen name="CheckoutCart">
+        <CategoryStack.Screen
+          name="CheckoutCart"
+          listeners={{
+            focus: () => {
+              if (!authToken) return;
+
+              void cartState.refresh().catch(() => undefined);
+            },
+          }}
+        >
           {({ navigation, route }) => (
             <CartScreen
               authToken={authToken}
@@ -757,11 +930,14 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
               consultationMode={route.params.consultationMode}
               errorMessage={cartState.errorMessage}
               isLoading={cartState.isLoading}
+              itemsSubtotal={cartState.itemsSubtotal}
               items={cartState.items}
               name={name}
               totalItems={cartState.totalItems}
               totalPrice={cartState.totalPrice}
+              grandTotal={cartState.grandTotal}
               onAdd={addToCart}
+              onAddMoreItems={openCartCategory}
               onBack={() => {
                 if (route.params.consultationMode) {
                   navigation.popTo('ServiceList', {

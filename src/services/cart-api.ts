@@ -32,8 +32,24 @@ type AddCartData = {
   cartSummary: CartSummary;
 };
 
-type GetCartData = CartSummary & {
+export type CartCategoryGroup = {
+  category_id: string;
+  category_name: string;
+  categoryTotal: number;
+  charges: {
+    govtTax: number;
+    platformFee: number;
+    visitationFee: number;
+  };
   items: CartItem[];
+  subtotal: number;
+};
+
+export type GetCartData = Partial<CartSummary> & {
+  categoryGroups?: CartCategoryGroup[];
+  grandTotal?: number;
+  items?: CartItem[];
+  itemsSubtotal?: number;
 };
 
 type DecrementCartData = {

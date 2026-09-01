@@ -20,6 +20,7 @@ type ProfileEntryScreenProps = {
   onLogout: () => void;
   onManageAddresses?: () => void;
   onManagePaymentMethods?: () => void;
+  onMyCart?: () => void;
   onMyBookings?: () => void;
   onMyPlans?: () => void;
   onMyRating?: () => void;

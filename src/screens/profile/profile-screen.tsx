@@ -19,6 +19,7 @@ type ProfileScreenProps = {
   onLogout: () => void;
   onManageAddresses?: () => void;
   onManagePaymentMethods?: () => void;
+  onMyCart?: () => void;
   onMyBookings?: () => void;
   onMyPlans?: () => void;
   onMyRating?: () => void;
@@ -60,7 +61,7 @@ function ChevronRight() {
   );
 }
 
-export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteProfile, onHelpSupport, onLogout, onManageAddresses, onManagePaymentMethods, onMyBookings, onMyPlans, onMyRating, onNativeDevices, onPassesMembership, onSettings, onWallet }: ProfileScreenProps) {
+export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteProfile, onHelpSupport, onLogout, onManageAddresses, onManagePaymentMethods, onMyBookings, onMyCart, onMyPlans, onMyRating, onNativeDevices, onPassesMembership, onSettings, onWallet }: ProfileScreenProps) {
   const insets = useSafeAreaInsets();
   const displayName = name?.trim() || 'Verified Customer';
   const displayEmail = email?.trim();
@@ -74,6 +75,7 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
   ];
 
   const menuItems: MenuItem[] = [
+    { imageSource: require('../../../assets/cart.png'), label: 'My cart', onPress: onMyCart },
     { imageSource: require('../../../assets/plans.png'), label: 'My Plans', onPress: onMyPlans },
     { imageSource: require('../../../assets/wallet.png'), label: 'Wallet', onPress: onWallet },
     { imageSource: require('../../../assets/passes.png'), label: 'Passes & membership', onPress: onPassesMembership },

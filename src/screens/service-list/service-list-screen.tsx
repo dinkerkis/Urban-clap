@@ -18,6 +18,7 @@ type ServiceListScreenProps = {
   cartItemsById: Record<string, ServiceItem>;
   categoryTitle: string;
   subcategory: ServiceSubcategory;
+  totalCartCategories: number;
   totalCartItems: number;
   onAdd: (item: ServiceItem) => void;
   onBack: () => void;
@@ -212,10 +213,10 @@ function ProductRow({ cartItem, item, quantity, showEstimateLabel, onAdd, onPres
               <Text style={{ fontSize: fontSizes.size16, fontFamily: fontFamilies.medium, color: colors.violetTone58 }}>Add</Text>
             </Pressable>
           ) : (
-            <View style={{ position: 'absolute', bottom: 0, alignSelf: 'center', width: 78, height: 32, flexDirection: 'row', alignItems: 'center', overflow: 'hidden', borderRadius: 10, backgroundColor: colors.violetTone58 }}>
-              <Pressable onPress={(event) => { event.stopPropagation(); onRemove(cartItem); }} style={{ width: 26, height: 32, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: fontSizes.size20, color: colors.white }}>−</Text></Pressable>
-              <Text style={{ flex: 1, textAlign: 'center', fontSize: fontSizes.size14, fontFamily: fontFamilies.semiBold, color: colors.white, fontVariant: ['tabular-nums'] }}>{quantity}</Text>
-              <Pressable onPress={(event) => { event.stopPropagation(); onAdd(cartItem); }} style={{ width: 26, height: 32, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: fontSizes.size20, color: colors.white }}>+</Text></Pressable>
+            <View style={{ position: 'absolute', bottom: 0, alignSelf: 'center', width: 78, height: 32, paddingHorizontal: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 2, overflow: 'hidden', borderRadius: 10, borderWidth: 1, borderColor: colors.violetTone58, backgroundColor: colors.white, elevation: 0, shadowOpacity: 0 }}>
+              <Pressable onPress={(event) => { event.stopPropagation(); onRemove(cartItem); }} style={{ width: 22, height: 30, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: fontSizes.size17, lineHeight: 20, fontFamily: fontFamilies.regular, color: colors.violetTone58 }}>−</Text></Pressable>
+              <Text style={{ minWidth: 18, textAlign: 'center', fontSize: fontSizes.size15, fontFamily: fontFamilies.bold, color: colors.violetTone58, fontVariant: ['tabular-nums'] }}>{quantity}</Text>
+              <Pressable onPress={(event) => { event.stopPropagation(); onAdd(cartItem); }} style={{ width: 22, height: 30, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: fontSizes.size17, lineHeight: 20, fontFamily: fontFamilies.regular, color: colors.violetTone58 }}>+</Text></Pressable>
             </View>
           )}
         </View>
@@ -224,7 +225,7 @@ function ProductRow({ cartItem, item, quantity, showEstimateLabel, onAdd, onPres
   );
 }
 
-export function ServiceListScreen({ cart, cartItemsById, categoryTitle, subcategory, totalCartItems, onAdd, onBack, onProductPress, onRemove, onSearchPress, onViewCart, scrollTarget }: ServiceListScreenProps) {
+export function ServiceListScreen({ cart, cartItemsById, categoryTitle, subcategory, totalCartCategories, totalCartItems, onAdd, onBack, onProductPress, onRemove, onSearchPress, onViewCart, scrollTarget }: ServiceListScreenProps) {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const { categoryName, errorMessage, isLoading, retry, sections } = useCategoryProducts(subcategory.id);
@@ -528,16 +529,21 @@ export function ServiceListScreen({ cart, cartItemsById, categoryTitle, subcateg
         </View>
       </View> : showCartFooter ? (
         <View
-          style={{ position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 30, paddingHorizontal: 16, paddingTop: 10, paddingBottom: Math.max(insets.bottom, 10), flexDirection: 'row', alignItems: 'center', gap: 16, backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.mauveTone93_2, boxShadow: `0 -4px 16px ${colors.violetTone10Alpha6}` }}
+          style={{ position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 30, paddingHorizontal: 16, paddingTop: 10, paddingBottom: Math.max(insets.bottom, 10), flexDirection: 'row', alignItems: 'center', gap: 16, backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.violetTone93_2, boxShadow: `0 -3px 10px ${colors.mauveTone9Alpha6}` }}
         >
-          <Text selectable style={{ flex: 1, fontSize: fontSizes.size14, lineHeight: 20, fontFamily: fontFamilies.semiBold, color: colors.black, fontVariant: ['tabular-nums'] }}>
-            {totalCartItems} {totalCartItems === 1 ? 'item' : 'items'} added
-          </Text>
+          <View style={{ flex: 1, gap: 3 }}>
+            <Text selectable style={{ fontSize: fontSizes.size14, lineHeight: 20, fontFamily: fontFamilies.semiBold, color: colors.black, fontVariant: ['tabular-nums'] }}>
+              {totalCartItems} {totalCartItems === 1 ? 'item' : 'items'} added
+            </Text>
+            <Text selectable style={{ fontSize: fontSizes.size12, lineHeight: 17, color: colors.mauveTone43, fontVariant: ['tabular-nums'] }}>
+              From {totalCartCategories} {totalCartCategories === 1 ? 'category' : 'categories'}
+            </Text>
+          </View>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={`View cart with ${totalCartItems} ${totalCartItems === 1 ? 'item' : 'items'}`}
             onPress={onViewCart}
-            style={({ pressed }) => ({ width: Math.min(172, width * 0.44), height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 8, borderCurve: 'continuous', backgroundColor: colors.violetTone58, opacity: pressed ? 0.78 : 1 })}
+            style={({ pressed }) => ({ width: Math.min(172, width * 0.44), height: 47, alignItems: 'center', justifyContent: 'center', borderRadius: 8, borderCurve: 'continuous', backgroundColor: colors.violetTone58, opacity: pressed ? 0.78 : 1 })}
           >
             <Text style={{ fontSize: fontSizes.size15, lineHeight: 21, fontFamily: fontFamilies.semiBold, color: colors.white }}>View cart</Text>
           </Pressable>

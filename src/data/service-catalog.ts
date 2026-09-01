@@ -21,6 +21,9 @@ export type ServiceItem = {
   selectedVariantLabel?: string;
   serverCartItemId?: string;
   serverLineTotal?: number;
+  cartCategoryId?: string;
+  cartCategoryName?: string;
+  cartCategoryTotal?: number;
   slug?: string;
   status?: string;
   variantLabel?: string;

@@ -8,26 +8,30 @@ import { getCategoryImageUrl } from '../services/categories-api';
 type CartState = {
   errorMessage: string;
   isLoading: boolean;
+  itemsSubtotal: number;
   itemsById: Record<string, ServiceItem>;
   quantities: Record<string, number>;
   totalItems: number;
   totalPrice: number;
+  grandTotal: number;
 };
 
 const emptyState: CartState = {
   errorMessage: '',
   isLoading: false,
+  itemsSubtotal: 0,
   itemsById: {},
   quantities: {},
   totalItems: 0,
   totalPrice: 0,
+  grandTotal: 0,
 };
 
 function cartKey(productId: string, variantKey?: string | null): string {
   return variantKey ? `${productId}::${variantKey}` : productId;
 }
 
-function mapCartItem(cartItem: CartItem, knownItem?: ServiceItem): ServiceItem {
+function mapCartItem(cartItem: CartItem, knownItem?: ServiceItem, category?: { id: string; name: string; total?: number }): ServiceItem {
   const key = cartKey(cartItem.product_id, cartItem.variant?.key);
   return {
     ...knownItem,
@@ -48,6 +52,9 @@ function mapCartItem(cartItem: CartItem, knownItem?: ServiceItem): ServiceItem {
     selectedVariantLabel: cartItem.variant?.label || knownItem?.selectedVariantLabel,
     serverCartItemId: cartItem.item_id,
     serverLineTotal: cartItem.lineTotal,
+    cartCategoryId: category?.id || knownItem?.cartCategoryId,
+    cartCategoryName: category?.name || knownItem?.cartCategoryName,
+    cartCategoryTotal: category?.total ?? knownItem?.cartCategoryTotal,
     slug: cartItem.snapshot?.slug || knownItem?.slug,
     variantKey: cartItem.variant?.key || knownItem?.variantKey,
   };
@@ -71,19 +78,31 @@ export function useCart(authToken?: string) {
       setState((current) => {
         const itemsById: Record<string, ServiceItem> = {};
         const quantities: Record<string, number> = {};
-        const items = Array.isArray(data.items) ? data.items : [];
-        items.forEach((cartItem) => {
+        const groupedItems = Array.isArray(data.categoryGroups)
+          ? data.categoryGroups.flatMap((group) => group.items.map((item) => ({
+              category: { id: group.category_id, name: group.category_name, total: group.categoryTotal },
+              item,
+            })))
+          : [];
+        const items = groupedItems.length > 0
+          ? groupedItems
+          : (Array.isArray(data.items) ? data.items : []).map((item) => ({ category: undefined, item }));
+        items.forEach(({ category, item: cartItem }) => {
           const key = cartKey(cartItem.product_id, cartItem.variant?.key);
-          itemsById[key] = mapCartItem(cartItem, current.itemsById[key]);
+          itemsById[key] = mapCartItem(cartItem, current.itemsById[key], category);
           quantities[key] = cartItem.quantity;
         });
+        const itemsSubtotal = data.itemsSubtotal ?? data.totalPrice ?? 0;
+        const grandTotal = data.grandTotal ?? data.totalPrice ?? itemsSubtotal;
         return {
           errorMessage: '',
           isLoading: false,
+          itemsSubtotal,
           itemsById,
           quantities,
           totalItems: data.totalItems ?? 0,
-          totalPrice: data.totalPrice ?? 0,
+          totalPrice: grandTotal,
+          grandTotal,
         };
       });
     } catch (error) {
@@ -121,8 +140,10 @@ export function useCart(authToken?: string) {
       isLoading: false,
       itemsById: { ...current.itemsById, [key]: mapCartItem(data.addedItem, { ...item, id: key }) },
       quantities: { ...current.quantities, [key]: data.addedItem.quantity },
+      itemsSubtotal: data.cartSummary.totalPrice,
       totalItems: data.cartSummary.totalItems,
       totalPrice: data.cartSummary.totalPrice,
+      grandTotal: data.cartSummary.totalPrice,
     }));
   }, [authToken]);
 
@@ -152,13 +173,36 @@ export function useCart(authToken?: string) {
         isLoading: false,
         itemsById,
         quantities,
+        itemsSubtotal: data.cartSummary.totalPrice,
         totalItems: data.cartSummary.totalItems,
         totalPrice: data.cartSummary.totalPrice,
+        grandTotal: data.cartSummary.totalPrice,
       };
     });
   }, [authToken]);
 
+  const clear = useCallback(async () => {
+    const selections = Object.values(state.itemsById).map((item) => ({
+      item,
+      quantity: state.quantities[item.id] ?? 0,
+    }));
+
+    try {
+      for (const { item, quantity } of selections) {
+        if (!item.serverCartItemId) throw new Error('A cart item is still syncing. Please try again.');
+        for (let count = 0; count < quantity; count += 1) {
+          await decrementCartItem(item.serverCartItemId, authToken);
+        }
+      }
+      mutationVersionRef.current += 1;
+      setState(emptyState);
+    } catch (error) {
+      await refresh().catch(() => undefined);
+      throw error;
+    }
+  }, [authToken, refresh, state.itemsById, state.quantities]);
+
   const items = useMemo(() => Object.values(state.itemsById), [state.itemsById]);
 
-  return { ...state, add, decrement, items, refresh };
+  return { ...state, add, clear, decrement, items, refresh };
 }
