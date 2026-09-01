@@ -1,6 +1,7 @@
 import { colors, fontFamilies, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
-import { Pressable, ScrollView, Share, Text, View } from 'react-native';
+import { Pressable, ScrollView, Share, View } from 'react-native';
+import { Text } from '../../components/app-text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BackIcon } from '../../components/back-icon';

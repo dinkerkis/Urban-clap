@@ -1,6 +1,7 @@
 import { colors, fontFamilies, fontSizes } from '../../theme';
 import { useEffect, useRef, useState } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
+import { Text } from '../../components/app-text';
 import Animated, {
   Easing,
   FadeIn,

@@ -1,10 +1,12 @@
 import { colors, fontFamilies, fontSizes } from '../../theme';
 import { useState, type ReactNode } from 'react';
 import { Image } from 'expo-image';
-import { Alert, Modal, Pressable, ScrollView, Text, View } from 'react-native';
+import { Alert, Modal, Pressable, ScrollView, View } from 'react-native';
+import { Text } from '../../components/app-text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BackIcon } from '../../components/back-icon';
+import { CloseButton } from '../../components/close-icon';
 import { EditIcon } from '../../components/edit-icon';
 import { LoadingDots } from '../../components/loading-dots';
 import type { ServiceItem } from '../../data/service-catalog';
@@ -381,9 +383,7 @@ export function CartScreen({
 
       <Modal animationType="slide" transparent visible={showBillSummary} onRequestClose={() => setShowBillSummary(false)}>
         <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: colors.mauveTone8Alpha80 }}>
-          <Pressable accessibilityLabel="Close bill summary" onPress={() => setShowBillSummary(false)} style={{ alignSelf: 'flex-end', width: 40, height: 40, marginRight: 20, marginBottom: 8, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: colors.white }}>
-            <Text style={{ fontSize: fontSizes.size23, lineHeight: 25, fontFamily: fontFamilies.light, color: colors.mauveTone9 }}>×</Text>
-          </Pressable>
+          <CloseButton accessibilityLabel="Close bill summary" color={colors.mauveTone9} floating onPress={() => setShowBillSummary(false)} />
           <View style={{ paddingTop: 24, paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 12), borderTopLeftRadius: 24, borderTopRightRadius: 24, backgroundColor: colors.white }}>
             <Text selectable style={{ fontSize: fontSizes.size24, lineHeight: 31, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9 }}>Bill summary</Text>
             <BillRow label="Item total" value={displayedTotalPrice} />
@@ -497,9 +497,7 @@ function SlotSelectionSheet({ selectedDate, selectedTime, onClose, onDateSelect,
 
   return (
     <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: colors.mauveTone8Alpha80 }}>
-      <Pressable accessibilityLabel="Close slot selection" onPress={onClose} style={{ alignSelf: 'flex-end', width: 36, height: 36, marginRight: 18, marginBottom: 8, alignItems: 'center', justifyContent: 'center', borderRadius: 18, backgroundColor: colors.white }}>
-        <Text style={{ fontSize: fontSizes.size21, lineHeight: 23, fontFamily: fontFamilies.light, color: colors.mauveTone9 }}>×</Text>
-      </Pressable>
+      <CloseButton accessibilityLabel="Close slot selection" color={colors.mauveTone9} floating onPress={onClose} />
       <View style={{ paddingTop: 22, paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 12) + 8, borderTopLeftRadius: 18, borderTopRightRadius: 18, backgroundColor: colors.white }}>
         <Text style={{ fontSize: fontSizes.size19, lineHeight: 25, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9 }}>When should the professional arrive?</Text>
         <Text style={{ marginTop: 7, fontSize: fontSizes.size14, lineHeight: 20, color: colors.mauveTone43 }}>Service will take approx. 1 hr</Text>
@@ -540,9 +538,7 @@ function SavedAddressSheet({ addresses, isProceeding, selectedAddressId, onAddAn
   const insets = useSafeAreaInsets();
   return (
     <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: colors.mauveTone8Alpha80 }}>
-      <Pressable accessibilityLabel="Close saved addresses" onPress={onClose} style={{ alignSelf: 'flex-end', width: 36, height: 36, marginRight: 18, marginBottom: 8, alignItems: 'center', justifyContent: 'center', borderRadius: 18, backgroundColor: colors.white }}>
-        <Text style={{ fontSize: fontSizes.size21, lineHeight: 23, fontFamily: fontFamilies.light, color: colors.mauveTone9 }}>×</Text>
-      </Pressable>
+      <CloseButton accessibilityLabel="Close saved addresses" color={colors.mauveTone9} floating onPress={onClose} />
       <View style={{ maxHeight: '68%', paddingTop: 22, paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 12) + 10, borderTopLeftRadius: 18, borderTopRightRadius: 18, backgroundColor: colors.white }}>
         <Text style={{ fontSize: fontSizes.size20, lineHeight: 27, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9 }}>Saved address</Text>
         <Pressable onPress={onAddAnother} style={{ height: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: colors.mauveTone94 }}>

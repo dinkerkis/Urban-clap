@@ -35,7 +35,7 @@ export default function App() {
     os_light: OpenSans_300Light,
     os_regular: OpenSans_400Regular,
     os_medium: OpenSans_500Medium,
-    os_semibold: OpenSans_600SemiBold,
+    os_semi_bold: OpenSans_600SemiBold,
     os_bold: OpenSans_700Bold,
     os_extrabold: OpenSans_800ExtraBold,
   });

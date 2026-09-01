@@ -1,6 +1,7 @@
 import { colors, fontSizes } from '../../theme';
 import { useEffect, useRef, useState } from 'react';
-import { Alert, Text, View } from 'react-native';
+import { Alert, View } from 'react-native';
+import { Text } from '../../components/app-text';
 import { NavigationContainer, StackActions, createNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Animated, { Easing, FadeIn, FadeOut, SlideInLeft, SlideInRight, SlideOutLeft, SlideOutRight } from 'react-native-reanimated';
@@ -267,11 +268,7 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
         categoryTitle="Your cart"
         item={page.item}
         subcategoryTitle={page.item.selectedVariantLabel || 'Selected service'}
-        onAdd={async (item) => {
-          if (await tryAddToCart(item)) {
-            setPage({ type: 'checkout-cart', categoryTitle: 'Selected services' });
-          }
-        }}
+        onAdd={tryAddToCart}
         onRemove={removeFromCart}
         onViewCart={() => setPage({ type: 'checkout-cart', categoryTitle: 'Selected services' })}
         onBack={() => changeTab('cart')}
@@ -287,17 +284,7 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
         categoryTitle={page.category.title}
         item={page.item}
         subcategoryTitle={page.subcategory.title}
-        onAdd={async (item) => {
-          if (await tryAddToCart(item)) {
-            setPage({
-              type: 'checkout-cart',
-              category: page.category,
-              consultationMode: true,
-              subcategory: page.subcategory,
-              categoryTitle: page.category.title,
-            });
-          }
-        }}
+        onAdd={tryAddToCart}
         onRemove={removeFromCart}
         onViewCart={() => setPage({
           type: 'checkout-cart',
@@ -315,8 +302,10 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
     content = (
       <ServiceListScreen
         cart={cartState.quantities}
+        cartItemsById={cartState.itemsById}
         categoryTitle={page.category.title}
         subcategory={page.subcategory}
+        totalCartItems={cartState.totalItems}
         onAdd={addToCart}
         onRemove={removeFromCart}
         onProductPress={(item) => setPage({ type: 'product', category: page.category, subcategory: page.subcategory, item })}
@@ -327,6 +316,12 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
           }
           setPage({ type: 'root' });
         }}
+        onViewCart={() => setPage({
+          type: 'checkout-cart',
+          category: page.category,
+          subcategory: page.subcategory,
+          categoryTitle: page.category.title,
+        })}
       />
     );
   } else if (activeTab === 'rewards') {
@@ -679,8 +674,10 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
           {({ navigation, route }) => (
             <ServiceListScreen
               cart={cartState.quantities}
+              cartItemsById={cartState.itemsById}
               categoryTitle={route.params.category.title}
               subcategory={route.params.subcategory}
+              totalCartItems={cartState.totalItems}
               onAdd={addToCart}
               onRemove={removeFromCart}
               onProductPress={(item) => {
@@ -690,6 +687,10 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
               }}
               onBack={navigation.goBack}
               onSearchPress={() => navigation.push('ServiceSearch', { category: route.params.category, subcategory: route.params.subcategory })}
+              onViewCart={() => navigation.push('CheckoutCart', {
+                category: route.params.category,
+                subcategory: route.params.subcategory,
+              })}
               scrollTarget={route.params.scrollToProductId && route.params.scrollRequestKey ? { productId: route.params.scrollToProductId, requestKey: route.params.scrollRequestKey } : undefined}
             />
           )}
@@ -732,14 +733,7 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
               categoryTitle={route.params.category.title}
               item={route.params.item}
               subcategoryTitle={route.params.subcategory.title}
-              onAdd={async (item) => {
-                if (!(await tryAddToCart(item))) return;
-                navigation.push('CheckoutCart', {
-                  category: route.params.category,
-                  consultationMode: true,
-                  subcategory: route.params.subcategory,
-                });
-              }}
+              onAdd={tryAddToCart}
               onRemove={removeFromCart}
               onViewCart={() => {
                 navigation.push('CheckoutCart', {

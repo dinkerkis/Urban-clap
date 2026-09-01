@@ -1,5 +1,6 @@
 import { colors, typography } from '../theme';
-import { Pressable, Text } from 'react-native';
+import { Pressable } from 'react-native';
+import { Text } from './app-text';
 
 import { LoadingDots } from './loading-dots';
 

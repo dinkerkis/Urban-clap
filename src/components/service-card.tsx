@@ -1,6 +1,7 @@
 import { colors, fontFamilies, fontSizes } from '../theme';
 import { Image } from 'expo-image';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, View } from 'react-native';
+import { Text } from './app-text';
 
 import type { ServiceItem } from '../data/service-catalog';
 

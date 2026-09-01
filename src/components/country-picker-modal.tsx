@@ -1,6 +1,8 @@
-import { colors, fontFamilies, fontSizes, typography } from '../theme';
-import { Modal, Pressable, Text, View } from 'react-native';
+import { colors, fontSizes, typography } from '../theme';
+import { Modal, Pressable, View } from 'react-native';
+import { Text } from './app-text';
 
+import { CloseButton } from './close-icon';
 import { countries, type Country } from '../config/countries';
 
 type Props = {
@@ -27,27 +29,12 @@ export function CountryPickerModal({ onClose, onSelect, selectedCountry, visible
           style={{ position: 'absolute', inset: 0, backgroundColor: colors.blueTone5Alpha66 }}
         />
 
-        <Pressable
-          accessibilityRole="button"
+        <CloseButton
           accessibilityLabel="Close country selection"
-          hitSlop={10}
+          color={colors.text}
+          floating
           onPress={onClose}
-          style={({ pressed }) => ({
-            width: 44,
-            height: 44,
-            alignSelf: 'flex-end',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginRight: 24,
-            marginBottom: 16,
-            borderRadius: 22,
-            backgroundColor: colors.white,
-            opacity: pressed ? 0.7 : 1,
-            boxShadow: `0 8px 26px ${colors.blackAlpha18}`,
-          })}
-        >
-          <Text style={{ fontSize: fontSizes.size21, lineHeight: 24, fontFamily: fontFamilies.light, color: colors.text }}>×</Text>
-        </Pressable>
+        />
 
         <View
           style={{

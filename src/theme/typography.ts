@@ -38,7 +38,7 @@ export const fontFamilies = {
   light: 'os_light',
   regular: 'os_regular',
   medium: 'os_medium',
-  semiBold: 'os_semibold',
+  semiBold: 'os_semi_bold',
   bold: 'os_bold',
   extraBold: 'os_extrabold',
 } as const;

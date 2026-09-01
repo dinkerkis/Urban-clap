@@ -1,7 +1,9 @@
 import { colors, fontFamilies, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable, ScrollView, View } from 'react-native';
+import { TextInput } from '../../components/app-text-input';
+import { Text } from '../../components/app-text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BackIcon } from '../../components/back-icon';

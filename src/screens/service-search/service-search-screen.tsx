@@ -1,10 +1,13 @@
 import { colors, fontFamilies, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
 import { useMemo, useState } from 'react';
-import { FlatList, Pressable, Text, TextInput, View } from 'react-native';
+import { FlatList, Pressable, View } from 'react-native';
+import { TextInput } from '../../components/app-text-input';
+import { Text } from '../../components/app-text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BackIcon } from '../../components/back-icon';
+import { CloseIcon } from '../../components/close-icon';
 import { LoadingDots } from '../../components/loading-dots';
 import type { ServiceItem, ServiceSubcategory } from '../../data/service-catalog';
 import { useCategoryProducts } from '../../hooks/use-category-products';
@@ -62,7 +65,8 @@ function SearchResultRow({ onPress, queryTokens, result }: { onPress: () => void
 export function ServiceSearchScreen({ categoryTitle, onBack, onResultPress, subcategory }: ServiceSearchScreenProps) {
   const insets = useSafeAreaInsets();
   const [query, setQuery] = useState('');
-  const { errorMessage, isLoading, retry, sections } = useCategoryProducts(subcategory.id);
+  const { categoryName, errorMessage, isLoading, retry, sections } = useCategoryProducts(subcategory.id);
+  const displayCategoryTitle = categoryName?.trim() || categoryTitle;
   const queryTokens = useMemo(() => Array.from(new Set(query.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean))), [query]);
   const results = useMemo<SearchResult[]>(() => {
     if (!queryTokens.length) return [];
@@ -74,9 +78,9 @@ export function ServiceSearchScreen({ categoryTitle, onBack, onResultPress, subc
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.white }}>
-      <View style={{ paddingTop: insets.top + 16, paddingHorizontal: 18, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: colors.mauveTone90_3, backgroundColor: colors.white }}>
-        <View style={{ height: 54, paddingHorizontal: 14, flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1.5, borderColor: colors.violetTone58, borderRadius: 12, backgroundColor: colors.white }}>
-          <Pressable accessibilityRole="button" accessibilityLabel="Go back" hitSlop={10} onPress={onBack} style={({ pressed }) => ({ width: 34, height: 40, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.55 : 1 })}>
+      <View style={{ paddingTop: insets.top + 16, paddingHorizontal: 16, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: colors.mauveTone90_3, backgroundColor: colors.white }}>
+        <View style={{ height: 46, paddingHorizontal: 10, flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, borderColor: colors.violetTone65, borderRadius: 8, backgroundColor: colors.white }}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Go back" hitSlop={10} onPress={onBack} style={({ pressed }) => ({ width: 32, height: 40, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.55 : 1 })}>
             <BackIcon />
           </Pressable>
           <TextInput
@@ -86,13 +90,13 @@ export function ServiceSearchScreen({ categoryTitle, onBack, onResultPress, subc
             returnKeyType="search"
             value={query}
             onChangeText={setQuery}
-            placeholder={`Search in ${categoryTitle}`}
-            placeholderTextColor={colors.placeholder}
-            style={{ flex: 1, height: '100%', paddingVertical: 0, fontSize: fontSizes.size17, color: colors.mauveTone9_2 }}
+            placeholder={`Search in ${displayCategoryTitle}`}
+            placeholderTextColor={colors.neutralTone70}
+            style={{ flex: 1, height: '100%', paddingVertical: 0, fontFamily: fontFamilies.regular, fontSize: fontSizes.size15, color: colors.mauveTone9_2 }}
           />
           {query.length ? (
             <Pressable accessibilityRole="button" accessibilityLabel="Clear search" hitSlop={8} onPress={() => setQuery('')} style={({ pressed }) => ({ width: 28, height: 28, alignItems: 'center', justifyContent: 'center', borderRadius: 14, backgroundColor: colors.mauveTone39, opacity: pressed ? 0.65 : 1 })}>
-              <Text style={{ marginTop: -1, fontSize: fontSizes.size17, lineHeight: 19, fontFamily: fontFamilies.semiBold, color: colors.white }}>×</Text>
+              <CloseIcon color={colors.white} size={14} />
             </Pressable>
           ) : null}
         </View>

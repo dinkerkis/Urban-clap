@@ -1,11 +1,13 @@
 import { colors, fontFamilies, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Modal, Pressable, ScrollView, Share, Text, View, useWindowDimensions } from 'react-native';
+import { Modal, Pressable, ScrollView, Share, View, useWindowDimensions } from 'react-native';
+import { Text } from '../../components/app-text';
 import Animated, { cancelAnimation, Easing, FadeIn, interpolate, runOnJS, type SharedValue, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BackIcon } from '../../components/back-icon';
+import { CloseButton, CLOSE_BUTTON_GAP } from '../../components/close-icon';
 import { DottedUnderline } from '../../components/dotted-underline';
 import { EstimateNoteIcon } from '../../components/estimate-note-icon';
 import type { ServiceItem, ServiceSubcategory } from '../../data/service-catalog';
@@ -13,20 +15,41 @@ import { useCategoryProducts, type ProductSection } from '../../hooks/use-catego
 
 type ServiceListScreenProps = {
   cart: Record<string, number>;
+  cartItemsById: Record<string, ServiceItem>;
   categoryTitle: string;
   subcategory: ServiceSubcategory;
+  totalCartItems: number;
   onAdd: (item: ServiceItem) => void;
   onBack: () => void;
   onProductPress: (item: ServiceItem) => void;
   onRemove: (item: ServiceItem) => void;
   onSearchPress?: () => void;
+  onViewCart: () => void;
   scrollTarget?: { productId: string; requestKey: number };
 };
 
 const HERO_DURATION = 4_500;
+const HERO_HEIGHT = 280;
 const NAV_HEIGHT = 66;
 const SECTION_HEADER_HEIGHT = 46;
+const ESTIMATE_NOTE_HEIGHT = 32;
+const CONSULTATION_BUTTON_HEIGHT = 50;
+const CONSULTATION_BUTTON_RADIUS = 8;
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+function isPaintingAndWaterproofingCategory(categoryTitle: string) {
+  const normalizedTitle = categoryTitle.trim().toLocaleLowerCase();
+  return normalizedTitle.includes('painting') && normalizedTitle.includes('waterproof');
+}
+
+function getSectionColumnCount(categoryTitle: string) {
+  return isPaintingAndWaterproofingCategory(categoryTitle) ? 4 : 3;
+}
+
+function shouldShowEstimateFooter(screenTitle: string) {
+  const normalizedTitle = screenTitle.trim().toLocaleLowerCase();
+  return normalizedTitle.includes('rooms') && normalizedTitle.includes('walls') && normalizedTitle.includes('painting');
+}
 
 function SearchIcon() {
   return (
@@ -64,13 +87,14 @@ function ServiceSkeletonBlock({ height, progress, radius = 8, screenWidth, width
   );
 }
 
-function ServiceListSkeleton({ onBack }: { onBack: () => void }) {
+function ServiceListSkeleton({ categoryTitle, onBack, showEstimateFooter }: { categoryTitle: string; onBack: () => void; showEstimateFooter: boolean }) {
   const insets = useSafeAreaInsets();
   const { width: screenWidth } = useWindowDimensions();
   const reducedMotion = useReducedMotion();
   const progress = useSharedValue(0);
-  const cardWidth = Math.floor((Math.min(screenWidth, 520) - 68) / 4);
-  const categoryImageSize = Math.min(64, cardWidth);
+  const columnCount = getSectionColumnCount(categoryTitle);
+  const cardWidth = Math.floor((Math.min(screenWidth, 520) - 32 - (columnCount - 1) * 12) / columnCount);
+  const categoryImageSize = Math.min(72, cardWidth);
   const productImageSize = 128;
 
   useEffect(() => {
@@ -86,14 +110,14 @@ function ServiceListSkeleton({ onBack }: { onBack: () => void }) {
 
   return (
     <View accessibilityLabel="Loading category details" accessibilityRole="progressbar" style={{ flex: 1, backgroundColor: colors.white }}>
-      <ScrollView scrollEnabled={false} contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 118 + insets.bottom }}>
-        <ServiceSkeletonBlock height={310} progress={progress} radius={0} screenWidth={screenWidth} />
+      <ScrollView scrollEnabled={false} contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: (showEstimateFooter ? 118 : 24) + insets.bottom }}>
+        <ServiceSkeletonBlock height={HERO_HEIGHT} progress={progress} radius={0} screenWidth={screenWidth} />
         <View style={{ paddingHorizontal: 20, paddingTop: 25, paddingBottom: 22, gap: 10 }}>
           <ServiceSkeletonBlock height={32} progress={progress} screenWidth={screenWidth} width="72%" />
           <ServiceSkeletonBlock height={18} progress={progress} radius={5} screenWidth={screenWidth} width="46%" />
         </View>
         <View style={{ height: 8, backgroundColor: colors.mauveTone96 }} />
-        <View style={{ paddingHorizontal: 16, paddingVertical: 25, flexDirection: 'row', flexWrap: 'wrap', columnGap: 12, rowGap: 22 }}>
+        <View style={{ paddingHorizontal: 16, paddingTop: 20, paddingBottom: 25, flexDirection: 'row', flexWrap: 'wrap', columnGap: 12, rowGap: 16 }}>
           {[0, 1, 2, 3, 4, 5].map((index) => (
             <View key={`service-skeleton-category-${index}`} style={{ width: cardWidth, alignItems: 'center', gap: 8 }}>
               <ServiceSkeletonBlock height={categoryImageSize} progress={progress} radius={8} screenWidth={screenWidth} width={categoryImageSize} />
@@ -125,21 +149,29 @@ function ServiceListSkeleton({ onBack }: { onBack: () => void }) {
         <ServiceSkeletonBlock height={40} progress={progress} radius={20} screenWidth={screenWidth} width={40} />
       </View>
 
-      <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 20, paddingTop: 10, paddingBottom: Math.max(insets.bottom, 10), borderTopWidth: 1, borderTopColor: colors.mauveTone93_2, backgroundColor: colors.white }}>
-        <ServiceSkeletonBlock height={54} progress={progress} radius={12} screenWidth={screenWidth} />
-      </View>
+      {showEstimateFooter ? (
+        <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingBottom: Math.max(insets.bottom, 10), borderTopWidth: 1, borderTopColor: colors.mauveTone93_2, backgroundColor: colors.white }}>
+          <View style={{ height: ESTIMATE_NOTE_HEIGHT, paddingHorizontal: 40, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.yellowTone95 }}>
+            <ServiceSkeletonBlock height={14} progress={progress} radius={4} screenWidth={screenWidth} width="72%" />
+          </View>
+          <View style={{ paddingHorizontal: 16, paddingTop: 9 }}>
+            <ServiceSkeletonBlock height={CONSULTATION_BUTTON_HEIGHT} progress={progress} radius={CONSULTATION_BUTTON_RADIUS} screenWidth={screenWidth} />
+          </View>
+        </View>
+      ) : null}
     </View>
   );
 }
 
-function ProductRow({ item, quantity, onAdd, onPress, onRemove }: { item: ServiceItem; quantity: number; onAdd: (item: ServiceItem) => void; onPress: (item: ServiceItem) => void; onRemove: (item: ServiceItem) => void }) {
+function ProductRow({ cartItem, item, quantity, showEstimateLabel, onAdd, onPress, onRemove }: { cartItem: ServiceItem; item: ServiceItem; quantity: number; showEstimateLabel: boolean; onAdd: (item: ServiceItem) => void; onPress: (item: ServiceItem) => void; onRemove: (item: ServiceItem) => void }) {
   const productImageSize = 128;
+  const displayItem = quantity > 0 ? cartItem : item;
 
   return (
     <Pressable onPress={() => onPress(item)} style={({ pressed }) => ({ paddingVertical: 22, opacity: pressed ? 0.72 : 1 })}>
       <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 16 }}>
         <View style={{ flex: 1, gap: 7 }}>
-          <Text selectable numberOfLines={3} style={{ fontSize: fontSizes.size18, lineHeight: 25, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9_2 }}>{item.title}</Text>
+          <Text selectable numberOfLines={3} style={{ fontSize: fontSizes.size18, lineHeight: 25, fontFamily: fontFamilies.semiBold, color: colors.black }}>{item.title}</Text>
           {item.rating > 0 ? (
             <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 4 }}>
               <Text style={{ fontSize: fontSizes.size12, lineHeight: 18, color: colors.mauveTone38_2 }}>★</Text>
@@ -150,7 +182,7 @@ function ProductRow({ item, quantity, onAdd, onPress, onRemove }: { item: Servic
           ) : null}
           <DottedUnderline fullWidth lineMarginTop={10} dotColor={colors.mauveTone86}>
             <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 7 }}>
-              <Text selectable style={{ fontSize: fontSizes.size13, lineHeight: 19, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9_2 }}>{item.variants?.length ? 'Starts at ' : ''}₹{item.price.toLocaleString('en-IN')}</Text>
+              <Text selectable style={{ fontSize: fontSizes.size13, lineHeight: 19, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9_2 }}>{quantity === 0 && item.variants?.length ? 'Starts at ' : ''}₹{displayItem.price.toLocaleString('en-IN')}</Text>
               {item.duration ? (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                   <Text style={{ fontSize: fontSizes.size16, lineHeight: 18, color: colors.mauveTone38_2 }}>•</Text>
@@ -160,12 +192,12 @@ function ProductRow({ item, quantity, onAdd, onPress, onRemove }: { item: Servic
             </View>
           </DottedUnderline>
           {item.description ? <Text selectable numberOfLines={3} style={{ fontSize: fontSizes.size13, lineHeight: 19, color: colors.mauveTone38_2 }}>{item.description}</Text> : null}
-          <Text style={{ paddingTop: 5, fontSize: fontSizes.size14, lineHeight: 19, fontFamily: fontFamilies.semiBold, color: colors.violetTone58 }}>View details and estimate</Text>
+          <Text style={{ paddingTop: 5, fontSize: fontSizes.size14, lineHeight: 19, fontFamily: fontFamilies.semiBold, color: colors.violetTone58 }}>{showEstimateLabel ? 'View details and estimate' : 'View details'}</Text>
         </View>
 
         <View style={{ width: productImageSize, height: productImageSize + 16, alignItems: 'center' }}>
           <View style={{ width: productImageSize, height: productImageSize, overflow: 'hidden', borderRadius: 13, borderCurve: 'continuous', backgroundColor: colors.violetTone95_2 }}>
-            {item.imageUrl ? <Image source={item.imageUrl} contentFit="cover" transition={180} style={{ position: 'absolute', inset: 0 }} /> : null}
+            {displayItem.imageUrl ? <Image source={displayItem.imageUrl} contentFit="cover" transition={180} style={{ position: 'absolute', inset: 0 }} /> : null}
           </View>
           {quantity === 0 ? (
             <Pressable
@@ -181,9 +213,9 @@ function ProductRow({ item, quantity, onAdd, onPress, onRemove }: { item: Servic
             </Pressable>
           ) : (
             <View style={{ position: 'absolute', bottom: 0, alignSelf: 'center', width: 78, height: 32, flexDirection: 'row', alignItems: 'center', overflow: 'hidden', borderRadius: 10, backgroundColor: colors.violetTone58 }}>
-              <Pressable onPress={(event) => { event.stopPropagation(); onRemove(item); }} style={{ width: 26, height: 32, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: fontSizes.size20, color: colors.white }}>−</Text></Pressable>
+              <Pressable onPress={(event) => { event.stopPropagation(); onRemove(cartItem); }} style={{ width: 26, height: 32, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: fontSizes.size20, color: colors.white }}>−</Text></Pressable>
               <Text style={{ flex: 1, textAlign: 'center', fontSize: fontSizes.size14, fontFamily: fontFamilies.semiBold, color: colors.white, fontVariant: ['tabular-nums'] }}>{quantity}</Text>
-              <Pressable onPress={(event) => { event.stopPropagation(); onAdd(item); }} style={{ width: 26, height: 32, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: fontSizes.size20, color: colors.white }}>+</Text></Pressable>
+              <Pressable onPress={(event) => { event.stopPropagation(); onAdd(cartItem); }} style={{ width: 26, height: 32, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: fontSizes.size20, color: colors.white }}>+</Text></Pressable>
             </View>
           )}
         </View>
@@ -192,10 +224,10 @@ function ProductRow({ item, quantity, onAdd, onPress, onRemove }: { item: Servic
   );
 }
 
-export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onBack, onProductPress, onRemove, onSearchPress, scrollTarget }: ServiceListScreenProps) {
+export function ServiceListScreen({ cart, cartItemsById, categoryTitle, subcategory, totalCartItems, onAdd, onBack, onProductPress, onRemove, onSearchPress, onViewCart, scrollTarget }: ServiceListScreenProps) {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
-  const { errorMessage, isLoading, retry, sections } = useCategoryProducts(subcategory.id);
+  const { categoryName, errorMessage, isLoading, retry, sections } = useCategoryProducts(subcategory.id);
   const scrollRef = useRef<ScrollView>(null);
   const sectionOffsets = useRef<Record<string, number>>({});
   const productOffsets = useRef<Record<string, number>>({});
@@ -205,13 +237,23 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
   const [stickySection, setStickySection] = useState<ProductSection | null>(null);
   const heroProgress = useSharedValue(0);
   const menuProgress = useSharedValue(0);
+  const displayCategoryTitle = categoryName?.trim() || categoryTitle;
+  const showEstimateFooter = shouldShowEstimateFooter(displayCategoryTitle);
+  const showCartFooter = !showEstimateFooter && totalCartItems > 0;
+
+  const getCartSelection = (item: ServiceItem) => {
+    const cartIds = Object.keys(cart).filter((cartId) => cart[cartId] > 0 && (cartId === item.id || cartId.startsWith(`${item.id}::`)));
+    const quantity = cartIds.reduce((total, cartId) => total + (cart[cartId] ?? 0), 0);
+    const cartItem = cartIds.map((cartId) => cartItemsById[cartId]).find(Boolean) ?? item;
+    return { cartItem, quantity };
+  };
 
   const heroItems = useMemo(() => {
     const items = sections.flatMap((section) => section.products.map((product) => ({ imageUrl: product.imageUrl || section.imageUrl, title: product.title, subtitle: product.description })));
     const unique = items.filter((item, index) => item.imageUrl && items.findIndex((candidate) => candidate.imageUrl === item.imageUrl) === index);
     if (unique.length > 0) return unique.slice(0, 5);
-    return subcategory.imageUrl ? [{ imageUrl: subcategory.imageUrl, title: categoryTitle, subtitle: subcategory.subtitle }] : [];
-  }, [categoryTitle, sections, subcategory.imageUrl, subcategory.subtitle]);
+    return subcategory.imageUrl ? [{ imageUrl: subcategory.imageUrl, title: displayCategoryTitle, subtitle: subcategory.subtitle }] : [];
+  }, [displayCategoryTitle, sections, subcategory.imageUrl, subcategory.subtitle]);
 
   const visibleSections = sections;
 
@@ -270,10 +312,12 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
   const productCount = sections.reduce((total, section) => total + section.products.length, 0);
   const ratedProducts = sections.flatMap((section) => section.products).filter((item) => item.rating > 0);
   const averageRating = ratedProducts.length ? ratedProducts.reduce((total, item) => total + item.rating, 0) / ratedProducts.length : 0;
-  const sectionCardWidth = Math.floor((Math.min(width, 520) - 68) / 4);
-  const sectionImageSize = Math.min(64, sectionCardWidth);
-  const modalCardWidth = Math.floor((Math.min(width, 520) - 92) / 4);
-  const modalImageSize = Math.min(64, modalCardWidth);
+  const showEstimateLabel = isPaintingAndWaterproofingCategory(categoryTitle);
+  const sectionColumnCount = getSectionColumnCount(categoryTitle);
+  const sectionCardWidth = Math.floor((Math.min(width, 520) - 32 - (sectionColumnCount - 1) * 12) / sectionColumnCount);
+  const sectionImageSize = Math.min(72, sectionCardWidth);
+  const modalCardWidth = Math.floor((Math.min(width, 520) - 56 - (sectionColumnCount - 1) * 12) / sectionColumnCount);
+  const modalImageSize = Math.min(72, modalCardWidth);
 
   const scrollToSection = (section: ProductSection) => {
     closeMenu();
@@ -281,10 +325,10 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
     if (offset !== undefined) requestAnimationFrame(() => scrollRef.current?.scrollTo({ y: Math.max(0, offset - (insets.top + NAV_HEIGHT + SECTION_HEADER_HEIGHT) + 10), animated: true }));
   };
 
-  const share = () => void Share.share({ message: `Explore ${categoryTitle} services on Urban Clap.` });
+  const share = () => void Share.share({ message: `Explore ${displayCategoryTitle} services on Urban Clap.` });
 
   if (isLoading) {
-    return <ServiceListSkeleton onBack={onBack} />;
+    return <ServiceListSkeleton categoryTitle={categoryTitle} onBack={onBack} showEstimateFooter={shouldShowEstimateFooter(subcategory.title)} />;
   }
 
   if (errorMessage) {
@@ -300,7 +344,7 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
         scrollEventThrottle={16}
         onScroll={(event) => {
           const y = event.nativeEvent.contentOffset.y;
-          const shouldShow = y >= 238;
+          const shouldShow = y >= HERO_HEIGHT - 72;
           if (shouldShow !== stickyHeaderVisible) setStickyHeaderVisible(shouldShow);
 
           const navBottom = y + insets.top + NAV_HEIGHT;
@@ -314,23 +358,20 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
           if (firstOffset === undefined || navBottom < firstOffset) nextSection = null;
           if (nextSection?.id !== stickySection?.id) setStickySection(nextSection);
         }}
-        contentContainerStyle={{ paddingBottom: 118 + insets.bottom }}
+        contentContainerStyle={{ paddingBottom: (showEstimateFooter ? 118 : showCartFooter ? 104 : 72) + insets.bottom }}
       >
-        <View style={{ height: 310, backgroundColor: colors.blueTone82 }}>
+        <View style={{ height: HERO_HEIGHT, backgroundColor: colors.blueTone82 }}>
           {heroItems[heroIndex]?.imageUrl ? (
             <Animated.View key={`${heroIndex}-${heroItems[heroIndex].imageUrl}`} entering={FadeIn.duration(280)} style={{ position: 'absolute', inset: 0 }}>
               <Image source={heroItems[heroIndex].imageUrl} contentFit="cover" contentPosition="center" transition={120} style={{ position: 'absolute', inset: 0 }} />
-              <View style={{ position: 'absolute', inset: 0, backgroundColor: colors.violetTone7Alpha26 }} />
             </Animated.View>
           ) : null}
-
-          {heroItems[heroIndex] ? <View style={{ position: 'absolute', left: 28, right: 28, bottom: 43, gap: 5 }}><Text selectable numberOfLines={2} style={{ maxWidth: '82%', fontSize: fontSizes.size23, lineHeight: 29, fontFamily: fontFamilies.semiBold, color: colors.white }}>{heroItems[heroIndex].title}</Text><Text selectable numberOfLines={2} style={{ maxWidth: '82%', fontSize: fontSizes.size13, lineHeight: 18, color: colors.whiteAlpha88 }}>{heroItems[heroIndex].subtitle}</Text></View> : null}
 
           {heroItems.length > 1 ? <View style={{ position: 'absolute', left: 20, right: 20, bottom: 17, flexDirection: 'row', gap: 5 }}>{heroItems.map((item, index) => <View key={`${item.imageUrl}-${index}`} style={{ flex: 1, height: 3, overflow: 'hidden', borderRadius: 2, backgroundColor: colors.whiteAlpha38 }}>{index < heroIndex ? <View style={{ flex: 1, backgroundColor: colors.white }} /> : index === heroIndex ? <Animated.View style={[{ flex: 1, backgroundColor: colors.white, transformOrigin: 'left' }, activeProgressStyle]} /> : null}</View>)}</View> : null}
         </View>
 
         <View style={{ paddingHorizontal: 20, paddingTop: 25, paddingBottom: 22, gap: 7 }}>
-          <Text selectable style={{ fontSize: fontSizes.size25, lineHeight: 32, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9_2 }}>{categoryTitle}</Text>
+          <Text selectable style={{ fontSize: fontSizes.size24, lineHeight: 32, fontFamily: fontFamilies.semiBold, color: colors.black }}>{displayCategoryTitle}</Text>
           <View style={{ flexDirection: 'row', alignItems: 'flex-start', flexWrap: 'wrap', gap: 4 }}>
             {averageRating > 0 ? (
               <>
@@ -347,11 +388,11 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
 
         <View style={{ height: 8, backgroundColor: colors.mauveTone96 }} />
 
-        <View style={{ paddingHorizontal: 16, paddingVertical: 25, flexDirection: 'row', flexWrap: 'wrap', columnGap: 12, rowGap: 22 }}>
+        <View style={{ paddingHorizontal: 16, paddingTop: 20, paddingBottom: 25, flexDirection: 'row', flexWrap: 'wrap', columnGap: 12, rowGap: 16 }}>
           {sections.map((section) => (
             <Pressable key={section.id} onPress={() => scrollToSection(section)} style={({ pressed }) => ({ width: sectionCardWidth, alignItems: 'center', gap: 8, opacity: pressed ? 0.65 : 1 })}>
-              <View style={{ width: sectionImageSize, height: sectionImageSize, overflow: 'hidden', borderRadius: 8, borderCurve: 'continuous', backgroundColor: colors.neutralTone93 }}>{section.imageUrl ? <Image source={section.imageUrl} contentFit="cover" style={{ position: 'absolute', inset: 0 }} /> : null}</View>
-              <Text selectable numberOfLines={3} style={{ minHeight: 37, textAlign: 'center', fontSize: fontSizes.size13, lineHeight: 18, color: colors.mauveTone9_2 }}>{section.title}</Text>
+              <View style={{ width: sectionImageSize, height: sectionImageSize, overflow: 'hidden', borderRadius: 8, borderCurve: 'continuous', backgroundColor: colors.neutralTone93 }}>{section.imageUrl ? <Image source={section.imageUrl} contentFit="contain" style={{ width: sectionImageSize, height: sectionImageSize }} /> : null}</View>
+              <Text selectable numberOfLines={3} style={{ minHeight: 37, textAlign: 'center', fontSize: fontSizes.size13, lineHeight: 18, color: colors.black }}>{section.title}</Text>
             </Pressable>
           ))}
         </View>
@@ -360,8 +401,11 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
 
         {visibleSections.map((section, sectionIndex) => (
           <View key={section.id} onLayout={(event) => { sectionOffsets.current[section.id] = event.nativeEvent.layout.y; }} style={{ paddingHorizontal: 20 }}>
-            <Text selectable style={{ paddingTop: 30, paddingBottom: 4, fontSize: fontSizes.size23, lineHeight: 30, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9_2 }}>{section.title}</Text>
-            {section.products.length > 0 ? section.products.map((item, index) => <View key={item.id} onLayout={(event) => { productOffsets.current[item.id] = event.nativeEvent.layout.y + (sectionOffsets.current[section.id] ?? 0); }}><ProductRow item={item} quantity={cart[item.id] ?? 0} onAdd={onAdd} onPress={onProductPress} onRemove={onRemove} />{index < section.products.length - 1 ? <View style={{ height: 1, backgroundColor: colors.mauveTone89_4 }} /> : null}</View>) : <Text selectable style={{ paddingVertical: 24, fontSize: fontSizes.size14, color: colors.violetTone47 }}>Products coming soon</Text>}
+            <Text selectable style={{ paddingTop: 30, paddingBottom: 4, fontSize: fontSizes.size23, lineHeight: 30, fontFamily: fontFamilies.semiBold, color: colors.black }}>{section.title}</Text>
+            {section.products.length > 0 ? section.products.map((item, index) => {
+              const { cartItem, quantity } = getCartSelection(item);
+              return <View key={item.id} onLayout={(event) => { productOffsets.current[item.id] = event.nativeEvent.layout.y + (sectionOffsets.current[section.id] ?? 0); }}><ProductRow cartItem={cartItem} item={item} quantity={quantity} showEstimateLabel={showEstimateLabel} onAdd={onAdd} onPress={onProductPress} onRemove={onRemove} />{index < section.products.length - 1 ? <View style={{ height: 1, backgroundColor: colors.mauveTone89_4 }} /> : null}</View>;
+            }) : <Text selectable style={{ paddingVertical: 24, fontSize: fontSizes.size14, color: colors.violetTone47 }}>Products coming soon</Text>}
             {sectionIndex < visibleSections.length - 1 ? <View style={{ height: 8, marginHorizontal: -20, backgroundColor: colors.mauveTone96 }} /> : null}
           </View>
         ))}
@@ -392,8 +436,8 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
             </Pressable>
 
             {stickyHeaderVisible ? (
-              <Text selectable numberOfLines={1} ellipsizeMode="tail" style={{ flex: 1, fontSize: fontSizes.size18, lineHeight: 24, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9_2 }}>
-                {categoryTitle}
+              <Text selectable numberOfLines={1} ellipsizeMode="tail" style={{ flex: 1, fontSize: fontSizes.size16, lineHeight: 22, fontFamily: fontFamilies.semiBold, color: colors.black }}>
+                {displayCategoryTitle}
               </Text>
             ) : <View style={{ flex: 1 }} />}
 
@@ -409,7 +453,7 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
 
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel={`Share ${categoryTitle}`}
+              accessibilityLabel={`Share ${displayCategoryTitle}`}
               hitSlop={8}
               onPress={share}
               style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, borderWidth: stickyHeaderVisible ? 1 : 0, borderColor: colors.mauveTone89_4, backgroundColor: colors.white, opacity: pressed ? 0.62 : 1 })}
@@ -419,16 +463,42 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
           </View>
           {stickySection ? (
             <View style={{ height: SECTION_HEADER_HEIGHT, paddingHorizontal: 20, justifyContent: 'center', backgroundColor: colors.white, borderBottomWidth: 1, borderBottomColor: colors.mauveTone90_3 }}>
-              <Text selectable numberOfLines={1} ellipsizeMode="tail" style={{ fontSize: fontSizes.size14, lineHeight: 20, fontFamily: fontFamilies.bold, color: colors.mauveTone9_2 }}>
+              <Text selectable numberOfLines={1} ellipsizeMode="tail" style={{ fontSize: fontSizes.size12, lineHeight: 18, fontFamily: fontFamilies.bold, color: colors.black }}>
                 {stickySection.title}
               </Text>
             </View>
           ) : null}
       </View>
 
-      {sections.length > 0 ? <Pressable onPress={openMenu} style={({ pressed }) => ({ position: 'absolute', bottom: insets.bottom + 130, alignSelf: 'center', height: 36, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', gap: 6, borderRadius: 18, backgroundColor: colors.violetTone15_3, boxShadow: `0 5px 16px ${colors.blackAlpha22}`, opacity: pressed ? 0.78 : 1 })}><Text style={{ fontSize: fontSizes.size19, color: colors.white }}>☰</Text><Text style={{ fontSize: fontSizes.size17, fontFamily: fontFamilies.semiBold, color: colors.white }}>Menu</Text></Pressable> : null}
+      {sections.length > 0 ? (
+        <Pressable
+          onPress={openMenu}
+          style={({ pressed }) => ({
+            position: 'absolute',
+            bottom: insets.bottom + (showEstimateFooter ? 130 : showCartFooter ? 86 : 24),
+            alignSelf: 'center',
+            height: 34,
+            paddingHorizontal: 14,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+            borderRadius: 17,
+            backgroundColor: colors.violetTone15_3,
+            boxShadow: `0 5px 16px ${colors.blackAlpha22}`,
+            opacity: pressed ? 0.78 : 1,
+          })}
+        >
+          <View style={{ width: 12, height: 10, alignSelf: 'center', justifyContent: 'space-between' }}>
+            <View style={{ width: 12, height: 1.5, borderRadius: 1, backgroundColor: colors.white }} />
+            <View style={{ width: 12, height: 1.5, borderRadius: 1, backgroundColor: colors.white }} />
+            <View style={{ width: 12, height: 1.5, borderRadius: 1, backgroundColor: colors.white }} />
+          </View>
+          <Text style={{ fontSize: fontSizes.size16, lineHeight: 20, fontFamily: fontFamilies.semiBold, color: colors.white }}>Menu</Text>
+        </Pressable>
+      ) : null}
 
-      <View
+      {showEstimateFooter ? <View
         style={{
           position: 'absolute',
           left: 0,
@@ -441,22 +511,38 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
           boxShadow: `0 -4px 16px ${colors.violetTone10Alpha6}`,
         }}
       >
-        <View style={{ minHeight: 38, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: colors.yellowTone95 }}>
+        <View style={{ minHeight: ESTIMATE_NOTE_HEIGHT, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5, backgroundColor: colors.yellowTone95 }}>
           <EstimateNoteIcon />
-          <Text selectable numberOfLines={2} style={{ flex: 1, fontSize: fontSizes.size12, lineHeight: 17, fontFamily: fontFamilies.bold, color: colors.yellowTone30 }}>
+          <Text selectable numberOfLines={2} style={{ flexShrink: 1, textAlign: 'center', fontSize: fontSizes.size12, lineHeight: 16, fontFamily: fontFamilies.semiBold, color: colors.yellowTone30 }}>
             Please generate an estimate first from the list above
           </Text>
         </View>
-        <View style={{ paddingHorizontal: 20, paddingTop: 10 }}>
+        <View style={{ paddingHorizontal: 16, paddingTop: 9 }}>
           <View
             accessibilityRole="button"
             accessibilityState={{ disabled: true }}
-            style={{ height: 54, alignItems: 'center', justifyContent: 'center', borderRadius: 12, borderCurve: 'continuous', backgroundColor: colors.neutralTone93 }}
+            style={{ height: CONSULTATION_BUTTON_HEIGHT, alignItems: 'center', justifyContent: 'center', borderRadius: CONSULTATION_BUTTON_RADIUS, borderCurve: 'continuous', backgroundColor: colors.neutralTone93 }}
           >
-            <Text style={{ fontSize: fontSizes.size17, fontFamily: fontFamilies.bold, color: colors.neutralTone72 }}>Book Consultation at ₹49</Text>
+            <Text style={{ fontSize: fontSizes.size15, fontFamily: fontFamilies.semiBold, color: colors.neutralTone72 }}>Book Consultation at ₹49</Text>
           </View>
         </View>
-      </View>
+      </View> : showCartFooter ? (
+        <View
+          style={{ position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 30, paddingHorizontal: 16, paddingTop: 10, paddingBottom: Math.max(insets.bottom, 10), flexDirection: 'row', alignItems: 'center', gap: 16, backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.mauveTone93_2, boxShadow: `0 -4px 16px ${colors.violetTone10Alpha6}` }}
+        >
+          <Text selectable style={{ flex: 1, fontSize: fontSizes.size14, lineHeight: 20, fontFamily: fontFamilies.semiBold, color: colors.black, fontVariant: ['tabular-nums'] }}>
+            {totalCartItems} {totalCartItems === 1 ? 'item' : 'items'} added
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`View cart with ${totalCartItems} ${totalCartItems === 1 ? 'item' : 'items'}`}
+            onPress={onViewCart}
+            style={({ pressed }) => ({ width: Math.min(172, width * 0.44), height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 8, borderCurve: 'continuous', backgroundColor: colors.violetTone58, opacity: pressed ? 0.78 : 1 })}
+          >
+            <Text style={{ fontSize: fontSizes.size15, lineHeight: 21, fontFamily: fontFamilies.semiBold, color: colors.white }}>View cart</Text>
+          </Pressable>
+        </View>
+      ) : null}
 
       <Modal visible={menuVisible} transparent animationType="none" onRequestClose={closeMenu}>
         <View style={{ flex: 1, justifyContent: 'flex-end', paddingBottom: 72 + insets.bottom }}>
@@ -466,13 +552,13 @@ export function ServiceListScreen({ cart, categoryTitle, subcategory, onAdd, onB
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', columnGap: 12, rowGap: 22 }}>
                 {sections.map((section) => (
                   <Pressable key={section.id} onPress={() => scrollToSection(section)} style={({ pressed }) => ({ width: modalCardWidth, alignItems: 'center', gap: 8, opacity: pressed ? 0.62 : 1 })}>
-                    <View style={{ width: modalImageSize, height: modalImageSize, overflow: 'hidden', borderRadius: 8, borderCurve: 'continuous', backgroundColor: colors.neutralTone93 }}>{section.imageUrl ? <Image source={section.imageUrl} contentFit="cover" style={{ position: 'absolute', inset: 0 }} /> : null}</View>
-                    <Text selectable numberOfLines={2} style={{ width: '100%', minHeight: 36, textAlign: 'center', fontSize: fontSizes.size13, lineHeight: 18, color: colors.mauveTone9_2 }}>{section.title}</Text>
+                    <View style={{ width: modalImageSize, height: modalImageSize, overflow: 'hidden', borderRadius: 8, borderCurve: 'continuous', backgroundColor: colors.neutralTone93 }}>{section.imageUrl ? <Image source={section.imageUrl} contentFit="contain" style={{ width: modalImageSize, height: modalImageSize }} /> : null}</View>
+                    <Text selectable numberOfLines={2} style={{ width: '100%', minHeight: 36, textAlign: 'center', fontSize: fontSizes.size13, lineHeight: 18, color: colors.black }}>{section.title}</Text>
                   </Pressable>
                 ))}
               </View>
             </View>
-            <Pressable accessibilityLabel="Close menu" onPress={closeMenu} style={({ pressed }) => ({ width: 44, height: 44, marginTop: 22, alignSelf: 'center', alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: colors.white, opacity: pressed ? 0.72 : 1 })}><Text style={{ fontSize: fontSizes.size28, lineHeight: 30, fontFamily: fontFamilies.light, color: colors.mauveTone9_2 }}>×</Text></Pressable>
+            <CloseButton accessibilityLabel="Close menu" onPress={closeMenu} style={{ marginTop: CLOSE_BUTTON_GAP, alignSelf: 'center' }} />
           </Animated.View>
         </View>
       </Modal>

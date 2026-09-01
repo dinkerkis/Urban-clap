@@ -1,6 +1,8 @@
 import { colors, fontSizes } from '../theme';
 import { useRef } from 'react';
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { Pressable, View } from 'react-native';
+import { TextInput } from './app-text-input';
+import { Text } from './app-text';
 
 import { OTP_LENGTH } from '../config/auth';
 

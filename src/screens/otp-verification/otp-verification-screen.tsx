@@ -1,6 +1,7 @@
 import { colors, fontFamilies, fontSizes, typography } from '../../theme';
 import { useEffect, useState } from 'react';
-import { KeyboardAvoidingView, Pressable, ScrollView, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Pressable, ScrollView, View } from 'react-native';
+import { Text } from '../../components/app-text';
 
 import { AuthHeader } from '../../components/auth-header';
 import { OtpInput } from '../../components/otp-input';

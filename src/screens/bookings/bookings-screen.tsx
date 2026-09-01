@@ -1,5 +1,6 @@
 import { colors, fontFamilies, fontSizes } from '../../theme';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
+import { Text } from '../../components/app-text';
 
 import { DashboardScreenHeader } from '../../components/dashboard-screen-header';
 

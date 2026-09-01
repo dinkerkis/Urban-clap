@@ -8,14 +8,15 @@ import {
   Modal,
   Pressable,
   ScrollView,
-  Text,
-  TextInput,
   View,
 } from 'react-native';
+import { TextInput } from '../../components/app-text-input';
+import { Text } from '../../components/app-text';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BackIcon } from '../../components/back-icon';
+import { CloseButton, CLOSE_BUTTON_ABOVE_OFFSET, CLOSE_BUTTON_INSET } from '../../components/close-icon';
 import { LoadingDots } from '../../components/loading-dots';
 import { countries, defaultCountry, type Country } from '../../config/countries';
 import { getApiErrorMessage, requestLoginOtp, verifyLoginOtp } from '../../services/auth-api';
@@ -91,26 +92,7 @@ function ProfilePickerModal({ children, onClose, title, visible }: ProfilePicker
     <Modal visible={visible} transparent animationType="slide" statusBarTranslucent onRequestClose={onClose}>
       <Animated.View entering={FadeIn.duration(180)} exiting={FadeOut.duration(150)} style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: colors.violetTone5Alpha76 }}>
         <Pressable accessibilityLabel={`Close ${title}`} onPress={onClose} style={{ position: 'absolute', inset: 0 }} />
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Close"
-          onPress={onClose}
-          style={({ pressed }) => ({
-            width: 36,
-            height: 36,
-            alignSelf: 'flex-end',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginRight: 22,
-            marginBottom: 8,
-            borderRadius: 18,
-            backgroundColor: colors.white,
-            opacity: pressed ? 0.65 : 1,
-            boxShadow: `0 7px 22px ${colors.blackAlpha18}`,
-          })}
-        >
-          <Text style={{ fontSize: fontSizes.size22, lineHeight: 24, fontFamily: fontFamilies.light, color: colors.mauveTone15_2 }}>×</Text>
-        </Pressable>
+        <CloseButton color={colors.mauveTone15_2} floating onPress={onClose} />
         <View
           style={{
             paddingTop: 26,
@@ -210,25 +192,11 @@ function VerificationModal({ destination, kind, visible, onClose, onResend, onVe
               backgroundColor: colors.white,
             }}
           >
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Close"
+            <CloseButton
+              color={colors.mauveTone15_2}
               onPress={onClose}
-              style={({ pressed }) => ({
-                position: 'absolute',
-                right: 20,
-                top: -44,
-                width: 36,
-                height: 36,
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 18,
-                backgroundColor: colors.white,
-                opacity: pressed ? 0.65 : 1,
-              })}
-            >
-              <Text style={{ fontSize: fontSizes.size22, lineHeight: 24, fontFamily: fontFamilies.light, color: colors.mauveTone15_2 }}>×</Text>
-            </Pressable>
+              style={{ position: 'absolute', right: CLOSE_BUTTON_INSET, top: CLOSE_BUTTON_ABOVE_OFFSET }}
+            />
 
             <Text selectable style={{ fontSize: kind === 'phone' ? 25 : fontSizes.size27, lineHeight: kind === 'phone' ? 32 : 34, fontFamily: fontFamilies.bold, color: colors.mauveTone9 }}>Verify your {kind}</Text>
             <Text selectable style={{ fontSize: kind === 'phone' ? 13 : fontSizes.size15, lineHeight: kind === 'phone' ? 19 : 21, color: colors.neutralTone45 }}>We sent a 6-digit code to {destination}.</Text>

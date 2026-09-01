@@ -1,5 +1,6 @@
 import { colors, fontFamilies, fontSizes } from '../theme';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, View } from 'react-native';
+import { Text } from './app-text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export type DashboardTab = 'home' | 'rewards' | 'native' | 'bookings' | 'categories' | 'cart';

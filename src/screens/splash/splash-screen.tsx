@@ -1,6 +1,7 @@
 import { colors, fontFamilies, fontSizes } from '../../theme';
 import { useEffect } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
+import { Text } from '../../components/app-text';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated';
 
 const splashColor = colors.violetTone58;

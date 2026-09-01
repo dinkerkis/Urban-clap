@@ -2,12 +2,14 @@ import { colors, fontFamilies, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Pressable, ScrollView, Text, useWindowDimensions, View } from 'react-native';
+import { Alert, Pressable, ScrollView, useWindowDimensions, View } from 'react-native';
+import { Text } from '../../components/app-text';
 import Animated, { cancelAnimation, Easing, Extrapolation, interpolate, SlideInRight, SlideOutRight, type SharedValue, useAnimatedScrollHandler, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LoadingDots } from '../../components/loading-dots';
 import { BackIcon } from '../../components/back-icon';
+import { CloseButton, CLOSE_BUTTON_INSET } from '../../components/close-icon';
 import { useNativeCategoryProducts } from '../../hooks/use-native-category-products';
 import { useNativeDescription } from '../../hooks/use-native-description';
 import { useNativeProducts } from '../../hooks/use-native-products';
@@ -96,7 +98,7 @@ function CategoryVideo({ onPress, path }: { onPress: () => void; path: string })
     <Pressable accessibilityRole="button" accessibilityLabel="Play video" onPress={onPress} style={({ pressed }) => ({ width: 150, height: 238, overflow: 'hidden', borderRadius: 9, backgroundColor: colors.black, opacity: pressed ? 0.75 : 1 })}>
       <VideoView player={player} nativeControls={false} contentFit="cover" style={{ width: '100%', height: '100%' }} />
       <View pointerEvents="none" style={{ position: 'absolute', left: 10, bottom: 10, width: 30, height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 15, backgroundColor: colors.white }}>
-        <Text style={{ marginLeft: 2, fontSize: 13, color: colors.black }}>▶</Text>
+        <Text style={{ marginLeft: 2, fontSize: fontSizes.size13, color: colors.black }}>▶</Text>
       </View>
     </Pressable>
   );
@@ -259,11 +261,13 @@ function VideoStoriesScreen({ initialIndex, onClose, videos }: { initialIndex: n
         {videos.map((_, index) => <StoryProgressSegment key={`story-progress-${index}`} active={index === currentIndex} complete={index < currentIndex} progress={progress} />)}
       </View>
 
-      <Pressable accessibilityRole="button" accessibilityLabel="Close videos" hitSlop={12} onPress={onClose} style={({ pressed }) => ({ position: 'absolute', left: 18, top: Math.max(insets.top, 12) + 6, zIndex: 4, width: 38, height: 38, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.6 : 1 })}>
-        <Text style={{ fontSize: 31, lineHeight: 34, fontFamily: fontFamilies.light, color: colors.white }}>×</Text>
-      </Pressable>
+      <CloseButton
+        accessibilityLabel="Close videos"
+        onPress={onClose}
+        style={{ position: 'absolute', left: CLOSE_BUTTON_INSET, top: Math.max(insets.top, 12) + 6, zIndex: 4 }}
+      />
       <Pressable accessibilityRole="button" accessibilityLabel={muted ? 'Unmute video' : 'Mute video'} hitSlop={10} onPress={() => setMuted((current) => !current)} style={({ pressed }) => ({ position: 'absolute', right: 18, top: Math.max(insets.top, 12) + 6, zIndex: 4, width: 38, height: 38, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.6 : 1 })}>
-        <Text style={{ fontSize: 20, color: colors.white }}>{muted ? '🔇' : '🔊'}</Text>
+        <Text style={{ fontSize: fontSizes.size20, color: colors.white }}>{muted ? '🔇' : '🔊'}</Text>
       </Pressable>
 
       <Pressable accessibilityLabel="Previous video" disabled={currentIndex === 0} onPress={() => setCurrentIndex((index) => Math.max(0, index - 1))} style={{ position: 'absolute', left: 0, top: 120, bottom: 0, zIndex: 2, width: '35%' }} />
@@ -559,7 +563,7 @@ export function NativeScreen({ cart, onAddToCart, onCategoryPress, onViewCart }:
   return (
     <View style={{ flex: 1 }}>
     <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} style={{ flex: 1, backgroundColor: colors.white }} contentContainerStyle={{ paddingTop: Math.max(insets.top, 18) + 18, paddingBottom: showCartBar ? 94 : 0 }}>
-      <View style={{ paddingHorizontal: 20, gap: 5 }}><Text style={{ fontSize: fontSizes.size25, lineHeight: 32, fontFamily: fontFamilies.bold }}>Native products</Text><Text style={{ fontSize: fontSizes.size16, lineHeight: 22, fontFamily: fontFamilies.bold, color: colors.mauveTone39 }}>Innovative products. Designed in India for India.</Text></View>
+      <View style={{ paddingHorizontal: 20, gap: 5 }}><Text style={{ fontSize: fontSizes.size25, lineHeight: 32, fontFamily: fontFamilies.bold }}>Native products</Text><Text style={{ fontSize: fontSizes.size16, lineHeight: 22, fontFamily: fontFamilies.regular, color: colors.mauveTone39 }}>Innovative products. Designed in India for India.</Text></View>
       {!productsLoading && productsError ? <View style={{ minHeight: 220, padding: 24, alignItems: 'center', justifyContent: 'center', gap: 14 }}><Text style={{ textAlign: 'center', fontSize: fontSizes.size14, lineHeight: 21, color: colors.mauveTone39 }}>{productsError}</Text><Pressable accessibilityRole="button" onPress={retryProducts} style={({ pressed }) => ({ paddingHorizontal: 20, paddingVertical: 10, borderRadius: 9, backgroundColor: colors.violetTone58, opacity: pressed ? 0.7 : 1 })}><Text style={{ fontFamily: fontFamilies.bold, color: colors.white }}>Retry</Text></Pressable></View> : null}
       {!productsLoading && !productsError ? <>
         <View style={{ paddingHorizontal: 20, paddingVertical: 30, flexDirection: 'row', gap: 18 }}>{productsData.categories.map((category) => <CategoryCard key={category._id} imageUrl={category.category_image ? resolveNativeMediaUrl(category.category_image) : undefined} kind={category.name.toLowerCase().includes('lock') ? 'lock' : 'purifier'} onPress={() => onCategoryPress(category)} title={category.name} />)}</View>

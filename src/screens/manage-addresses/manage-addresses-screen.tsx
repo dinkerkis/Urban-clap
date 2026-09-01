@@ -1,11 +1,14 @@
 import { colors, fontFamilies, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
 import { useEffect, useRef, useState } from 'react';
-import { Alert, Keyboard, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Alert, Keyboard, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, View } from 'react-native';
+import { TextInput } from '../../components/app-text-input';
+import { Text } from '../../components/app-text';
 import MapView, { PROVIDER_GOOGLE, type Region } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BackIcon } from '../../components/back-icon';
+import { CloseButton as SharedCloseButton, CLOSE_BUTTON_ABOVE_OFFSET, CLOSE_BUTTON_INSET } from '../../components/close-icon';
 import { EditIcon } from '../../components/edit-icon';
 import { LoadingDots } from '../../components/loading-dots';
 import { useAddresses } from '../../hooks/use-addresses';
@@ -40,7 +43,7 @@ type Props = {
 };
 
 function CloseButton({ onPress }: { onPress: () => void }) {
-  return <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={onPress} style={({ pressed }) => ({ position: 'absolute', right: 18, top: -42, zIndex: 5, width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: colors.white, opacity: pressed ? 0.65 : 1 })}><Text style={{ fontSize: fontSizes.size20, lineHeight: 22, fontFamily: fontFamilies.light, color: TEXT }}>×</Text></Pressable>;
+  return <SharedCloseButton color={TEXT} onPress={onPress} style={{ position: 'absolute', zIndex: 5, right: CLOSE_BUTTON_INSET, top: CLOSE_BUTTON_ABOVE_OFFSET }} />;
 }
 
 function SearchIcon() {
@@ -401,7 +404,7 @@ export function AddressDetailsSheet({ authToken, name, phone, place, onChange, o
     finally { setSaving(false); }
   };
   return <View style={{ flex: 1, justifyContent: 'flex-end' }}><Pressable onPress={onClose} style={{ position: 'absolute', inset: 0, backgroundColor: colors.blackAlpha72 }} />
-    <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} style={({ pressed }) => ({ position: 'absolute', right: 18, top: '4.5%', zIndex: 5, width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: colors.white, opacity: pressed ? 0.65 : 1 })}><Text style={{ fontSize: fontSizes.size20, lineHeight: 22, fontFamily: fontFamilies.light, color: TEXT }}>×</Text></Pressable>
+    <SharedCloseButton color={TEXT} onPress={onClose} style={{ position: 'absolute', zIndex: 5, right: CLOSE_BUTTON_INSET, top: '4.5%' }} />
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ height: '91%' }}><View style={{ flex: 1, overflow: 'hidden', borderTopLeftRadius: 16, borderTopRightRadius: 16, backgroundColor: colors.white }}>
       <MapPreview latitude={pinLocation.latitude} longitude={pinLocation.longitude} onPinChange={updateAddressFromPin} /><ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingHorizontal: 18, paddingBottom: Math.max(insets.bottom, 14) + 14 }}>
         <View style={{ width: 34, height: 4, alignSelf: 'center', marginTop: 9, borderRadius: 2, backgroundColor: colors.mauveTone74 }} />

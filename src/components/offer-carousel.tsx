@@ -1,7 +1,8 @@
 import { Image } from 'expo-image';
 import { useEffect, useRef, useState } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
-import { Platform, Pressable, Text, View } from 'react-native';
+import { Text } from './app-text';
+import { Pressable, View } from 'react-native';
 import Animated, {
   Easing,
   FadeInDown,
@@ -17,7 +18,6 @@ import type { BannerHeadingColor, PromotionalBannerSlide } from '../services/hom
 
 const AUTO_SCROLL_INTERVAL_MS = 4_500;
 const IMAGE_TRANSITION_MS = 950;
-const DISPLAY_SERIF = Platform.select({ ios: 'Georgia', android: 'serif', default: 'Georgia' });
 const TEXT_IN = FadeInDown.delay(380).duration(520).withInitialValues({
   opacity: 0,
   transform: [{ translateY: 10 }],
@@ -81,10 +81,9 @@ function BannerHeading({
       <Text
         selectable
         style={{
-          fontFamily: DISPLAY_SERIF,
+          fontFamily: fontFamilies.bold,
           fontSize: fontSizes.size12,
           lineHeight: 16,
-          fontFamily: fontFamilies.bold,
           letterSpacing: 2.4,
           color: accent,
         }}
@@ -97,10 +96,9 @@ function BannerHeading({
             key={line}
             selectable
             style={{
-              fontFamily: DISPLAY_SERIF,
+              fontFamily: fontFamilies.bold,
               fontSize: fontSizes.size34 - 2,
               lineHeight: 34,
-              fontFamily: fontFamilies.bold,
               letterSpacing: 0.4,
               color: accent,
             }}
@@ -205,9 +203,8 @@ export function OfferCarousel({ embeddedOnPurple = false, slides }: OfferCarouse
   const activeSlide = slides[activeIndex] ?? slides[0];
   const baseSlide = slides[baseIndex] ?? slides[0];
   const incomingSlide = incomingIndex != null ? slides[incomingIndex] : null;
-  const actionLabel = activeSlide.actionText
-    ? `${activeSlide.actionText}${activeSlide.showActionArrow ? '  →' : ''}`
-    : undefined;
+  const actionLabel = activeSlide.actionText;
+
   const bannerHeight = embeddedOnPurple ? 160 : 140;
 
   return (
@@ -268,9 +265,24 @@ export function OfferCarousel({ embeddedOnPurple = false, slides }: OfferCarouse
               </Text>
             ) : null}
             {actionLabel ? (
-              <Text selectable style={{ marginTop: 18, fontSize: fontSizes.size14, lineHeight: 19, fontFamily: fontFamilies.bold, color: activeSlide.textColor }}>
-                {actionLabel}
-              </Text>
+              <View style={{ marginTop: 18, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Text selectable style={{ fontSize: fontSizes.size15, lineHeight: 20, fontFamily: fontFamilies.extraBold, color: activeSlide.textColor }}>
+                  {actionLabel}
+                </Text>
+                {activeSlide.showActionArrow ? (
+                  <View
+                    style={{
+                      width: 7,
+                      height: 7,
+                      marginTop: 1,
+                      borderRightWidth: 2.2,
+                      borderTopWidth: 2.2,
+                      borderColor: activeSlide.textColor,
+                      transform: [{ rotate: '45deg' }],
+                    }}
+                  />
+                ) : null}
+              </View>
             ) : null}
           </Animated.View>
         </View>

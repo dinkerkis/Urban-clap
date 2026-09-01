@@ -1,6 +1,7 @@
 import { colors, fontFamilies, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
-import { Alert, Pressable, ScrollView, Share, Text, View } from 'react-native';
+import { Alert, Pressable, ScrollView, Share, View } from 'react-native';
+import { Text } from '../../components/app-text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const REFERRAL_MESSAGE = 'Try Urban Clap and get ₹50 off your first service!';

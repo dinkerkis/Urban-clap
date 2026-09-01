@@ -1,10 +1,13 @@
 import { colors, fontFamilies, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
 import { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, View } from 'react-native';
+import { TextInput } from '../../components/app-text-input';
+import { Text } from '../../components/app-text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BackIcon } from '../../components/back-icon';
+import { CloseButton, CLOSE_BUTTON_ABOVE_OFFSET, CLOSE_BUTTON_INSET } from '../../components/close-icon';
 
 type PaymentMethodsScreenProps = {
   onBack: () => void;
@@ -52,14 +55,11 @@ function AddCardModal({ visible, onClose }: { visible: boolean; onClose: () => v
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1, justifyContent: 'flex-end' }}>
         <Pressable accessibilityRole="button" accessibilityLabel="Close add card form" onPress={onClose} style={{ position: 'absolute', inset: 0, backgroundColor: colors.blackAlpha72 }} />
         <View style={{ paddingHorizontal: 18, paddingTop: 26, paddingBottom: Math.max(insets.bottom, 16) + 12, borderTopLeftRadius: 18, borderTopRightRadius: 18, backgroundColor: colors.white }}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Close"
+          <CloseButton
+            color={colors.mauveTone19_2}
             onPress={onClose}
-            style={({ pressed }) => ({ position: 'absolute', right: 14, top: -42, width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: colors.white, opacity: pressed ? 0.65 : 1 })}
-          >
-            <Text style={{ fontSize: fontSizes.size20, lineHeight: 23, fontFamily: fontFamilies.light, color: colors.mauveTone19_2 }}>×</Text>
-          </Pressable>
+            style={{ position: 'absolute', right: CLOSE_BUTTON_INSET, top: CLOSE_BUTTON_ABOVE_OFFSET }}
+          />
 
           <Text style={{ fontSize: fontSizes.size21, lineHeight: 27, fontFamily: fontFamilies.bold, color: colors.mauveTone11 }}>Add new card</Text>
 

@@ -1,7 +1,9 @@
 import { colors, fontFamilies, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable, ScrollView, Text, TextInput, useWindowDimensions, View } from 'react-native';
+import { Pressable, ScrollView, useWindowDimensions, View } from 'react-native';
+import { TextInput } from '../../components/app-text-input';
+import { Text } from '../../components/app-text';
 import Animated, { useAnimatedReaction, useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { scheduleOnRN } from 'react-native-worklets';
@@ -25,6 +27,14 @@ function lightenHexColor(color: string, whiteMix = 0.54) {
 }
 
 function formatCategoryLabel(title: string) {
+  const normalizedTitle = title.trim().toLowerCase();
+  if (normalizedTitle === "women's salon & spa") {
+    return `${title.replace(/\s+spa$/i, '')}\nSpa`;
+  }
+  if (normalizedTitle === 'ac & appliance repair') {
+    return `${title.replace(/\s+repair$/i, '')}\nRepair`;
+  }
+
   const commaIndex = title.indexOf(', ');
   const ampIndex = title.lastIndexOf(' & ');
   if (commaIndex >= 0 && ampIndex > commaIndex) {
@@ -136,10 +146,9 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
   const stickyWhiteThreshold = useSharedValue(10_000);
   const { width } = useWindowDimensions();
   const categoryWidth = Math.min(125, Math.max(88, Math.floor((width - 32 - 24) / 3)));
-  const categoryScale = Math.min(1, categoryWidth / 125);
-  const categoryHeight = Math.round(64 * categoryScale);
-  const categoryImageWidth = Math.round(64 * categoryScale);
-  const categoryImageHeight = Math.round(48 * categoryScale);
+  const categoryHeight = 64;
+  const categoryImageWidth = 64;
+  const categoryImageHeight = 48;
   const normalizedSearch = search.trim().toLowerCase();
   const bannerSlides = promotionalBanner?.slides ?? [];
   const headerBackgroundUrl = promotionalBanner?.backgroundImageUrl;
@@ -312,7 +321,7 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
                   style={({ pressed }) => ({ width: categoryWidth, alignItems: 'center', gap: 6, opacity: pressed ? 0.62 : 1 })}
                 >
                   <View style={{ width: categoryWidth, height: categoryHeight, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderRadius: 12, borderCurve: 'continuous', backgroundColor: colors.violetTone98_3 }}>
-                    <Text style={{ fontSize: Math.round(fontSizes.size22 * categoryScale) }}>{category.icon}</Text>
+                    <Text style={{ fontSize: fontSizes.size22 }}>{category.icon}</Text>
                     {category.imageUrl ? (
                       <Image
                         source={category.imageUrl}
@@ -326,13 +335,13 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
                     numberOfLines={2}
                     style={{
                       width: categoryWidth + 8,
-                      minHeight: 34,
+                      minHeight: 32,
                       paddingHorizontal: 0,
                       textAlign: 'center',
-                      fontSize: fontSizes.size13,
-                      lineHeight: 17,
+                      fontSize: fontSizes.size12,
+                      lineHeight: 16,
                       fontFamily: fontFamilies.regular,
-                      color: colors.violetTone17,
+                      color: colors.black,
                     }}
                   >
                     {formatCategoryLabel(category.title)}
@@ -352,7 +361,7 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
         {!normalizedSearch && spotlights && spotlights.spotlightContent.length > 0 ? (
           <View style={{ marginHorizontal: -16, gap: 18, paddingTop: 10, paddingBottom: 2 }}>
             <View style={{ width: '100%', height: 8, backgroundColor: colors.violetTone96_4 }} />
-            <Text style={{ marginTop: 8, paddingHorizontal: 16, fontSize: fontSizes.size21, lineHeight: 27, fontFamily: fontFamilies.bold, color: colors.violetTone13 }}>
+            <Text style={{ marginTop: 8, paddingHorizontal: 16, fontSize: fontSizes.size22, lineHeight: 44, fontFamily: fontFamilies.semiBold, color: colors.black }}>
               {spotlights.sectionTitle}
             </Text>
             <ScrollView

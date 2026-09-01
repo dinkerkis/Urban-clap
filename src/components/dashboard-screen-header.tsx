@@ -1,5 +1,6 @@
 import { colors, fontFamilies, fontSizes } from '../theme';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, View } from 'react-native';
+import { Text } from './app-text';
 
 import { BackIcon } from './back-icon';
 

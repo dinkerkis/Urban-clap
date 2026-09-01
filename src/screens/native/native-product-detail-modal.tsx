@@ -3,9 +3,11 @@ import { Image } from 'expo-image';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
-import { Modal, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { Text } from '../../components/app-text';
+import { Modal, Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { CloseButton, CLOSE_BUTTON_GAP, CLOSE_BUTTON_INSET, CLOSE_BUTTON_SIZE } from '../../components/close-icon';
 import { useNativeProductDetail } from '../../hooks/use-native-product-detail';
 import { DottedUnderline } from '../../components/dotted-underline';
 import { LoadingDots } from '../../components/loading-dots';
@@ -90,31 +92,16 @@ function ExchangeInfoModal({ visible, onClose }: { onClose: () => void; visible:
   return (
     <Modal animationType="slide" onRequestClose={onClose} presentationStyle="overFullScreen" statusBarTranslucent transparent visible={visible}>
       <View style={{ flex: 1, backgroundColor: colors.blackAlpha78 }}>
-        <Pressable
-          accessibilityRole="button"
+        <CloseButton
           accessibilityLabel="Close exchange info"
           onPress={onClose}
-          style={({ pressed }) => ({
-            position: 'absolute',
-            zIndex: 2,
-            top: insets.top + 10,
-            right: 16,
-            width: 30,
-            height: 30,
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: 15,
-            backgroundColor: colors.white,
-            opacity: pressed ? 0.7 : 1,
-          })}
-        >
-          <Text style={{ marginTop: -1, fontSize: fontSizes.size21, lineHeight: 23, fontFamily: fontFamilies.light, color: colors.mauveTone9_2 }}>×</Text>
-        </Pressable>
+          style={{ position: 'absolute', zIndex: 2, top: insets.top + 10, right: CLOSE_BUTTON_INSET }}
+        />
 
         <View
           style={{
             flex: 1,
-            marginTop: insets.top + 52,
+            marginTop: insets.top + 10 + CLOSE_BUTTON_SIZE + CLOSE_BUTTON_GAP,
             overflow: 'hidden',
             borderTopLeftRadius: 16,
             borderTopRightRadius: 16,
@@ -313,10 +300,12 @@ function FullSpecificationsModal({ images, onClose, visible }: { images: { image
   return (
     <Modal animationType="slide" onRequestClose={onClose} presentationStyle="overFullScreen" statusBarTranslucent transparent visible={visible}>
       <View style={{ flex: 1, backgroundColor: colors.blackAlpha78 }}>
-        <Pressable accessibilityRole="button" accessibilityLabel="Close specifications" onPress={onClose} style={({ pressed }) => ({ position: 'absolute', zIndex: 2, top: insets.top + 10, right: 16, width: 30, height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 15, backgroundColor: colors.white, opacity: pressed ? 0.7 : 1 })}>
-          <Text style={{ marginTop: -1, fontSize: fontSizes.size21, lineHeight: 23, fontFamily: fontFamilies.light, color: colors.mauveTone9_2 }}>×</Text>
-        </Pressable>
-        <View style={{ flex: 1, marginTop: insets.top + 52, overflow: 'hidden', borderTopLeftRadius: 16, borderTopRightRadius: 16, borderCurve: 'continuous', backgroundColor: colors.white }}>
+        <CloseButton
+          accessibilityLabel="Close specifications"
+          onPress={onClose}
+          style={{ position: 'absolute', zIndex: 2, top: insets.top + 10, right: CLOSE_BUTTON_INSET }}
+        />
+        <View style={{ flex: 1, marginTop: insets.top + 10 + CLOSE_BUTTON_SIZE + CLOSE_BUTTON_GAP, overflow: 'hidden', borderTopLeftRadius: 16, borderTopRightRadius: 16, borderCurve: 'continuous', backgroundColor: colors.white }}>
           <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: Math.max(insets.bottom, 16) }}>
             {[...images].sort((left, right) => left.sort_order - right.sort_order).map((item) => (
               <DetailImage key={`full-spec-${item.sort_order}`} path={item.image} width={width} />
@@ -680,11 +669,13 @@ export function NativeProductDetailModal({ onAddToCart, onClose, productId }: Na
   return (
     <Modal animationType="slide" onRequestClose={onClose} presentationStyle="overFullScreen" statusBarTranslucent transparent visible={Boolean(productId)}>
       <View style={{ flex: 1, backgroundColor: colors.blackAlpha78 }}>
-        <Pressable accessibilityRole="button" accessibilityLabel="Close product details" onPress={onClose} style={({ pressed }) => ({ position: 'absolute', zIndex: 2, top: insets.top + 10, right: 16, width: 30, height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 15, backgroundColor: colors.white, opacity: pressed ? 0.7 : 1 })}>
-          <Text style={{ marginTop: -1, fontSize: fontSizes.size21, lineHeight: 23, fontFamily: fontFamilies.light, color: colors.mauveTone9_2 }}>×</Text>
-        </Pressable>
+        <CloseButton
+          accessibilityLabel="Close product details"
+          onPress={onClose}
+          style={{ position: 'absolute', zIndex: 2, top: insets.top + 10, right: CLOSE_BUTTON_INSET }}
+        />
 
-        <View style={{ flex: 1, marginTop: insets.top + 52, overflow: 'hidden', borderTopLeftRadius: 16, borderTopRightRadius: 16, borderCurve: 'continuous', backgroundColor: colors.white }}>
+        <View style={{ flex: 1, marginTop: insets.top + 10 + CLOSE_BUTTON_SIZE + CLOSE_BUTTON_GAP, overflow: 'hidden', borderTopLeftRadius: 16, borderTopRightRadius: 16, borderCurve: 'continuous', backgroundColor: colors.white }}>
           {isLoading ? <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, backgroundColor: colors.transparent }}><LoadingDots /><Text style={{ fontSize: fontSizes.size14, color: colors.mauveTone39 }}>Loading product details...</Text></View> : null}
           {!isLoading && errorMessage ? <View style={{ flex: 1, padding: 24, alignItems: 'center', justifyContent: 'center', gap: 16 }}><Text selectable style={{ textAlign: 'center', fontSize: fontSizes.size14, lineHeight: 21, color: colors.mauveTone39 }}>{errorMessage}</Text><Pressable accessibilityRole="button" onPress={retry} style={({ pressed }) => ({ paddingHorizontal: 22, paddingVertical: 11, borderRadius: 8, backgroundColor: colors.violetTone58, opacity: pressed ? 0.72 : 1 })}><Text style={{ fontFamily: fontFamilies.bold, color: colors.white }}>Retry</Text></Pressable></View> : null}
           {!isLoading && data ? (

@@ -1,10 +1,13 @@
 import { colors, fontFamilies, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
 import { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Switch, Text, TextInput, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Switch, View } from 'react-native';
+import { TextInput } from '../../components/app-text-input';
+import { Text } from '../../components/app-text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BackIcon } from '../../components/back-icon';
+import { CloseButton, CLOSE_BUTTON_ABOVE_OFFSET, CLOSE_BUTTON_INSET } from '../../components/close-icon';
 
 type SettingsScreenProps = {
   email?: string;
@@ -62,14 +65,11 @@ function DownloadDataModal({ initialEmail, visible, onClose }: { initialEmail?: 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1, justifyContent: 'flex-end' }}>
         <Pressable accessibilityRole="button" accessibilityLabel="Close download data form" onPress={onClose} style={{ position: 'absolute', inset: 0, backgroundColor: colors.blackAlpha72 }} />
         <View style={{ marginHorizontal: 10, paddingHorizontal: 20, paddingTop: 28, paddingBottom: Math.max(insets.bottom, 20) + 16, borderTopLeftRadius: 18, borderTopRightRadius: 18, backgroundColor: colors.white }}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Close"
+          <CloseButton
+            color={colors.mauveTone19_2}
             onPress={onClose}
-            style={({ pressed }) => ({ position: 'absolute', right: 14, top: -54, width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 19, backgroundColor: colors.white, opacity: pressed ? 0.65 : 1 })}
-          >
-            <Text style={{ fontSize: fontSizes.size24, lineHeight: 27, fontFamily: fontFamilies.light, color: colors.mauveTone19_2 }}>×</Text>
-          </Pressable>
+            style={{ position: 'absolute', right: CLOSE_BUTTON_INSET, top: CLOSE_BUTTON_ABOVE_OFFSET }}
+          />
           <Text style={{ fontSize: fontSizes.size21, lineHeight: 27, fontFamily: fontFamilies.bold, color: colors.mauveTone11 }}>Add email address</Text>
           <Text style={{ paddingTop: 7, fontSize: fontSizes.size15, lineHeight: 22, color: colors.neutralTone45 }}>All your details will be shared on the email.</Text>
           <TextInput

@@ -12,6 +12,7 @@ export type ProductSection = {
 };
 
 type ProductsState = {
+  categoryName?: string;
   errorMessage: string;
   isLoading: boolean;
   sections: ProductSection[];
@@ -20,10 +21,13 @@ type ProductsState = {
 const productsCache = new Map<string, ProductSection[]>();
 
 function formatDuration(minutes?: number): string {
-  if (!minutes) return 'Duration on request';
-  if (minutes < 60) return `${minutes} mins`;
-  const hours = minutes / 60;
-  return Number.isInteger(hours) ? `${hours} hrs` : `${hours.toFixed(1)} hrs`;
+  if (!minutes || minutes <= 0) return 'Duration on request';
+  const totalMinutes = Math.round(minutes);
+  if (totalMinutes < 60) return `${totalMinutes} mins`;
+  const hours = Math.floor(totalMinutes / 60);
+  const remainingMinutes = totalMinutes % 60;
+  const hoursLabel = `${hours} ${hours === 1 ? 'hr' : 'hrs'}`;
+  return remainingMinutes > 0 ? `${hoursLabel} ${remainingMinutes} mins` : hoursLabel;
 }
 
 function formatReviewCount(count?: number): string {
@@ -41,7 +45,7 @@ export function useCategoryProducts(categoryId: string) {
     setState({ errorMessage: '', isLoading: true, sections: [] });
 
     void fetchProductsWithCategory(categoryId, controller.signal)
-      .then(({ productDetails }) => {
+      .then(({ category, productDetails }) => {
         const sections = productDetails.map((section, sectionIndex) => ({
           id: section._id,
           title: section.name,
@@ -83,7 +87,7 @@ export function useCategoryProducts(categoryId: string) {
         }));
 
         productsCache.set(categoryId, sections);
-        setState({ errorMessage: '', isLoading: false, sections });
+        setState({ categoryName: category.name, errorMessage: '', isLoading: false, sections });
       })
       .catch((error: unknown) => {
         if (controller.signal.aborted) return;

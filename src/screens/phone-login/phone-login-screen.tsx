@@ -1,6 +1,8 @@
 import { colors, fontFamilies, fontSizes, typography } from '../../theme';
 import { useState } from 'react';
-import { Keyboard, KeyboardAvoidingView, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Keyboard, KeyboardAvoidingView, Pressable, ScrollView, View } from 'react-native';
+import { TextInput } from '../../components/app-text-input';
+import { Text } from '../../components/app-text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CountryPickerModal } from '../../components/country-picker-modal';

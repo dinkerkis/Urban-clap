@@ -1,9 +1,11 @@
 import { colors, fontFamilies, fontSizes } from '../theme';
 import { Image } from 'expo-image';
-import { Modal, Pressable, Text, useWindowDimensions, View } from 'react-native';
-import Animated, { Easing, FadeIn, SlideInDown } from 'react-native-reanimated';
+import { Modal, Pressable, useWindowDimensions, View } from 'react-native';
+import { Text } from './app-text';
+import Animated, { Easing, ReduceMotion, SlideInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { CloseButton } from './close-icon';
 import type { ServiceCategory, ServiceSubcategory } from '../data/service-catalog';
 
 type CategorySubcategoriesSheetProps = {
@@ -19,11 +21,11 @@ export function isFullPageCategory(category: ServiceCategory) {
 export function CategorySubcategoriesSheet({ category, onClose, onSubcategoryPress }: CategorySubcategoriesSheetProps) {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
-  const itemWidth = Math.floor((width - 40 - 24) / 3);
+  const itemWidth = Math.min(125, Math.max(88, Math.floor((width - 32 - 24) / 3)));
 
   return (
     <Modal
-      animationType="slide"
+      animationType="none"
       onRequestClose={onClose}
       presentationStyle="overFullScreen"
       statusBarTranslucent
@@ -34,35 +36,21 @@ export function CategorySubcategoriesSheet({ category, onClose, onSubcategoryPre
         <Pressable
           accessibilityLabel="Close category"
           onPress={onClose}
-          style={{ position: 'absolute', inset: 0, backgroundColor: colors.blackAlpha46 }}
+          style={{ position: 'absolute', inset: 0, backgroundColor: colors.blackAlpha72 }}
         />
 
         {category ? (
-          <Animated.View entering={SlideInDown.duration(320).easing(Easing.out(Easing.cubic))}>
-            <Animated.View entering={FadeIn.duration(180)} style={{ alignItems: 'flex-end', paddingRight: 18, marginBottom: 12 }}>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Close"
-                hitSlop={8}
-                onPress={onClose}
-                style={({ pressed }) => ({
-                  width: 36,
-                  height: 36,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: 18,
-                  backgroundColor: colors.neutralTone95_2,
-                  opacity: pressed ? 0.7 : 1,
-                })}
-              >
-                <Text style={{ fontSize: fontSizes.size22, lineHeight: 24, fontFamily: fontFamilies.regular, color: colors.neutralTone10, marginTop: -1 }}>×</Text>
-              </Pressable>
-            </Animated.View>
+          <Animated.View
+            entering={SlideInDown.duration(300)
+              .easing(Easing.bezier(0.32, 0.72, 0, 1))
+              .reduceMotion(ReduceMotion.System)}
+          >
+            <CloseButton color={colors.neutralTone10} floating onPress={onClose} />
 
             <View
               style={{
                 paddingTop: 22,
-                paddingHorizontal: 20,
+                paddingHorizontal: 16,
                 paddingBottom: Math.max(28, insets.bottom + 16),
                 borderTopLeftRadius: 16,
                 borderTopRightRadius: 16,
@@ -70,30 +58,30 @@ export function CategorySubcategoriesSheet({ category, onClose, onSubcategoryPre
                 backgroundColor: colors.white,
               }}
             >
-              <Text selectable style={{ marginBottom: 22, fontSize: fontSizes.size22, lineHeight: 28, fontFamily: fontFamilies.bold, color: colors.neutralTone7 }}>
+              <Text selectable style={{ marginBottom: 22, fontSize: fontSizes.size22, lineHeight: 28, fontFamily: fontFamilies.bold, color: colors.black }}>
                 {category.title}
               </Text>
 
               {category.subcategories.length > 0 ? (
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 12 }}>
                   {category.subcategories.map((subcategory) => (
                     <Pressable
                       key={subcategory.id}
                       accessibilityRole="button"
                       accessibilityLabel={subcategory.title}
                       onPress={() => onSubcategoryPress(subcategory)}
-                      style={({ pressed }) => ({ width: itemWidth, alignItems: 'center', gap: 8, opacity: pressed ? 0.62 : 1 })}
+                      style={({ pressed }) => ({ width: itemWidth, alignItems: 'center', gap: 6, opacity: pressed ? 0.62 : 1 })}
                     >
                       <View
                         style={{
                           width: itemWidth,
-                          height: 72,
+                          height: 64,
                           alignItems: 'center',
                           justifyContent: 'center',
                           overflow: 'hidden',
-                          borderRadius: 14,
+                          borderRadius: 12,
                           borderCurve: 'continuous',
-                          backgroundColor: colors.neutralTone95_3,
+                          backgroundColor: colors.violetTone98_3,
                         }}
                       >
                         {subcategory.imageUrl ? (
@@ -101,22 +89,22 @@ export function CategorySubcategoriesSheet({ category, onClose, onSubcategoryPre
                             source={subcategory.imageUrl}
                             contentFit="contain"
                             transition={180}
-                            style={{ position: 'absolute', inset: 10 }}
+                            style={{ position: 'absolute', width: 64, height: 48 }}
                           />
                         ) : (
                           <Text style={{ fontSize: fontSizes.size22 }}>{subcategory.icon || '•'}</Text>
                         )}
                       </View>
                       <Text
-                        numberOfLines={3}
+                        numberOfLines={2}
                         style={{
-                          width: itemWidth,
-                          minHeight: 36,
+                          width: itemWidth + 8,
+                          minHeight: 32,
                           textAlign: 'center',
                           fontSize: fontSizes.size12,
                           lineHeight: 16,
                           fontFamily: fontFamilies.regular,
-                          color: colors.violetTone17,
+                          color: colors.black,
                         }}
                       >
                         {subcategory.title}

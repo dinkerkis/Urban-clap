@@ -1,6 +1,7 @@
 import { colors, fontFamilies, fontSizes } from '../../theme';
 import { Image } from 'expo-image';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { Alert, Pressable, ScrollView, View } from 'react-native';
+import { Text } from '../../components/app-text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BackIcon } from '../../components/back-icon';
@@ -151,7 +152,7 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
                     backgroundColor: colors.redTone54,
                   }}
                 >
-                  <Text style={{ marginTop: -0.5, fontSize: 10, lineHeight: 11, fontFamily: fontFamilies.bold, color: colors.white }}>!</Text>
+                  <Text style={{ marginTop: -0.5, fontSize: fontSizes.size10, lineHeight: 11, fontFamily: fontFamilies.bold, color: colors.white }}>!</Text>
                 </View>
                 <Text style={{ fontSize: fontSizes.size12, lineHeight: 16, fontFamily: fontFamilies.semiBold, color: colors.redTone47 }}>Incomplete profile</Text>
               </View>
