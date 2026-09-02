@@ -2,7 +2,7 @@ import { colors } from '../theme';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { ServiceItem } from '../data/service-catalog';
-import { addCartItem, decrementCartItem, getCart, type CartItem } from '../services/cart-api';
+import { addCartItem, decrementCartItem, getCart, NATIVE_PRODUCT_TYPE, type CartItem } from '../services/cart-api';
 import { getCategoryImageUrl } from '../services/categories-api';
 
 type CartState = {
@@ -27,12 +27,21 @@ const emptyState: CartState = {
   grandTotal: 0,
 };
 
+function isNativeProduct(item: Pick<ServiceItem, 'productType'> | Pick<CartItem, 'productType'>): boolean {
+  return item.productType === NATIVE_PRODUCT_TYPE;
+}
+
 function cartKey(productId: string, variantKey?: string | null): string {
   return variantKey ? `${productId}::${variantKey}` : productId;
 }
 
 function mapCartItem(cartItem: CartItem, knownItem?: ServiceItem, category?: { id: string; name: string; total?: number }): ServiceItem {
-  const key = cartKey(cartItem.product_id, cartItem.variant?.key);
+  const optionId = cartItem.option_id || knownItem?.optionId;
+  const variantKey = optionId || cartItem.variant?.key || knownItem?.variantKey;
+  const key = cartKey(cartItem.product_id, variantKey);
+  const productType = isNativeProduct(cartItem) || (knownItem ? isNativeProduct(knownItem) : false) || Boolean(optionId)
+    ? NATIVE_PRODUCT_TYPE
+    : knownItem?.productType;
   return {
     ...knownItem,
     id: key,
@@ -56,7 +65,9 @@ function mapCartItem(cartItem: CartItem, knownItem?: ServiceItem, category?: { i
     cartCategoryName: category?.name || knownItem?.cartCategoryName,
     cartCategoryTotal: category?.total ?? knownItem?.cartCategoryTotal,
     slug: cartItem.snapshot?.slug || knownItem?.slug,
-    variantKey: cartItem.variant?.key || knownItem?.variantKey,
+    variantKey,
+    optionId,
+    productType,
   };
 }
 
@@ -88,7 +99,7 @@ export function useCart(authToken?: string) {
           ? groupedItems
           : (Array.isArray(data.items) ? data.items : []).map((item) => ({ category: undefined, item }));
         items.forEach(({ category, item: cartItem }) => {
-          const key = cartKey(cartItem.product_id, cartItem.variant?.key);
+          const key = cartKey(cartItem.product_id, cartItem.option_id || cartItem.variant?.key);
           itemsById[key] = mapCartItem(cartItem, current.itemsById[key], category);
           quantities[key] = cartItem.quantity;
         });
@@ -123,15 +134,23 @@ export function useCart(authToken?: string) {
 
   const add = useCallback(async (item: ServiceItem, quantity = 1) => {
     const productId = item.productId || item.id.split('::')[0];
+    const optionId = item.optionId;
     const data = await addCartItem(
-      {
-        product_id: productId,
-        variant_key: item.variantKey,
-        quantity,
-      },
+      item.productType === NATIVE_PRODUCT_TYPE && optionId
+        ? {
+            product_id: productId,
+            option_id: optionId,
+            quantity,
+            productType: NATIVE_PRODUCT_TYPE,
+          }
+        : {
+            product_id: productId,
+            variant_key: item.variantKey,
+            quantity,
+          },
       authToken,
     );
-    const key = cartKey(data.addedItem.product_id, data.addedItem.variant?.key || item.variantKey);
+    const key = cartKey(data.addedItem.product_id, data.addedItem.option_id || data.addedItem.variant?.key || item.optionId || item.variantKey);
 
     mutationVersionRef.current += 1;
     setState((current) => ({

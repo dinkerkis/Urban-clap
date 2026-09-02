@@ -28,6 +28,7 @@ export type NativeProduct = {
 export type NativeProductRating = { average?: number; count?: number };
 
 export type NativeProductOption = {
+  _id?: string;
   image?: string;
   key?: string;
   label: string;
@@ -314,6 +315,7 @@ export async function fetchNativeProductDetail(productId: string, signal?: Abort
         const price = optionalFiniteNumber(value.price);
         if (!label || price == null) return [];
         return [{
+          _id: cleanString(value._id),
           label,
           key: cleanString(value.key),
           image: cleanString(value.image),

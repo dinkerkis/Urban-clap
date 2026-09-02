@@ -615,7 +615,8 @@ export function NativeProductDetailModal({ onAddToCart, onClose, productId }: Na
     const selections: NativeCartSelection[] = data.options.flatMap((option, index) => {
       const quantity = optionQuantities[index] ?? 0;
       if (quantity <= 0) return [];
-      const variantKey = option.key || option.label;
+      const optionId = option._id;
+      const variantKey = optionId || option.key || option.label;
       const reviewsCount = option.rating?.count ?? data.rating?.count ?? 0;
       return [{
         quantity,
@@ -635,6 +636,8 @@ export function NativeProductDetailModal({ onAddToCart, onClose, productId }: Na
           selectedVariantLabel: option.label,
           slug: data.slug,
           variantKey,
+          optionId,
+          productType: optionId ? 'NativeProduct' : undefined,
         },
       }];
     });

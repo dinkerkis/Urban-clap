@@ -26,6 +26,8 @@ export type ServiceItem = {
   cartCategoryTotal?: number;
   slug?: string;
   status?: string;
+  productType?: 'NativeProduct';
+  optionId?: string;
   variantLabel?: string;
   variantKey?: string;
   variants?: Array<{ hasImageField?: boolean; imageUrl?: string; key?: string; label: string; price: number }>;

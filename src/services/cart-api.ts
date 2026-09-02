@@ -11,7 +11,9 @@ export type CartVariant = {
 export type CartItem = {
   item_id: string;
   lineTotal: number;
+  option_id?: string;
   product_id: string;
+  productType?: string;
   quantity: number;
   snapshot?: {
     mainImage?: string;
@@ -72,10 +74,13 @@ async function request<T>(path: string, method: 'GET' | 'PATCH' | 'POST', token?
   return requireApiData(payload, 'The cart response was incomplete. Please try again.');
 }
 
-export function addCartItem(
-  body: { product_id: string; quantity: number; variant_key?: string },
-  token?: string,
-): Promise<AddCartData> {
+export const NATIVE_PRODUCT_TYPE = 'NativeProduct' as const;
+
+export type AddCartItemBody =
+  | { product_id: string; quantity: number; variant_key?: string }
+  | { option_id: string; product_id: string; productType: typeof NATIVE_PRODUCT_TYPE; quantity: number };
+
+export function addCartItem(body: AddCartItemBody, token?: string): Promise<AddCartData> {
   return request<AddCartData>(apiEndpoints.cart.add, 'POST', token, body);
 }
 
