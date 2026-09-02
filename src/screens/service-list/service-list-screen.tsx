@@ -252,6 +252,11 @@ export function ServiceListScreen({ cart, cartItemsById, categoryTitle, subcateg
   const hidePriceUnderline = hideParentCategoryHero
     || /Furniture Assembly/i.test(subcategory.title)
     || /Furniture Assembly/i.test(displayCategoryTitle)
+    || /Geyser/i.test(subcategory.title)
+    || /Geyser/i.test(displayCategoryTitle)
+    || /Water Purifier/i.test(subcategory.title)
+    || /Water Purifier/i.test(displayCategoryTitle)
+    || /RO\s*\/\s*Water Purifier/i.test(subcategory.title)
     || /^AC$/i.test(subcategory.title.trim())
     || /^AC$/i.test(displayCategoryTitle.trim());
   // Without a hero, the category title starts 25px below the navigation bar

@@ -47,7 +47,18 @@ function shouldShowEstimateFlow(screenTitle: string) {
   return normalizedTitle.includes('rooms') && normalizedTitle.includes('walls') && normalizedTitle.includes('painting');
 }
 
-export function ProductDetailScreen({ item, onAdd, onBack, onLoadingChange, onViewCart, subcategoryTitle }: ProductDetailScreenProps) {
+function shouldHideSelectRequirements(categoryTitle: string, subcategoryTitle: string, hasVariants: boolean) {
+  const titles = `${categoryTitle} ${subcategoryTitle}`;
+  const isExactCategory = (name: string) => new RegExp(`^${name}$`, 'i').test(categoryTitle.trim()) || new RegExp(`^${name}$`, 'i').test(subcategoryTitle.trim());
+  return /Furniture Assembly/i.test(titles)
+    || /Geyser/i.test(titles)
+    || /Installation\s*&\s*uninstallation/i.test(titles)
+    || /^AC$/i.test(categoryTitle.trim())
+    || /^AC$/i.test(subcategoryTitle.trim())
+    || ((isExactCategory('Carpenter') || isExactCategory('Electrician')) && !hasVariants);
+}
+
+export function ProductDetailScreen({ categoryTitle, item, onAdd, onBack, onLoadingChange, onViewCart, subcategoryTitle }: ProductDetailScreenProps) {
   const insets = useSafeAreaInsets();
   const { height: windowHeight, width } = useWindowDimensions();
   const dragY = useSharedValue(0);
@@ -79,8 +90,9 @@ export function ProductDetailScreen({ item, onAdd, onBack, onLoadingChange, onVi
   const hasRequiredSelection = !hasVariants || Boolean(selectedVariant);
   const canContinue = isAvailable && hasRequiredSelection;
   const showEstimateFlow = shouldShowEstimateFlow(subcategoryTitle);
-  const showSimplifiedVariants = /Furniture Assembly/i.test(subcategoryTitle) && hasVariants;
-  const hideRequirementsTitle = showSimplifiedVariants || /^AC$/i.test(subcategoryTitle.trim());
+  const isIkeaFurniture = /IKEA Furniture/i.test(categoryTitle) || /IKEA Furniture/i.test(subcategoryTitle);
+  const showSimplifiedVariants = (/Furniture Assembly/i.test(subcategoryTitle) || isIkeaFurniture) && hasVariants;
+  const hideRequirementsTitle = showSimplifiedVariants || shouldHideSelectRequirements(categoryTitle, subcategoryTitle, hasVariants);
   const showDoneBar = !showEstimateFlow && Boolean(selectedVariant) && (!showSimplifiedVariants || selectedVariantQuantity > 0);
 
   const closeAfterSwipe = () => {
