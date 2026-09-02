@@ -22,7 +22,7 @@ export function DashboardScreenHeader({ title, subtitle, onBack }: DashboardScre
         gap: 13,
         backgroundColor: colors.white,
         borderBottomWidth: 1,
-        borderBottomColor: colors.violetTone94_3,
+        borderBottomColor: colors.violetTone98_3,
       }}
     >
       {onBack && (

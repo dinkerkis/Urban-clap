@@ -320,7 +320,7 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
                   onPress={() => onCategoryPress(category)}
                   style={({ pressed }) => ({ width: categoryWidth, alignItems: 'center', gap: 6, opacity: pressed ? 0.62 : 1 })}
                 >
-                  <View style={{ width: categoryWidth, height: categoryHeight, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderRadius: 12, borderCurve: 'continuous', backgroundColor: colors.violetTone98_3 }}>
+                  <View style={{ width: categoryWidth, height: categoryHeight, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderRadius: 8, borderCurve: 'continuous', backgroundColor: colors.neutralTone95_2 }}>
                     <Text style={{ fontSize: fontSizes.size22 }}>{category.icon}</Text>
                     {category.imageUrl ? (
                       <Image
@@ -360,8 +360,8 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
 
         {!normalizedSearch && spotlights && spotlights.spotlightContent.length > 0 ? (
           <View style={{ marginHorizontal: -16, gap: 18, paddingTop: 10, paddingBottom: 2 }}>
-            <View style={{ width: '100%', height: 8, backgroundColor: colors.violetTone96_4 }} />
-            <Text style={{ marginTop: 8, paddingHorizontal: 16, fontSize: fontSizes.size22, lineHeight: 44, fontFamily: fontFamilies.semiBold, color: colors.black }}>
+            <View style={{ width: '100%', height: 8, backgroundColor: colors.neutralTone95_2 }} />
+            <Text style={{ marginTop: 4, paddingHorizontal: 16, fontSize: fontSizes.size22, lineHeight: 44, fontFamily: fontFamilies.semiBold, color: colors.black }}>
               {spotlights.sectionTitle}
             </Text>
             <ScrollView
@@ -415,7 +415,7 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
           </View>
         ) : null}
 
-        {!normalizedSearch ? <View style={{ marginHorizontal: -16, height: 12, backgroundColor: colors.violetTone96_4 }} /> : null}
+        {!normalizedSearch ? <View style={{ marginHorizontal: -16, height: 12, backgroundColor: colors.neutralTone95_2 }} /> : null}
       </View>
     </Animated.ScrollView>
     {stickySearchVisible ? (

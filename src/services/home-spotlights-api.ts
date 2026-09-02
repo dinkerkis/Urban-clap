@@ -4,10 +4,17 @@ import { apiEndpoints } from './api-endpoints';
 export type SpotlightRedirectType = 'native' | 'service';
 
 export type HomeSpotlight = {
+  categoryDetails?: SpotlightCategoryDetail[];
   imageUrl: string;
-  redirectId: string;
+  redirectId?: string;
   redirectType: SpotlightRedirectType;
   sortOrder: number;
+};
+
+export type SpotlightCategoryDetail = {
+  id: string;
+  imageUrl?: string;
+  name: string;
 };
 
 export type HomeSpotlightsData = {
@@ -29,18 +36,33 @@ function parseSpotlight(value: unknown): HomeSpotlight | null {
   const item = value as Record<string, unknown>;
   if (
     typeof item.image !== 'string' ||
-    typeof item.redirectId !== 'string' ||
     typeof item.sortOrder !== 'number' ||
     !isSpotlightRedirectType(item.redirectType)
   ) return null;
+
+  const categoryDetails = Array.isArray(item.categoryDetails)
+    ? item.categoryDetails.flatMap((entry): SpotlightCategoryDetail[] => {
+        if (!entry || typeof entry !== 'object') return [];
+        const detail = entry as Record<string, unknown>;
+        if (typeof detail._id !== 'string' || typeof detail.name !== 'string') return [];
+        return [{
+          id: detail._id,
+          imageUrl: typeof detail.category_image === 'string' ? getApiAssetUrl(detail.category_image) : undefined,
+          name: detail.name,
+        }];
+      })
+    : [];
+  const redirectId = typeof item.redirectId === 'string' ? item.redirectId : undefined;
+  if (!redirectId && categoryDetails.length === 0) return null;
 
   const imageUrl = getApiAssetUrl(item.image);
   if (!imageUrl) return null;
   return {
     imageUrl,
-    redirectId: item.redirectId,
+    redirectId,
     redirectType: item.redirectType,
     sortOrder: item.sortOrder,
+    categoryDetails: categoryDetails.length ? categoryDetails : undefined,
   };
 }
 

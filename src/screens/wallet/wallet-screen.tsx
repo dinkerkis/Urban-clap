@@ -122,7 +122,7 @@ export function WalletScreen({ onBack, onHelp }: WalletScreenProps) {
         </View>
         </View>
 
-        <View style={{ height: 8, backgroundColor: colors.violetTone96_6 }} />
+        <View style={{ height: 8, backgroundColor: colors.violetTone98_3 }} />
 
         <View style={{ paddingHorizontal: 20, paddingTop: 22, paddingBottom: 10 }}>
         <Text style={{ fontSize: fontSizes.size21, lineHeight: 27, fontFamily: fontFamilies.bold, color: colors.mauveTone11 }}>Wallet activity</Text>
@@ -131,7 +131,7 @@ export function WalletScreen({ onBack, onHelp }: WalletScreenProps) {
         </View>
         </View>
 
-        <View style={{ height: 8, backgroundColor: colors.violetTone96_6 }} />
+        <View style={{ height: 8, backgroundColor: colors.violetTone98_3 }} />
 
         <View style={{ paddingHorizontal: 20, paddingTop: 26 }}>
         <Text style={{ paddingBottom: 12, fontSize: fontSizes.size21, lineHeight: 27, fontFamily: fontFamilies.bold, color: colors.mauveTone11 }}>Have a question?</Text>
@@ -146,7 +146,7 @@ export function WalletScreen({ onBack, onHelp }: WalletScreenProps) {
               style={({ pressed }) => ({
                 paddingVertical: 18,
                 borderBottomWidth: index === FAQS.length - 1 ? 0 : 1,
-                borderBottomColor: colors.mauveTone93,
+                borderBottomColor: colors.violetTone98_3,
                 opacity: pressed ? 0.7 : 1,
               })}
             >

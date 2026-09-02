@@ -88,7 +88,7 @@ function ServiceSkeletonBlock({ height, progress, radius = 8, screenWidth, width
   );
 }
 
-function ServiceListSkeleton({ categoryTitle, onBack, showEstimateFooter }: { categoryTitle: string; onBack: () => void; showEstimateFooter: boolean }) {
+function ServiceListSkeleton({ categoryTitle, hideHeroImage, onBack, showEstimateFooter }: { categoryTitle: string; hideHeroImage: boolean; onBack: () => void; showEstimateFooter: boolean }) {
   const insets = useSafeAreaInsets();
   const { width: screenWidth } = useWindowDimensions();
   const reducedMotion = useReducedMotion();
@@ -111,13 +111,13 @@ function ServiceListSkeleton({ categoryTitle, onBack, showEstimateFooter }: { ca
 
   return (
     <View accessibilityLabel="Loading category details" accessibilityRole="progressbar" style={{ flex: 1, backgroundColor: colors.white }}>
-      <ScrollView scrollEnabled={false} contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: (showEstimateFooter ? 118 : 24) + insets.bottom }}>
-        <ServiceSkeletonBlock height={HERO_HEIGHT} progress={progress} radius={0} screenWidth={screenWidth} />
+      <ScrollView scrollEnabled={false} contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: hideHeroImage ? insets.top + NAV_HEIGHT : 0, paddingBottom: (showEstimateFooter ? 118 : 24) + insets.bottom }}>
+        {!hideHeroImage ? <ServiceSkeletonBlock height={HERO_HEIGHT} progress={progress} radius={0} screenWidth={screenWidth} /> : null}
         <View style={{ paddingHorizontal: 20, paddingTop: 25, paddingBottom: 22, gap: 10 }}>
           <ServiceSkeletonBlock height={32} progress={progress} screenWidth={screenWidth} width="72%" />
           <ServiceSkeletonBlock height={18} progress={progress} radius={5} screenWidth={screenWidth} width="46%" />
         </View>
-        <View style={{ height: 8, backgroundColor: colors.mauveTone96 }} />
+        <View style={{ height: 8, backgroundColor: colors.violetTone98_3 }} />
         <View style={{ paddingHorizontal: 16, paddingTop: 20, paddingBottom: 25, flexDirection: 'row', flexWrap: 'wrap', columnGap: 12, rowGap: 16 }}>
           {[0, 1, 2, 3, 4, 5].map((index) => (
             <View key={`service-skeleton-category-${index}`} style={{ width: cardWidth, alignItems: 'center', gap: 8 }}>
@@ -127,7 +127,7 @@ function ServiceListSkeleton({ categoryTitle, onBack, showEstimateFooter }: { ca
             </View>
           ))}
         </View>
-        <View style={{ height: 8, backgroundColor: colors.mauveTone96 }} />
+        <View style={{ height: 8, backgroundColor: colors.violetTone98_3 }} />
         <View style={{ padding: 20, gap: 18 }}>
           <ServiceSkeletonBlock height={28} progress={progress} screenWidth={screenWidth} width="62%" />
           {[0, 1].map((index) => (
@@ -151,7 +151,7 @@ function ServiceListSkeleton({ categoryTitle, onBack, showEstimateFooter }: { ca
       </View>
 
       {showEstimateFooter ? (
-        <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingBottom: Math.max(insets.bottom, 10), borderTopWidth: 1, borderTopColor: colors.mauveTone93_2, backgroundColor: colors.white }}>
+        <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingBottom: Math.max(insets.bottom, 10), borderTopWidth: 1, borderTopColor: colors.violetTone98_3, backgroundColor: colors.white }}>
           <View style={{ height: ESTIMATE_NOTE_HEIGHT, paddingHorizontal: 40, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.yellowTone95 }}>
             <ServiceSkeletonBlock height={14} progress={progress} radius={4} screenWidth={screenWidth} width="72%" />
           </View>
@@ -164,9 +164,21 @@ function ServiceListSkeleton({ categoryTitle, onBack, showEstimateFooter }: { ca
   );
 }
 
-function ProductRow({ cartItem, item, quantity, showEstimateLabel, onAdd, onPress, onRemove }: { cartItem: ServiceItem; item: ServiceItem; quantity: number; showEstimateLabel: boolean; onAdd: (item: ServiceItem) => void; onPress: (item: ServiceItem) => void; onRemove: (item: ServiceItem) => void }) {
+function ProductRow({ cartItem, hidePriceUnderline, item, quantity, showEstimateLabel, onAdd, onPress, onRemove }: { cartItem: ServiceItem; hidePriceUnderline: boolean; item: ServiceItem; quantity: number; showEstimateLabel: boolean; onAdd: (item: ServiceItem) => void; onPress: (item: ServiceItem) => void; onRemove: (item: ServiceItem) => void }) {
   const productImageSize = 128;
   const displayItem = quantity > 0 ? cartItem : item;
+  const variantsCount = item.variants?.length ?? 0;
+  const priceRow = (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
+      <Text selectable style={{ fontSize: fontSizes.size13, lineHeight: 19, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9_2 }}>{quantity === 0 && item.variants?.length ? 'Starts at ' : ''}₹{displayItem.price.toLocaleString('en-IN')}</Text>
+      {item.duration ? (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+          <Text style={{ fontSize: fontSizes.size16, lineHeight: 19, textAlignVertical: 'center', color: colors.mauveTone38_2 }}>•</Text>
+          <Text selectable style={{ fontSize: fontSizes.size12, lineHeight: 18, color: colors.mauveTone38_2 }}>{item.duration}</Text>
+        </View>
+      ) : null}
+    </View>
+  );
 
   return (
     <Pressable onPress={() => onPress(item)} style={({ pressed }) => ({ paddingVertical: 22, opacity: pressed ? 0.72 : 1 })}>
@@ -181,34 +193,25 @@ function ProductRow({ cartItem, item, quantity, showEstimateLabel, onAdd, onPres
               </DottedUnderline>
             </View>
           ) : null}
-          <DottedUnderline fullWidth lineMarginTop={10} dotColor={colors.mauveTone86}>
-            <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 7 }}>
-              <Text selectable style={{ fontSize: fontSizes.size13, lineHeight: 19, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9_2 }}>{quantity === 0 && item.variants?.length ? 'Starts at ' : ''}₹{displayItem.price.toLocaleString('en-IN')}</Text>
-              {item.duration ? (
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-                  <Text style={{ fontSize: fontSizes.size16, lineHeight: 18, color: colors.mauveTone38_2 }}>•</Text>
-                  <Text selectable style={{ fontSize: fontSizes.size12, lineHeight: 18, color: colors.mauveTone38_2 }}>{item.duration}</Text>
-                </View>
-              ) : null}
-            </View>
-          </DottedUnderline>
+          {hidePriceUnderline ? priceRow : <DottedUnderline fullWidth lineMarginTop={10} dotColor={colors.mauveTone86}>{priceRow}</DottedUnderline>}
           {item.description ? <Text selectable numberOfLines={3} style={{ fontSize: fontSizes.size13, lineHeight: 19, color: colors.mauveTone38_2 }}>{item.description}</Text> : null}
           <Text style={{ paddingTop: 5, fontSize: fontSizes.size14, lineHeight: 19, fontFamily: fontFamilies.semiBold, color: colors.violetTone58 }}>{showEstimateLabel ? 'View details and estimate' : 'View details'}</Text>
         </View>
 
-        <View style={{ width: productImageSize, height: productImageSize + 16, alignItems: 'center' }}>
-          <View style={{ width: productImageSize, height: productImageSize, overflow: 'hidden', borderRadius: 13, borderCurve: 'continuous', backgroundColor: colors.violetTone95_2 }}>
+        <View style={{ width: productImageSize, height: productImageSize + (quantity === 0 && variantsCount > 0 ? 39 : 16), alignItems: 'center' }}>
+          <View style={{ width: productImageSize, height: productImageSize, overflow: 'hidden', borderRadius: 9, borderCurve: 'continuous', backgroundColor: colors.violetTone98_3 }}>
             {displayItem.imageUrl ? <Image source={displayItem.imageUrl} contentFit="cover" transition={180} style={{ position: 'absolute', inset: 0 }} /> : null}
           </View>
           {quantity === 0 ? (
             <Pressable
               accessibilityRole="button"
+              accessibilityLabel={`Add ${item.title}${variantsCount > 0 ? `, ${variantsCount} ${variantsCount === 1 ? 'option' : 'options'}` : ''}`}
               onPress={(event) => {
                 event.stopPropagation();
                 if (item.variants?.length) onPress(item);
                 else onAdd(item);
               }}
-              style={({ pressed }) => ({ position: 'absolute', bottom: 0, alignSelf: 'center', width: 78, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 10, borderCurve: 'continuous', backgroundColor: pressed ? colors.violetTone97 : colors.white, boxShadow: `0 1px 6px ${colors.mauveTone9Alpha16}` })}
+              style={({ pressed }) => ({ position: 'absolute', bottom: variantsCount > 0 ? 23 : 0, alignSelf: 'center', width: 78, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 7, borderCurve: 'continuous', borderWidth: 1, borderColor: colors.mauveTone89_4, backgroundColor: pressed ? colors.violetTone97 : colors.white, elevation: 0, shadowOpacity: 0 })}
             >
               <Text style={{ fontSize: fontSizes.size16, fontFamily: fontFamilies.medium, color: colors.violetTone58 }}>Add</Text>
             </Pressable>
@@ -219,6 +222,7 @@ function ProductRow({ cartItem, item, quantity, showEstimateLabel, onAdd, onPres
               <Pressable onPress={(event) => { event.stopPropagation(); onAdd(cartItem); }} style={{ width: 22, height: 30, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: fontSizes.size17, lineHeight: 20, fontFamily: fontFamilies.regular, color: colors.violetTone58 }}>+</Text></Pressable>
             </View>
           )}
+          {quantity === 0 && variantsCount > 0 ? <Text selectable style={{ position: 'absolute', bottom: -1, fontSize: fontSizes.size12, lineHeight: 15, fontFamily: fontFamilies.regular, color: colors.mauveTone38_2 }}>{variantsCount} {variantsCount === 1 ? 'option' : 'options'}</Text> : null}
         </View>
       </View>
     </Pressable>
@@ -241,6 +245,18 @@ export function ServiceListScreen({ cart, cartItemsById, categoryTitle, subcateg
   const displayCategoryTitle = categoryName?.trim() || categoryTitle;
   const showEstimateFooter = shouldShowEstimateFooter(displayCategoryTitle);
   const showCartFooter = !showEstimateFooter && totalCartItems > 0;
+  const hideSectionPicker = /RO\s*\/\s*Water Purifier|Geyser/i.test(subcategory.title);
+  const hideParentCategoryHero = /Electrician.*Plumber.*Carpenter/i.test(categoryTitle);
+  const alwaysShowNavButtonBorders = /AC\s*&\s*Appliance|Electrician.*Plumber.*Carpenter/i.test(categoryTitle);
+  const hideHeroImage = hideSectionPicker || hideParentCategoryHero || /Furniture Assembly/i.test(subcategory.title);
+  const hidePriceUnderline = hideParentCategoryHero
+    || /Furniture Assembly/i.test(subcategory.title)
+    || /Furniture Assembly/i.test(displayCategoryTitle)
+    || /^AC$/i.test(subcategory.title.trim())
+    || /^AC$/i.test(displayCategoryTitle.trim());
+  // Without a hero, the category title starts 25px below the navigation bar
+  // and is 32px tall. Pin it as soon as its last pixel scrolls under the bar.
+  const stickyHeaderThreshold = hideHeroImage ? 57 : HERO_HEIGHT - 72;
 
   const getCartSelection = (item: ServiceItem) => {
     const cartIds = Object.keys(cart).filter((cartId) => cart[cartId] > 0 && (cartId === item.id || cartId.startsWith(`${item.id}::`)));
@@ -314,7 +330,8 @@ export function ServiceListScreen({ cart, cartItemsById, categoryTitle, subcateg
   const ratedProducts = sections.flatMap((section) => section.products).filter((item) => item.rating > 0);
   const averageRating = ratedProducts.length ? ratedProducts.reduce((total, item) => total + item.rating, 0) / ratedProducts.length : 0;
   const showEstimateLabel = isPaintingAndWaterproofingCategory(categoryTitle);
-  const sectionColumnCount = getSectionColumnCount(categoryTitle);
+  const useFourColumnSectionGrid = /^(IKEA Furniture Assembly|Carpenter)$/i.test(displayCategoryTitle.trim());
+  const sectionColumnCount = useFourColumnSectionGrid ? 4 : getSectionColumnCount(categoryTitle);
   const sectionCardWidth = Math.floor((Math.min(width, 520) - 32 - (sectionColumnCount - 1) * 12) / sectionColumnCount);
   const sectionImageSize = Math.min(72, sectionCardWidth);
   const modalCardWidth = Math.floor((Math.min(width, 520) - 56 - (sectionColumnCount - 1) * 12) / sectionColumnCount);
@@ -329,7 +346,7 @@ export function ServiceListScreen({ cart, cartItemsById, categoryTitle, subcateg
   const share = () => void Share.share({ message: `Explore ${displayCategoryTitle} services on Urban Clap.` });
 
   if (isLoading) {
-    return <ServiceListSkeleton categoryTitle={categoryTitle} onBack={onBack} showEstimateFooter={shouldShowEstimateFooter(subcategory.title)} />;
+    return <ServiceListSkeleton categoryTitle={categoryTitle} hideHeroImage={hideHeroImage} onBack={onBack} showEstimateFooter={shouldShowEstimateFooter(subcategory.title)} />;
   }
 
   if (errorMessage) {
@@ -345,7 +362,7 @@ export function ServiceListScreen({ cart, cartItemsById, categoryTitle, subcateg
         scrollEventThrottle={16}
         onScroll={(event) => {
           const y = event.nativeEvent.contentOffset.y;
-          const shouldShow = y >= HERO_HEIGHT - 72;
+          const shouldShow = !hideSectionPicker && y >= stickyHeaderThreshold;
           if (shouldShow !== stickyHeaderVisible) setStickyHeaderVisible(shouldShow);
 
           const navBottom = y + insets.top + NAV_HEIGHT;
@@ -359,55 +376,65 @@ export function ServiceListScreen({ cart, cartItemsById, categoryTitle, subcateg
           if (firstOffset === undefined || navBottom < firstOffset) nextSection = null;
           if (nextSection?.id !== stickySection?.id) setStickySection(nextSection);
         }}
-        contentContainerStyle={{ paddingBottom: (showEstimateFooter ? 118 : showCartFooter ? 104 : 72) + insets.bottom }}
+        contentContainerStyle={{ paddingTop: hideHeroImage ? insets.top + NAV_HEIGHT : 0, paddingBottom: (showEstimateFooter ? 118 : showCartFooter ? 104 : 8) + insets.bottom }}
       >
-        <View style={{ height: HERO_HEIGHT, backgroundColor: colors.blueTone82 }}>
-          {heroItems[heroIndex]?.imageUrl ? (
-            <Animated.View key={`${heroIndex}-${heroItems[heroIndex].imageUrl}`} entering={FadeIn.duration(280)} style={{ position: 'absolute', inset: 0 }}>
-              <Image source={heroItems[heroIndex].imageUrl} contentFit="cover" contentPosition="center" transition={120} style={{ position: 'absolute', inset: 0 }} />
-            </Animated.View>
-          ) : null}
+        {!hideSectionPicker ? (
+          <>
+            {!hideHeroImage ? (
+              <View style={{ height: HERO_HEIGHT, backgroundColor: colors.blueTone82 }}>
+                {heroItems[heroIndex]?.imageUrl ? (
+                  <Animated.View key={`${heroIndex}-${heroItems[heroIndex].imageUrl}`} entering={FadeIn.duration(280)} style={{ position: 'absolute', inset: 0 }}>
+                    <Image source={heroItems[heroIndex].imageUrl} contentFit="cover" contentPosition="center" transition={120} style={{ position: 'absolute', inset: 0 }} />
+                  </Animated.View>
+                ) : null}
 
-          {heroItems.length > 1 ? <View style={{ position: 'absolute', left: 20, right: 20, bottom: 17, flexDirection: 'row', gap: 5 }}>{heroItems.map((item, index) => <View key={`${item.imageUrl}-${index}`} style={{ flex: 1, height: 3, overflow: 'hidden', borderRadius: 2, backgroundColor: colors.whiteAlpha38 }}>{index < heroIndex ? <View style={{ flex: 1, backgroundColor: colors.white }} /> : index === heroIndex ? <Animated.View style={[{ flex: 1, backgroundColor: colors.white, transformOrigin: 'left' }, activeProgressStyle]} /> : null}</View>)}</View> : null}
-        </View>
+                {heroItems.length > 1 ? <View style={{ position: 'absolute', left: 20, right: 20, bottom: 17, flexDirection: 'row', gap: 5 }}>{heroItems.map((item, index) => <View key={`${item.imageUrl}-${index}`} style={{ flex: 1, height: 3, overflow: 'hidden', borderRadius: 2, backgroundColor: colors.whiteAlpha38 }}>{index < heroIndex ? <View style={{ flex: 1, backgroundColor: colors.white }} /> : index === heroIndex ? <Animated.View style={[{ flex: 1, backgroundColor: colors.white, transformOrigin: 'left' }, activeProgressStyle]} /> : null}</View>)}</View> : null}
+              </View>
+            ) : null}
 
-        <View style={{ paddingHorizontal: 20, paddingTop: 25, paddingBottom: 22, gap: 7 }}>
-          <Text selectable style={{ fontSize: fontSizes.size24, lineHeight: 32, fontFamily: fontFamilies.semiBold, color: colors.black }}>{displayCategoryTitle}</Text>
-          <View style={{ flexDirection: 'row', alignItems: 'flex-start', flexWrap: 'wrap', gap: 4 }}>
-            {averageRating > 0 ? (
-              <>
-                <Text style={{ fontSize: fontSizes.size13, lineHeight: 18, color: colors.mauveTone9_2 }}>★</Text>
-                <DottedUnderline>
-                  <Text selectable style={{ fontSize: fontSizes.size13, lineHeight: 18, color: colors.mauveTone9_2 }}>{averageRating.toFixed(2)} ({productCount} services available)</Text>
-                </DottedUnderline>
-              </>
-            ) : (
-              <Text selectable style={{ fontSize: fontSizes.size13, lineHeight: 18, color: colors.mauveTone9_2 }}>{productCount} services available</Text>
-            )}
-          </View>
-        </View>
+            <View style={{ paddingHorizontal: 20, paddingTop: 25, paddingBottom: 22, gap: 7 }}>
+              <Text selectable style={{ fontSize: fontSizes.size24, lineHeight: 32, fontFamily: fontFamilies.semiBold, color: colors.black }}>{displayCategoryTitle}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start', flexWrap: 'wrap', gap: 4 }}>
+                {averageRating > 0 ? (
+                  <>
+                    <Text style={{ fontSize: fontSizes.size13, lineHeight: 18, color: colors.mauveTone9_2 }}>★</Text>
+                    <DottedUnderline>
+                      <Text selectable style={{ fontSize: fontSizes.size13, lineHeight: 18, color: colors.mauveTone9_2 }}>{averageRating.toFixed(2)} ({productCount} services available)</Text>
+                    </DottedUnderline>
+                  </>
+                ) : (
+                  <Text selectable style={{ fontSize: fontSizes.size13, lineHeight: 18, color: colors.mauveTone9_2 }}>{productCount} services available</Text>
+                )}
+              </View>
+            </View>
 
-        <View style={{ height: 8, backgroundColor: colors.mauveTone96 }} />
+            <View style={{ height: 8, backgroundColor: colors.violetTone98_3 }} />
+          </>
+        ) : null}
 
-        <View style={{ paddingHorizontal: 16, paddingTop: 20, paddingBottom: 25, flexDirection: 'row', flexWrap: 'wrap', columnGap: 12, rowGap: 16 }}>
-          {sections.map((section) => (
-            <Pressable key={section.id} onPress={() => scrollToSection(section)} style={({ pressed }) => ({ width: sectionCardWidth, alignItems: 'center', gap: 8, opacity: pressed ? 0.65 : 1 })}>
-              <View style={{ width: sectionImageSize, height: sectionImageSize, overflow: 'hidden', borderRadius: 8, borderCurve: 'continuous', backgroundColor: colors.neutralTone93 }}>{section.imageUrl ? <Image source={section.imageUrl} contentFit="contain" style={{ width: sectionImageSize, height: sectionImageSize }} /> : null}</View>
-              <Text selectable numberOfLines={3} style={{ minHeight: 37, textAlign: 'center', fontSize: fontSizes.size13, lineHeight: 18, color: colors.black }}>{section.title}</Text>
-            </Pressable>
-          ))}
-        </View>
+        {!hideSectionPicker ? (
+          <>
+            <View style={{ paddingHorizontal: 16, paddingTop: 20, paddingBottom: 25, flexDirection: 'row', flexWrap: 'wrap', columnGap: 12, rowGap: 16 }}>
+              {sections.map((section) => (
+                <Pressable key={section.id} onPress={() => scrollToSection(section)} style={({ pressed }) => ({ width: sectionCardWidth, alignItems: 'center', gap: 8, opacity: pressed ? 0.65 : 1 })}>
+                  <View style={{ width: sectionImageSize, height: sectionImageSize, overflow: 'hidden', borderRadius: 8, borderCurve: 'continuous', backgroundColor: colors.violetTone98_3 }}>{section.imageUrl ? <Image source={section.imageUrl} contentFit="contain" style={{ width: sectionImageSize, height: sectionImageSize }} /> : null}</View>
+                  <Text selectable numberOfLines={3} style={{ minHeight: 37, textAlign: 'center', fontSize: fontSizes.size13, lineHeight: 18, color: colors.black }}>{section.title}</Text>
+                </Pressable>
+              ))}
+            </View>
 
-        <View style={{ height: 8, backgroundColor: colors.mauveTone96 }} />
+            <View style={{ height: 8, backgroundColor: colors.violetTone98_3 }} />
+          </>
+        ) : null}
 
         {visibleSections.map((section, sectionIndex) => (
           <View key={section.id} onLayout={(event) => { sectionOffsets.current[section.id] = event.nativeEvent.layout.y; }} style={{ paddingHorizontal: 20 }}>
             <Text selectable style={{ paddingTop: 30, paddingBottom: 4, fontSize: fontSizes.size23, lineHeight: 30, fontFamily: fontFamilies.semiBold, color: colors.black }}>{section.title}</Text>
             {section.products.length > 0 ? section.products.map((item, index) => {
               const { cartItem, quantity } = getCartSelection(item);
-              return <View key={item.id} onLayout={(event) => { productOffsets.current[item.id] = event.nativeEvent.layout.y + (sectionOffsets.current[section.id] ?? 0); }}><ProductRow cartItem={cartItem} item={item} quantity={quantity} showEstimateLabel={showEstimateLabel} onAdd={onAdd} onPress={onProductPress} onRemove={onRemove} />{index < section.products.length - 1 ? <View style={{ height: 1, backgroundColor: colors.mauveTone89_4 }} /> : null}</View>;
+              return <View key={item.id} onLayout={(event) => { productOffsets.current[item.id] = event.nativeEvent.layout.y + (sectionOffsets.current[section.id] ?? 0); }}><ProductRow cartItem={cartItem} hidePriceUnderline={hidePriceUnderline} item={item} quantity={quantity} showEstimateLabel={showEstimateLabel} onAdd={onAdd} onPress={onProductPress} onRemove={onRemove} />{index < section.products.length - 1 ? <View style={{ height: 1, backgroundColor: colors.violetTone98_3 }} /> : null}</View>;
             }) : <Text selectable style={{ paddingVertical: 24, fontSize: fontSizes.size14, color: colors.violetTone47 }}>Products coming soon</Text>}
-            {sectionIndex < visibleSections.length - 1 ? <View style={{ height: 8, marginHorizontal: -20, backgroundColor: colors.mauveTone96 }} /> : null}
+            {sectionIndex < visibleSections.length - 1 ? <View style={{ height: 8, marginHorizontal: -20, backgroundColor: colors.violetTone98_3 }} /> : null}
           </View>
         ))}
       </ScrollView>
@@ -421,23 +448,23 @@ export function ServiceListScreen({ cart, cartItemsById, categoryTitle, subcateg
           top: 0,
           height: insets.top + NAV_HEIGHT + (stickySection ? SECTION_HEADER_HEIGHT : 0),
           paddingTop: insets.top,
-          backgroundColor: stickyHeaderVisible || stickySection ? colors.white : colors.transparent,
+          backgroundColor: hideHeroImage || stickyHeaderVisible || stickySection ? colors.white : colors.transparent,
           boxShadow: stickyHeaderVisible || stickySection ? `0 3px 12px ${colors.violetTone10Alpha7}` : undefined,
         }}
       >
-          <View style={{ height: NAV_HEIGHT, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', gap: 10, borderBottomWidth: stickyHeaderVisible || stickySection ? 1 : 0, borderBottomColor: colors.mauveTone90_3 }}>
+          <View style={{ height: NAV_HEIGHT, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', gap: 10, borderBottomWidth: stickyHeaderVisible || stickySection ? 1 : 0, borderBottomColor: colors.violetTone98_3 }}>
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Go back"
               hitSlop={8}
               onPress={onBack}
-              style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, borderCurve: 'continuous', backgroundColor: colors.white, opacity: pressed ? 0.58 : 1 })}
+              style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, borderCurve: 'continuous', borderWidth: alwaysShowNavButtonBorders ? 1 : 0, borderColor: colors.mauveTone89_4, backgroundColor: colors.white, opacity: pressed ? 0.58 : 1 })}
             >
               <BackIcon />
             </Pressable>
 
             {stickyHeaderVisible ? (
-              <Text selectable numberOfLines={1} ellipsizeMode="tail" style={{ flex: 1, fontSize: fontSizes.size16, lineHeight: 22, fontFamily: fontFamilies.semiBold, color: colors.black }}>
+              <Text selectable numberOfLines={1} ellipsizeMode="tail" style={{ flex: 1, fontSize: fontSizes.size16, lineHeight: 22, fontFamily: fontFamilies.bold, color: colors.black }}>
                 {displayCategoryTitle}
               </Text>
             ) : <View style={{ flex: 1 }} />}
@@ -447,7 +474,7 @@ export function ServiceListScreen({ cart, cartItemsById, categoryTitle, subcateg
               accessibilityLabel="Search services"
               hitSlop={8}
               onPress={onSearchPress}
-              style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, borderWidth: stickyHeaderVisible ? 1 : 0, borderColor: colors.mauveTone89_4, backgroundColor: colors.white, opacity: pressed ? 0.62 : 1 })}
+              style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, borderWidth: alwaysShowNavButtonBorders || stickyHeaderVisible ? 1 : 0, borderColor: colors.mauveTone89_4, backgroundColor: colors.white, opacity: pressed ? 0.62 : 1 })}
             >
               <SearchIcon />
             </Pressable>
@@ -457,14 +484,14 @@ export function ServiceListScreen({ cart, cartItemsById, categoryTitle, subcateg
               accessibilityLabel={`Share ${displayCategoryTitle}`}
               hitSlop={8}
               onPress={share}
-              style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, borderWidth: stickyHeaderVisible ? 1 : 0, borderColor: colors.mauveTone89_4, backgroundColor: colors.white, opacity: pressed ? 0.62 : 1 })}
+              style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, borderWidth: alwaysShowNavButtonBorders || stickyHeaderVisible ? 1 : 0, borderColor: colors.mauveTone89_4, backgroundColor: colors.white, opacity: pressed ? 0.62 : 1 })}
             >
               <ShareIcon />
             </Pressable>
           </View>
           {stickySection ? (
-            <View style={{ height: SECTION_HEADER_HEIGHT, paddingHorizontal: 20, justifyContent: 'center', backgroundColor: colors.white, borderBottomWidth: 1, borderBottomColor: colors.mauveTone90_3 }}>
-              <Text selectable numberOfLines={1} ellipsizeMode="tail" style={{ fontSize: fontSizes.size12, lineHeight: 18, fontFamily: fontFamilies.bold, color: colors.black }}>
+            <View style={{ height: SECTION_HEADER_HEIGHT, paddingHorizontal: 20, justifyContent: 'center', backgroundColor: colors.white, borderBottomWidth: 1, borderBottomColor: colors.violetTone98_3 }}>
+              <Text selectable numberOfLines={1} ellipsizeMode="tail" style={{ fontSize: fontSizes.size13, lineHeight: 19, fontFamily: fontFamilies.bold, color: colors.black }}>
                 {stickySection.title}
               </Text>
             </View>
@@ -508,7 +535,7 @@ export function ServiceListScreen({ cart, cartItemsById, categoryTitle, subcateg
           paddingBottom: Math.max(insets.bottom, 10),
           backgroundColor: colors.white,
           borderTopWidth: 1,
-          borderTopColor: colors.mauveTone93_2,
+          borderTopColor: colors.violetTone98_3,
           boxShadow: `0 -4px 16px ${colors.violetTone10Alpha6}`,
         }}
       >
@@ -529,7 +556,7 @@ export function ServiceListScreen({ cart, cartItemsById, categoryTitle, subcateg
         </View>
       </View> : showCartFooter ? (
         <View
-          style={{ position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 30, paddingHorizontal: 16, paddingTop: 10, paddingBottom: Math.max(insets.bottom, 10), flexDirection: 'row', alignItems: 'center', gap: 16, backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.violetTone93_2, boxShadow: `0 -3px 10px ${colors.mauveTone9Alpha6}` }}
+          style={{ position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 30, paddingHorizontal: 16, paddingTop: 10, paddingBottom: Math.max(insets.bottom, 10), flexDirection: 'row', alignItems: 'center', gap: 16, backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.violetTone98_3, boxShadow: `0 -3px 10px ${colors.mauveTone9Alpha6}` }}
         >
           <View style={{ flex: 1, gap: 3 }}>
             <Text selectable style={{ fontSize: fontSizes.size14, lineHeight: 20, fontFamily: fontFamilies.semiBold, color: colors.black, fontVariant: ['tabular-nums'] }}>
@@ -558,7 +585,7 @@ export function ServiceListScreen({ cart, cartItemsById, categoryTitle, subcateg
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', columnGap: 12, rowGap: 22 }}>
                 {sections.map((section) => (
                   <Pressable key={section.id} onPress={() => scrollToSection(section)} style={({ pressed }) => ({ width: modalCardWidth, alignItems: 'center', gap: 8, opacity: pressed ? 0.62 : 1 })}>
-                    <View style={{ width: modalImageSize, height: modalImageSize, overflow: 'hidden', borderRadius: 8, borderCurve: 'continuous', backgroundColor: colors.neutralTone93 }}>{section.imageUrl ? <Image source={section.imageUrl} contentFit="contain" style={{ width: modalImageSize, height: modalImageSize }} /> : null}</View>
+                    <View style={{ width: modalImageSize, height: modalImageSize, overflow: 'hidden', borderRadius: 8, borderCurve: 'continuous', backgroundColor: colors.violetTone98_3 }}>{section.imageUrl ? <Image source={section.imageUrl} contentFit="contain" style={{ width: modalImageSize, height: modalImageSize }} /> : null}</View>
                     <Text selectable numberOfLines={2} style={{ width: '100%', minHeight: 36, textAlign: 'center', fontSize: fontSizes.size13, lineHeight: 18, color: colors.black }}>{section.title}</Text>
                   </Pressable>
                 ))}

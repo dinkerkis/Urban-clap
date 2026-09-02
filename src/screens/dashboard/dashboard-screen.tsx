@@ -26,7 +26,7 @@ import { ManageAddressesScreen } from '../manage-addresses';
 import { NativeCategoryDetailsScreen, NativeScreen } from '../native';
 import type { NativeCartSelection } from '../native/native-product-detail-modal';
 import type { NativeProductCategory } from '../../services/native-products-api';
-import type { HomeSpotlight } from '../../services/home-spotlights-api';
+import type { HomeSpotlight, SpotlightCategoryDetail } from '../../services/home-spotlights-api';
 import { PaymentMethodsScreen } from '../payment-methods';
 import { ProfileDetailsScreen, ProfileEntryScreen, type CompletedProfile } from '../profile';
 import { ProductDetailScreen } from '../product-detail';
@@ -34,6 +34,7 @@ import { AccountArticleScreen, AccountHelpScreen, ChangePhoneHelpScreen, Getting
 import { RewardsScreen } from '../rewards';
 import { ServiceListScreen } from '../service-list';
 import { ServiceSearchScreen } from '../service-search';
+import { SpotlightCategorySelectionScreen } from '../spotlight-category-selection';
 import { PrivacyCenterScreen, SettingsScreen } from '../settings';
 import { WalletScreen } from '../wallet';
 
@@ -50,7 +51,26 @@ type CategoryStackParams = {
   ServiceSearch: { category: ServiceCategory; subcategory: ServiceSubcategory };
   ProductDetail: { category: ServiceCategory; subcategory: ServiceSubcategory; item: ServiceItem };
   CheckoutCart: { category: ServiceCategory; consultationMode?: boolean; subcategory: ServiceSubcategory };
+  SpotlightCategories: { categories: SpotlightCategoryDetail[] };
 };
+
+function findSubcategoryById(subcategories: ServiceSubcategory[], categoryId: string): ServiceSubcategory | undefined {
+  for (const subcategory of subcategories) {
+    if (subcategory.id === categoryId) return subcategory;
+    const nestedMatch = findSubcategoryById(subcategory.children ?? [], categoryId);
+    if (nestedMatch) return nestedMatch;
+  }
+  return undefined;
+}
+
+function findCategoryDestination(categories: ServiceCategory[], categoryId: string) {
+  for (const category of categories) {
+    if (category.id === categoryId) return { category, subcategory: undefined };
+    const subcategory = findSubcategoryById(category.subcategories, categoryId);
+    if (subcategory) return { category, subcategory };
+  }
+  return undefined;
+}
 
 type HelpOrigin = 'my-bookings' | 'profile' | 'wallet';
 
@@ -145,7 +165,7 @@ function CartSummaryBar({ categoryCount, itemCount, onClose, onView }: { categor
 
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
         <Pressable accessibilityRole="button" onPress={onView} style={({ pressed }) => ({ minWidth: 64, height: 40, paddingHorizontal: 14, alignItems: 'center', justifyContent: 'center', borderRadius: 9, borderCurve: 'continuous', backgroundColor: pressed ? colors.violetTone51 : colors.violetTone58 })}>
-          <Text style={{ fontSize: fontSizes.size14, lineHeight: 20, fontFamily: fontFamilies.bold, color: colors.white }}>View</Text>
+          <Text style={{ fontSize: fontSizes.size14, lineHeight: 20, fontFamily: fontFamilies.semiBold, color: colors.white }}>View</Text>
         </Pressable>
 
         <Pressable accessibilityLabel="Dismiss cart summary" accessibilityRole="button" hitSlop={10} onPress={onClose} style={({ pressed }) => ({ width: 22, height: 40, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.5 : 1 })}>
@@ -277,42 +297,45 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
       return;
     }
 
-    const category = categories.find((item) => item.id === spotlight.redirectId)
-      ?? categories.find((item) => item.subcategories.some((subcategory) => subcategory.id === spotlight.redirectId));
-    if (!category) {
+    if (spotlight.categoryDetails?.length) {
+      if (categoryNavigationRef.isReady()) {
+        categoryNavigationRef.dispatch(StackActions.push('SpotlightCategories', { categories: spotlight.categoryDetails }));
+      }
+      return;
+    }
+
+    if (!spotlight.redirectId) return;
+
+    const destination = findCategoryDestination(categories, spotlight.redirectId);
+    if (!destination) {
       changeTab('categories');
       return;
     }
 
-    const subcategory = category.subcategories.find((item) => item.id === spotlight.redirectId);
-    if (subcategory && !isFullPageCategory(category)) {
+    if (destination.subcategory && !isFullPageCategory(destination.category)) {
       if (categoryNavigationRef.isReady()) {
-        categoryNavigationRef.navigate('ServiceList', { category, subcategory });
+        categoryNavigationRef.navigate('ServiceList', { category: destination.category, subcategory: destination.subcategory });
       }
       return;
     }
-    openCategory(category);
+    openCategory(destination.category);
   };
 
   const openCartCategory = (categoryId: string) => {
-    const category = categories.find((item) => item.id === categoryId);
-    const categoryWithSubcategory = categories.find((item) =>
-      item.subcategories.some((subcategory) => subcategory.id === categoryId),
-    );
-    const subcategory = categoryWithSubcategory?.subcategories.find((item) => item.id === categoryId);
+    const destination = findCategoryDestination(categories, categoryId);
 
     if (!categoryNavigationRef.isReady()) return;
 
-    if (categoryWithSubcategory && subcategory) {
+    if (destination?.subcategory) {
       categoryNavigationRef.dispatch(StackActions.push('ServiceList', {
-        category: categoryWithSubcategory,
-        subcategory,
+        category: destination.category,
+        subcategory: destination.subcategory,
       }));
       return;
     }
 
-    if (category) {
-      categoryNavigationRef.dispatch(StackActions.push('CategoryDetail', { category }));
+    if (destination) {
+      categoryNavigationRef.dispatch(StackActions.push('CategoryDetail', { category: destination.category }));
       return;
     }
 
@@ -830,6 +853,23 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
               onSubcategoryPress={(subcategory) =>
                 navigation.push('ServiceList', { category: route.params.category, subcategory })
               }
+            />
+          )}
+        </CategoryStack.Screen>
+        <CategoryStack.Screen name="SpotlightCategories">
+          {({ navigation, route }) => (
+            <SpotlightCategorySelectionScreen
+              categories={route.params.categories}
+              onBack={navigation.goBack}
+              onCategoryPress={(spotlightCategory) => {
+                const destination = findCategoryDestination(categories, spotlightCategory.id);
+                if (!destination) return;
+                if (destination.subcategory) {
+                  navigation.push('ServiceList', { category: destination.category, subcategory: destination.subcategory });
+                  return;
+                }
+                navigation.push('CategoryDetail', { category: destination.category });
+              }}
             />
           )}
         </CategoryStack.Screen>

@@ -26,6 +26,9 @@ export async function fetchCategories(signal?: AbortSignal): Promise<ApiCategory
     signal,
     defaultErrorMessage: 'Unable to load categories. Please try again.',
   });
+  if (__DEV__) {
+    console.log(`[Category List API] Data\n${JSON.stringify(payload.data, null, 2)}`);
+  }
   if (!payload.success || !Array.isArray(payload.data)) {
     throw new ApiClientError(payload.message || 'The categories response is invalid. Please try again.', 200, 'INVALID_RESPONSE');
   }

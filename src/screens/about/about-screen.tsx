@@ -10,7 +10,7 @@ type AboutScreenProps = {
 };
 
 function ChevronRight() {
-  return <View style={{ width: 8, height: 8, borderTopWidth: 1.4, borderRightWidth: 1.4, borderColor: colors.mauveTone15_4, transform: [{ rotate: '45deg' }] }} />;
+  return <View style={{ width: 8, height: 8, borderTopWidth: 1.4, borderRightWidth: 1.4, borderColor: colors.violetTone98_3, transform: [{ rotate: '45deg' }] }} />;
 }
 
 function TermsIcon() {
@@ -55,7 +55,7 @@ export function AboutScreen({ onBack }: AboutScreenProps) {
           Urban Company (Formerly UrbanClap) was launched in Nov 2014. It is the largest home services platform in Asia, with presence in India, UAE and Singapore. The platform helps customers book reliable home services like beauty services, massage therapy, cleaning, plumbing, carpentry, appliance repair, painting etc. The company&apos;s vision is to empower millions of service professionals across the world to deliver services at home like never seen before. The company partners with tens of thousands of service professionals, helping them with training, credit, product procurement, insurance, technology etc.
         </Text>
 
-        <View style={{ height: 8, marginHorizontal: -20, marginTop: 28, backgroundColor: colors.violetTone96_6 }} />
+        <View style={{ height: 8, marginHorizontal: -20, marginTop: 28, backgroundColor: colors.violetTone98_3 }} />
 
         <Pressable
           accessibilityRole="button"

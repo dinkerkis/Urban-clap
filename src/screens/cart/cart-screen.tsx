@@ -169,7 +169,7 @@ export function CartScreen({
           gap: 9,
           backgroundColor: colors.white,
           borderBottomWidth: 1,
-          borderBottomColor: colors.neutralTone91,
+          borderBottomColor: colors.violetTone98_3,
         }}
       >
         {onBack ? (
@@ -220,7 +220,7 @@ export function CartScreen({
           <>
             <View style={{ backgroundColor: colors.white }}>
               {groupedCartItems.map((group, groupIndex) => (
-                <View key={group.id} style={{ paddingHorizontal: 20, paddingTop: groupIndex === 0 ? 30 : 24, paddingBottom: 22, gap: 16, borderTopWidth: groupIndex === 0 ? 0 : 8, borderTopColor: colors.neutralTone96 }}>
+                <View key={group.id} style={{ paddingHorizontal: 20, paddingTop: groupIndex === 0 ? 30 : 24, paddingBottom: 22, gap: 16, borderTopWidth: groupIndex === 0 ? 0 : 8, borderTopColor: colors.violetTone98_3 }}>
                   <Text selectable style={{ fontSize: fontSizes.size18, lineHeight: 25, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9 }}>
                     {group.name}
                   </Text>
@@ -230,7 +230,7 @@ export function CartScreen({
                 if (consultationMode) {
                   return (
                     <View key={item.id}>
-                      {index > 0 ? <View style={{ height: 1, marginBottom: 14, backgroundColor: colors.mauveTone92_2 }} /> : null}
+                      {index > 0 ? <View style={{ height: 1, marginBottom: 14, backgroundColor: colors.violetTone98_3 }} /> : null}
                       <View style={{ minHeight: 48, flexDirection: 'row', alignItems: 'center' }}>
                         <Text selectable style={{ flex: 1, fontSize: fontSizes.size14, lineHeight: 20, color: colors.mauveTone30 }}>At home consultation</Text>
                         <View style={{ width: 94, height: 36, marginHorizontal: 14, paddingHorizontal: 6, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderRadius: 9, borderWidth: 1, borderColor: colors.violetTone86, backgroundColor: colors.violetTone98 }}>
@@ -364,10 +364,10 @@ export function CartScreen({
                     );
                   })}
                 </View>
-                <View style={{ height: 1, marginTop: 14, backgroundColor: colors.mauveTone89_3 }} />
+                <View style={{ height: 1, marginTop: 14, backgroundColor: colors.violetTone98_3 }} />
                 <BillRow bold label="Total bill" value={displayedTotalPrice} />
                 <Text selectable style={{ marginTop: -14, paddingBottom: 12, fontSize: fontSizes.size12, lineHeight: 17, color: colors.violetTone44 }}>Incl. govt. taxes &amp; charges</Text>
-                <View style={{ height: 1, backgroundColor: colors.mauveTone89_3 }} />
+                <View style={{ height: 1, backgroundColor: colors.violetTone98_3 }} />
                 <BillRow bold label="Amount to pay" value={displayedTotalPrice} />
               </View>
             ) : (
@@ -413,7 +413,7 @@ export function CartScreen({
             paddingBottom: showBottomTab ? 9 : Math.max(insets.bottom, 10),
             backgroundColor: '#FFFFFF',
             borderTopWidth: 1,
-            borderTopColor: colors.violetTone93_2,
+            borderTopColor: colors.violetTone98_3,
             boxShadow: `0 -3px 10px ${colors.mauveTone9Alpha6}`,
           }}
         >
@@ -458,9 +458,9 @@ export function CartScreen({
             <Text selectable style={{ fontSize: fontSizes.size24, lineHeight: 31, fontFamily: fontFamilies.bold, color: colors.mauveTone9 }}>Bill summary</Text>
             <BillRow label="Item total" value={displayedItemsSubtotal} />
             {displayedTaxesAndCharges > 0 ? <BillRow label="Taxes & charges" value={displayedTaxesAndCharges} /> : null}
-            <View style={{ height: 1, backgroundColor: colors.mauveTone89_3 }} />
+            <View style={{ height: 1, backgroundColor: colors.violetTone98_3 }} />
             <BillRow bold label="Total bill" value={displayedTotalPrice} />
-            <View style={{ height: 1, backgroundColor: colors.mauveTone89_3 }} />
+            <View style={{ height: 1, backgroundColor: colors.violetTone98_3 }} />
             <BillRow bold label="Amount to pay" value={displayedTotalPrice} />
             <Pressable onPress={() => setShowBillSummary(false)} style={({ pressed }) => ({ height: 48, marginTop: 10, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: pressed ? colors.violetTone51 : colors.violetTone58 })}>
               <Text style={{ fontSize: fontSizes.size15, fontFamily: fontFamilies.semiBold, color: colors.white }}>Okay, got it</Text>
@@ -542,7 +542,7 @@ function formatCheckoutSlot(dateValue: string, time: string): string {
 
 function CheckoutDetailRow({ icon, label, onPress }: { icon: ReactNode; label: string; onPress: () => void }) {
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => ({ minHeight: 48, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: colors.mauveTone94, opacity: pressed ? 0.65 : 1 })}>
+    <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => ({ minHeight: 48, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: colors.violetTone98_3, opacity: pressed ? 0.65 : 1 })}>
       <View style={{ width: 30, alignItems: 'flex-start', justifyContent: 'center' }}>{typeof icon === 'string' ? <Text style={{ fontSize: fontSizes.size20, color: colors.mauveTone14 }}>{icon}</Text> : icon}</View>
       <Text numberOfLines={1} style={{ flex: 1, fontSize: fontSizes.size13, color: colors.mauveTone24 }}>{label}</Text>
       <View style={{ width: 32, alignItems: 'flex-end' }}>
@@ -612,7 +612,7 @@ function SavedAddressSheet({ addresses, isProceeding, selectedAddressId, onAddAn
       <CloseButton accessibilityLabel="Close saved addresses" color={colors.mauveTone9} floating onPress={onClose} />
       <View style={{ maxHeight: '68%', paddingTop: 22, paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 12) + 10, borderTopLeftRadius: 18, borderTopRightRadius: 18, backgroundColor: colors.white }}>
         <Text style={{ fontSize: fontSizes.size20, lineHeight: 27, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9 }}>Saved address</Text>
-        <Pressable onPress={onAddAnother} style={{ height: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: colors.mauveTone94 }}>
+        <Pressable onPress={onAddAnother} style={{ height: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: colors.violetTone98_3 }}>
           <Text style={{ width: 28, fontSize: fontSizes.size22, fontFamily: fontFamilies.light, color: colors.violetTone58 }}>+</Text>
           <Text style={{ fontSize: fontSizes.size15, fontFamily: fontFamilies.bold, color: colors.violetTone58 }}>Add another address</Text>
         </Pressable>
@@ -620,7 +620,7 @@ function SavedAddressSheet({ addresses, isProceeding, selectedAddressId, onAddAn
           {addresses.map((address) => {
             const selected = selectedAddressId === address._id;
             return (
-              <Pressable key={address._id} onPress={() => onSelect(address._id)} style={{ minHeight: 112, paddingVertical: 18, flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: colors.mauveTone94 }}>
+              <Pressable key={address._id} onPress={() => onSelect(address._id)} style={{ minHeight: 112, paddingVertical: 18, flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: colors.violetTone98_3 }}>
                 <View style={{ width: 18, height: 18, marginTop: 2, marginRight: 14, alignItems: 'center', justifyContent: 'center', borderRadius: 9, borderWidth: 1.25, borderColor: selected ? colors.violetTone58 : colors.mauveTone47 }}>
                   {selected ? <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: colors.violetTone58 }} /> : null}
                 </View>

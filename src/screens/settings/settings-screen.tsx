@@ -46,7 +46,7 @@ function ScreenHeader({ onBack, title }: { onBack: () => void; title: string }) 
 }
 
 function ChevronRight() {
-  return <View style={{ width: 8, height: 8, borderTopWidth: 1.4, borderRightWidth: 1.4, borderColor: colors.mauveTone15_4, transform: [{ rotate: '45deg' }] }} />;
+  return <View style={{ width: 8, height: 8, borderTopWidth: 1.4, borderRightWidth: 1.4, borderColor: colors.violetTone98_3, transform: [{ rotate: '45deg' }] }} />;
 }
 
 function DownloadDataModal({ initialEmail, visible, onClose }: { initialEmail?: string; visible: boolean; onClose: () => void }) {
@@ -113,7 +113,7 @@ export function SettingsScreen({ email, onBack, onDeleteAccount }: SettingsScree
         <View style={{ paddingHorizontal: 20, paddingTop: 26 }}>
           <Text style={{ paddingBottom: 10, fontSize: fontSizes.size21, lineHeight: 27, fontFamily: fontFamilies.bold, color: colors.mauveTone11 }}>Notifications & reminders</Text>
           {NOTIFICATIONS.map((item) => (
-            <View key={item.key} style={{ minHeight: 54, flexDirection: 'row', alignItems: 'center', borderBottomWidth: item.key === 'calls' ? 0 : 1, borderBottomColor: colors.mauveTone94 }}>
+            <View key={item.key} style={{ minHeight: 54, flexDirection: 'row', alignItems: 'center', borderBottomWidth: item.key === 'calls' ? 0 : 1, borderBottomColor: colors.violetTone98_3 }}>
               <View style={{ width: 34, alignItems: 'flex-start', justifyContent: 'center' }}>
                 <Image source={item.imageSource} contentFit="contain" style={{ width: item.key === 'sms' ? 20 : 18, height: item.key === 'sms' ? 20 : 18 }} />
               </View>
@@ -138,7 +138,7 @@ export function SettingsScreen({ email, onBack, onDeleteAccount }: SettingsScree
           <Text style={{ paddingTop: 5, fontSize: fontSizes.size13, lineHeight: 21, color: colors.neutralTone45 }}>Order related messages can’t be turned off as they are important for service experience</Text>
         </View>
 
-        <View style={{ height: 8, marginTop: 24, backgroundColor: colors.violetTone96_6 }} />
+        <View style={{ height: 8, marginTop: 24, backgroundColor: colors.violetTone98_3 }} />
 
         <View style={{ paddingHorizontal: 20, paddingTop: 26 }}>
           <Text style={{ paddingBottom: 8, fontSize: fontSizes.size21, lineHeight: 27, fontFamily: fontFamilies.bold, color: colors.mauveTone11 }}>Privacy & data</Text>

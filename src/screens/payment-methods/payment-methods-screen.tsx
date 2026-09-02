@@ -14,7 +14,7 @@ type PaymentMethodsScreenProps = {
 };
 
 function ChevronRight() {
-  return <View style={{ width: 8, height: 8, borderTopWidth: 1.4, borderRightWidth: 1.4, borderColor: colors.mauveTone15_4, transform: [{ rotate: '45deg' }] }} />;
+  return <View style={{ width: 8, height: 8, borderTopWidth: 1.4, borderRightWidth: 1.4, borderColor: colors.violetTone98_3, transform: [{ rotate: '45deg' }] }} />;
 }
 
 function CardIcon({ size = 22 }: { size?: number }) {
@@ -138,7 +138,7 @@ export function PaymentMethodsScreen({ onBack }: PaymentMethodsScreenProps) {
           <Text style={{ marginLeft: 5, fontSize: fontSizes.size16, lineHeight: 22, fontFamily: fontFamilies.bold, color: colors.mauveTone12_2 }}>Manage payment methods</Text>
         </View>
       </View>
-      <View style={{ height: 1, backgroundColor: colors.mauveTone94 }} />
+      <View style={{ height: 1, backgroundColor: colors.violetTone98_3 }} />
 
       <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: Math.max(insets.bottom, 20) + 28 }}>
         <Text style={{ paddingHorizontal: 20, paddingTop: 18, fontSize: fontSizes.size13, lineHeight: 20, color: colors.neutralTone45 }}>We will debit ₹1 to verify a new payment method. This will be refunded after verification.</Text>

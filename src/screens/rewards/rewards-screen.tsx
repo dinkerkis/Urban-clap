@@ -29,7 +29,7 @@ export function RewardsScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.white }}>
-      <View style={{ paddingTop: Math.max(insets.top, 18) + 8, paddingBottom: 14, alignItems: 'center', borderBottomWidth: 1, borderBottomColor: colors.mauveTone94_2, backgroundColor: colors.white }}>
+      <View style={{ paddingTop: Math.max(insets.top, 18) + 8, paddingBottom: 14, alignItems: 'center', borderBottomWidth: 1, borderBottomColor: colors.violetTone98_3, backgroundColor: colors.white }}>
         <Text selectable style={{ fontSize: fontSizes.size18, lineHeight: 24, fontFamily: fontFamilies.semiBold, color: colors.mauveTone12_4 }}>Refer and Earn</Text>
       </View>
 
@@ -46,9 +46,9 @@ export function RewardsScreen() {
           </View>
 
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-            <View style={{ flex: 1, height: 1, backgroundColor: colors.blueTone88 }} />
+            <View style={{ flex: 1, height: 1, backgroundColor: colors.violetTone98_3 }} />
             <Text style={{ textAlign: 'center', fontSize: fontSizes.size14, color: colors.violetTone31 }}>Refer via</Text>
-            <View style={{ flex: 1, height: 1, backgroundColor: colors.blueTone88 }} />
+            <View style={{ flex: 1, height: 1, backgroundColor: colors.violetTone98_3 }} />
           </View>
           <View style={{ flexDirection: 'row', gap: 14 }}>
             <ShareAction imageSource={require('../../../assets/whatsapp.png')} label="Whatsapp" onPress={shareReferral} />
@@ -58,7 +58,7 @@ export function RewardsScreen() {
         </View>
 
         <View style={{ height: 40, backgroundColor: colors.white }} />
-        <View style={{ height: 12, backgroundColor: colors.neutralTone95, borderTopWidth: 1, borderBottomWidth: 1, borderColor: colors.neutralTone91 }} />
+        <View style={{ height: 12, backgroundColor: colors.violetTone98_3, borderTopWidth: 1, borderBottomWidth: 1, borderColor: colors.violetTone98_3 }} />
 
         <View style={{ marginHorizontal: 20, marginTop: 16, padding: 22, gap: 21, borderRadius: 10, borderCurve: 'continuous', backgroundColor: colors.blueTone97_3 }}>
           <Text selectable style={{ fontSize: fontSizes.size20, lineHeight: 27, fontFamily: fontFamilies.bold, color: colors.mauveTone12 }}>How it works?</Text>
@@ -84,7 +84,7 @@ export function RewardsScreen() {
           </Pressable>
         </View>
 
-        <View style={{ height: 12, backgroundColor: colors.neutralTone95, borderTopWidth: 1, borderBottomWidth: 1, borderColor: colors.neutralTone91 }} />
+        <View style={{ height: 12, backgroundColor: colors.violetTone98_3, borderTopWidth: 1, borderBottomWidth: 1, borderColor: colors.violetTone98_3 }} />
 
         <View style={{ paddingHorizontal: 20, paddingTop: 26, gap: 8 }}>
           <Text selectable style={{ fontSize: fontSizes.size18, lineHeight: 24, fontFamily: fontFamilies.bold, color: colors.violetTone12_2 }}>You are yet to earn any scratch cards</Text>

@@ -39,11 +39,11 @@ export function ServiceCard({ item, quantity = 0, onAdd, onPress, onRemove }: Se
           height: 112,
           flexShrink: 0,
           overflow: 'hidden',
-          borderRadius: 18,
+          borderRadius: 9,
           borderCurve: 'continuous',
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: item.tint,
+          backgroundColor: colors.violetTone98_3,
         }}
       >
         {item.imageUrl ? (
@@ -54,7 +54,7 @@ export function ServiceCard({ item, quantity = 0, onAdd, onPress, onRemove }: Se
             onError={(event) => {
               if (__DEV__) console.log('[Product Image] Failed', item.imageUrl, event.error);
             }}
-            style={{ position: 'absolute', inset: 0, borderRadius: 18 }}
+            style={{ position: 'absolute', inset: 0, borderRadius: 9 }}
           />
         ) : <Text style={{ fontSize: fontSizes.size10, color: colors.violetTone54_2 }}>No image</Text>}
       </View>

@@ -215,7 +215,7 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
         </View>
       </View>
 
-      <View style={{ height: 8, marginTop: 22, backgroundColor: colors.violetTone96_6 }} />
+      <View style={{ height: 8, marginTop: 22, backgroundColor: colors.violetTone98_3 }} />
 
       <View style={{ paddingHorizontal: 16, paddingVertical: 6 }}>
         {menuItems.map((item) => (

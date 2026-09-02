@@ -21,7 +21,7 @@ type ProductsState = {
 const productsCache = new Map<string, ProductSection[]>();
 
 function formatDuration(minutes?: number): string {
-  if (!minutes || minutes <= 0) return 'Duration on request';
+  if (!minutes || minutes <= 0) return '';
   const totalMinutes = Math.round(minutes);
   if (totalMinutes < 60) return `${totalMinutes} mins`;
   const hours = Math.floor(totalMinutes / 60);
@@ -53,7 +53,7 @@ export function useCategoryProducts(categoryId: string) {
           products: (section.products ?? []).map((product, productIndex) => ({
             id: product._id,
             title: product.name,
-            description: product.shortDescription || product.description || 'Professional service at your doorstep',
+            description: product.shortDescription || product.description || '',
             fullDescription: product.description,
             price: product.basePrice,
             originalPrice: product.basePrice,

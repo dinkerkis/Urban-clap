@@ -78,7 +78,7 @@ export function ServiceSearchScreen({ categoryTitle, onBack, onResultPress, subc
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.white }}>
-      <View style={{ paddingTop: insets.top + 16, paddingHorizontal: 16, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: colors.mauveTone90_3, backgroundColor: colors.white }}>
+      <View style={{ paddingTop: insets.top + 16, paddingHorizontal: 16, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: colors.violetTone98_3, backgroundColor: colors.white }}>
         <View style={{ height: 46, paddingHorizontal: 10, flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, borderColor: colors.violetTone65, borderRadius: 8, backgroundColor: colors.white }}>
           <Pressable accessibilityRole="button" accessibilityLabel="Go back" hitSlop={10} onPress={onBack} style={({ pressed }) => ({ width: 32, height: 40, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.55 : 1 })}>
             <BackIcon />
@@ -116,7 +116,7 @@ export function ServiceSearchScreen({ categoryTitle, onBack, onResultPress, subc
           keyExtractor={({ item }) => item.id}
           contentContainerStyle={{ paddingTop: queryTokens.length ? 8 : 0, paddingBottom: Math.max(insets.bottom, 20) + 24, flexGrow: results.length ? 0 : 1 }}
           renderItem={({ item }) => <SearchResultRow onPress={() => onResultPress(item.item)} queryTokens={queryTokens} result={item} />}
-          ItemSeparatorComponent={() => <View style={{ height: 1, marginLeft: 128, backgroundColor: colors.mauveTone92 }} />}
+          ItemSeparatorComponent={() => <View style={{ height: 1, marginLeft: 128, backgroundColor: colors.violetTone98_3 }} />}
           ListEmptyComponent={queryTokens.length ? <View style={{ flex: 1, minHeight: 260, padding: 24, alignItems: 'center', justifyContent: 'center' }}><Text selectable style={{ textAlign: 'center', fontSize: fontSizes.size14, color: colors.mauveTone39 }}>No matching services found.</Text></View> : null}
         />
       ) : null}

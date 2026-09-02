@@ -70,7 +70,7 @@ export function MyPlansScreen({ onBack }: ProfileOptionScreenProps) {
   return (
     <View style={{ flex: 1, backgroundColor: colors.white }}>
       <ProfilePageHeader title="My plan" onBack={onBack} />
-      <View style={{ height: 1, backgroundColor: colors.mauveTone94 }} />
+      <View style={{ height: 1, backgroundColor: colors.violetTone98_3 }} />
       <View style={{ paddingHorizontal: 20, paddingTop: 28, paddingBottom: Math.max(insets.bottom, 20) }}>
         <Text style={{ fontSize: fontSizes.size21, lineHeight: 27, fontFamily: fontFamilies.bold, color: colors.mauveTone11 }}>Active plans</Text>
         <Text style={{ paddingTop: 16, fontSize: fontSizes.size15, lineHeight: 23, color: colors.neutralTone45 }}>You have no active plans</Text>
@@ -128,7 +128,7 @@ export function MyRatingScreen({ onBack }: ProfileOptionScreenProps) {
           <Text style={{ paddingTop: 3, fontSize: fontSizes.size24, lineHeight: 30, fontFamily: fontFamilies.bold, color: colors.mauveTone11 }}>No rating yet</Text>
         </View>
 
-        <View style={{ height: 8, backgroundColor: colors.violetTone96_6 }} />
+        <View style={{ height: 8, backgroundColor: colors.violetTone98_3 }} />
 
         <View style={{ paddingHorizontal: 20, paddingTop: 28, gap: 10 }}>
           <Text style={{ fontSize: fontSizes.size19, lineHeight: 25, fontFamily: fontFamilies.semiBold, color: colors.mauveTone11 }}>Introducing customer ratings</Text>
@@ -307,7 +307,7 @@ export function HelpSupportScreen({ onAccount, onBack, onGettingStarted, onMembe
                 alignItems: 'center',
                 gap: 14,
                 borderBottomWidth: index === HELP_TOPICS.length - 1 ? 0 : 1,
-                borderBottomColor: colors.mauveTone94,
+                borderBottomColor: colors.violetTone98_3,
                 opacity: pressed ? 0.55 : 1,
               })}
             >
@@ -360,9 +360,9 @@ export function WarrantyHelpScreen({ onBack, onTopic }: ProfileOptionScreenProps
     <View style={{ flex: 1, backgroundColor: colors.white }}>
       <ProfilePageHeader onBack={onBack} />
       <Text style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 14, fontSize: fontSizes.size26, lineHeight: 33, fontFamily: fontFamilies.bold, color: colors.violetTone10_2 }}>Warranty</Text>
-      <View style={{ paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 20) + 28, borderTopWidth: 1, borderTopColor: colors.mauveTone94 }}>
+      <View style={{ paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 20) + 28, borderTopWidth: 1, borderTopColor: colors.violetTone98_3 }}>
         {WARRANTY_TOPICS.map((topic, index) => (
-          <Pressable key={topic.key} accessibilityRole="button" onPress={() => onTopic(topic.key)} style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: index === WARRANTY_TOPICS.length - 1 ? 0 : 1, borderBottomColor: colors.mauveTone94, opacity: pressed ? 0.55 : 1 })}>
+          <Pressable key={topic.key} accessibilityRole="button" onPress={() => onTopic(topic.key)} style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: index === WARRANTY_TOPICS.length - 1 ? 0 : 1, borderBottomColor: colors.violetTone98_3, opacity: pressed ? 0.55 : 1 })}>
             <Text style={{ flex: 1, paddingRight: 12, fontSize: fontSizes.size15, lineHeight: 22, color: colors.violetTone18 }}>{topic.label}</Text>
             <TopicChevron />
           </Pressable>
@@ -391,7 +391,7 @@ export function WarrantyArticleScreen({ article, onBack }: ProfileOptionScreenPr
           </View>
         ))}
       </View>
-      <View style={{ height: 1, marginTop: 20, backgroundColor: colors.mauveTone94 }} />
+      <View style={{ height: 1, marginTop: 20, backgroundColor: colors.violetTone98_3 }} />
       <Text style={{ paddingTop: 18, fontSize: fontSizes.size15, lineHeight: 23, color: colors.mauveTone38_2 }}>However, the UC warranty <Text style={{ fontFamily: fontFamilies.bold }}>does not</Text> cover:</Text>
       <NumberedSteps steps={['Any new issue that occurs post the service', 'Any item/service that is not mentioned on the invoice']} />
     </AccountArticleScreen>
@@ -435,7 +435,7 @@ export function MembershipHelpScreen({ onBack, onTopic }: ProfileOptionScreenPro
           <View key={section.title} style={{ borderTopWidth: sectionIndex === 0 ? 1 : 8, borderTopColor: sectionIndex === 0 ? colors.mauveTone94 : colors.violetTone96_6, paddingHorizontal: 20, paddingTop: 18 }}>
             <Text style={{ paddingBottom: 8, fontSize: fontSizes.size17, lineHeight: 23, fontFamily: fontFamilies.semiBold, color: colors.violetTone10_2 }}>{section.title}</Text>
             {section.topics.map((topic, index) => (
-              <Pressable key={topic.key} accessibilityRole="button" onPress={() => onTopic(topic.key)} style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: index === section.topics.length - 1 ? 0 : 1, borderBottomColor: colors.mauveTone94, opacity: pressed ? 0.55 : 1 })}>
+              <Pressable key={topic.key} accessibilityRole="button" onPress={() => onTopic(topic.key)} style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: index === section.topics.length - 1 ? 0 : 1, borderBottomColor: colors.violetTone98_3, opacity: pressed ? 0.55 : 1 })}>
                 <Text style={{ flex: 1, paddingRight: 12, fontSize: fontSizes.size15, lineHeight: 22, color: colors.violetTone18 }}>{topic.label}</Text>
                 <TopicChevron />
               </Pressable>
@@ -517,7 +517,7 @@ export function GettingStartedHelpScreen({ onBack, onTopic }: ProfileOptionScree
           <View key={section.title} style={{ borderTopWidth: sectionIndex === 0 ? 1 : 8, borderTopColor: sectionIndex === 0 ? colors.mauveTone94 : colors.violetTone96_6, paddingHorizontal: 20, paddingTop: 18 }}>
             <Text style={{ paddingBottom: 8, fontSize: fontSizes.size17, lineHeight: 23, fontFamily: fontFamilies.semiBold, color: colors.violetTone10_2 }}>{section.title}</Text>
             {section.topics.map((topic, index) => (
-              <Pressable key={topic.key} accessibilityRole="button" onPress={() => onTopic(topic.key)} style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: index === section.topics.length - 1 ? 0 : 1, borderBottomColor: colors.mauveTone94, opacity: pressed ? 0.55 : 1 })}>
+              <Pressable key={topic.key} accessibilityRole="button" onPress={() => onTopic(topic.key)} style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: index === section.topics.length - 1 ? 0 : 1, borderBottomColor: colors.violetTone98_3, opacity: pressed ? 0.55 : 1 })}>
                 <Text style={{ flex: 1, paddingRight: 12, fontSize: fontSizes.size15, lineHeight: 22, color: colors.violetTone18 }}>{topic.label}</Text>
                 <TopicChevron />
               </Pressable>
@@ -572,9 +572,9 @@ export function PaymentCreditsHelpScreen({ onBack, onTopic }: ProfileOptionScree
     <View style={{ flex: 1, backgroundColor: colors.white }}>
       <ProfilePageHeader onBack={onBack} />
       <Text style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 14, fontSize: fontSizes.size26, lineHeight: 33, fontFamily: fontFamilies.bold, color: colors.violetTone10_2 }}>Payment & UC Credits</Text>
-      <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 20) + 28, borderTopWidth: 1, borderTopColor: colors.mauveTone94 }}>
+      <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 20) + 28, borderTopWidth: 1, borderTopColor: colors.violetTone98_3 }}>
         {PAYMENT_CREDITS_TOPICS.map((topic, index) => (
-          <Pressable key={topic.key} accessibilityRole="button" onPress={() => onTopic(topic.key)} style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: index === PAYMENT_CREDITS_TOPICS.length - 1 ? 0 : 1, borderBottomColor: colors.mauveTone94, opacity: pressed ? 0.55 : 1 })}>
+          <Pressable key={topic.key} accessibilityRole="button" onPress={() => onTopic(topic.key)} style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: index === PAYMENT_CREDITS_TOPICS.length - 1 ? 0 : 1, borderBottomColor: colors.violetTone98_3, opacity: pressed ? 0.55 : 1 })}>
             <Text style={{ flex: 1, paddingRight: 12, fontSize: fontSizes.size15, lineHeight: 22, color: colors.violetTone18 }}>{topic.label}</Text>
             <TopicChevron />
           </Pressable>
@@ -690,7 +690,7 @@ export function AccountHelpScreen({ onBack, onChangeEmail, onChangePhone, onPaym
             key={topic.key}
             accessibilityRole="button"
             onPress={actions[topic.key]}
-            style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: index === ACCOUNT_HELP_TOPICS.length - 1 ? 0 : 1, borderBottomColor: colors.mauveTone94, opacity: pressed ? 0.55 : 1 })}
+            style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', borderBottomWidth: index === ACCOUNT_HELP_TOPICS.length - 1 ? 0 : 1, borderBottomColor: colors.violetTone98_3, opacity: pressed ? 0.55 : 1 })}
           >
             <Text style={{ flex: 1, paddingRight: 12, fontSize: fontSizes.size15, lineHeight: 22, color: colors.violetTone18 }}>{topic.label}</Text>
             <TopicChevron />
@@ -730,7 +730,7 @@ export function AccountArticleScreen({ buttonLabel, children, description, onAct
             <Text style={{ fontSize: fontSizes.size15, fontFamily: fontFamilies.semiBold, color: colors.white }}>{buttonLabel}</Text>
           </Pressable> : null}
         </View>
-        <View style={{ height: 1, marginTop: 24, backgroundColor: colors.mauveTone94 }} />
+        <View style={{ height: 1, marginTop: 24, backgroundColor: colors.violetTone98_3 }} />
         <View style={{ minHeight: 72, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center' }}>
           <Text style={{ flex: 1, fontSize: fontSizes.size15, color: colors.mauveTone38_2 }}>{feedback ? 'Thanks for your feedback' : 'Was this article helpful?'}</Text>
           <Pressable accessibilityRole="button" accessibilityLabel="Not helpful" onPress={() => setFeedback('down')} style={({ pressed }) => ({ width: 42, height: 42, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.55 : 1 })}>

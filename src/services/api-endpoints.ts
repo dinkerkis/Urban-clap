@@ -5,12 +5,12 @@ export const apiEndpoints = {
   },
   categories: {
     list: '/mobile/category/list',
-    products: (categoryId: string) => `/products-with-category/${encodeURIComponent(categoryId)}`,
+    products: (categoryId: string) => `/mobile/product/products-with-category/${encodeURIComponent(categoryId)}`,
   },
   cart: {
-    add: '/cart/add',
-    details: '/cart',
-    decrement: (itemId: string) => `/cart/${encodeURIComponent(itemId)}/decrement`,
+    add: '/mobile/cart/add',
+    details: '/mobile/cart',
+    decrement: (itemId: string) => `/mobile/cart/${encodeURIComponent(itemId)}/decrement`,
   },
   addresses: {
     list: '/address',

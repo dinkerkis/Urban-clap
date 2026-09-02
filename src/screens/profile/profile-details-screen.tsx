@@ -537,7 +537,7 @@ export function ProfileDetailsScreen({ anniversaryDate, authToken, dob, email, n
         </View>
       </ScrollView>
 
-      <View style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: keyboardVisible ? 6 : Math.max(insets.bottom, 14), backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.violetTone93_2, boxShadow: `0 -3px 10px ${colors.mauveTone9Alpha6}` }}>
+      <View style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: keyboardVisible ? 6 : Math.max(insets.bottom, 14), backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.violetTone98_3, boxShadow: `0 -3px 10px ${colors.mauveTone9Alpha6}` }}>
         <Pressable
           accessibilityRole="button"
           disabled={isSubmitting}
@@ -597,7 +597,7 @@ export function ProfileDetailsScreen({ anniversaryDate, authToken, dob, email, n
               setTitleIndex(index);
               setIsTitlePickerOpen(false);
             }}
-            style={({ pressed }) => ({ minHeight: 58, justifyContent: 'center', borderBottomWidth: 1, borderBottomColor: colors.mauveTone93, opacity: pressed ? 0.55 : 1 })}
+            style={({ pressed }) => ({ minHeight: 58, justifyContent: 'center', borderBottomWidth: 1, borderBottomColor: colors.violetTone98_3, opacity: pressed ? 0.55 : 1 })}
           >
             <Text style={{ fontSize: fontSizes.size15, color: colors.black }}>{title}</Text>
           </Pressable>
@@ -619,7 +619,7 @@ export function ProfileDetailsScreen({ anniversaryDate, authToken, dob, email, n
               setErrors((current) => ({ ...current, phone: false }));
               setIsCountryPickerOpen(false);
             }}
-            style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: 11, borderBottomWidth: 1, borderBottomColor: colors.mauveTone93, opacity: pressed ? 0.55 : 1 })}
+            style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: 11, borderBottomWidth: 1, borderBottomColor: colors.violetTone98_3, opacity: pressed ? 0.55 : 1 })}
           >
             <Text style={{ fontSize: fontSizes.size19 }}>{nextCountry.flag}</Text>
             <Text style={{ flex: 1, fontSize: fontSizes.size15, color: colors.black }}>{nextCountry.name}</Text>

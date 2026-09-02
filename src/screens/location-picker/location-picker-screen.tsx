@@ -42,7 +42,7 @@ function WorkOutlineIcon() {
   return (
     <View style={{ width: 22, height: 20, alignItems: 'center', justifyContent: 'flex-end' }}>
       <View style={{ width: 8, height: 4, borderWidth: 1.4, borderBottomWidth: 0, borderColor: colors.mauveTone24_2, borderTopLeftRadius: 2, borderTopRightRadius: 2 }} />
-      <View style={{ width: 18, height: 12, borderWidth: 1.4, borderColor: colors.mauveTone24_2, borderRadius: 2 }} />
+      <View style={{ width: 18, height: 12, borderWidth: 1.4, borderColor: colors.violetTone98_3, borderRadius: 2 }} />
     </View>
   );
 }
@@ -175,7 +175,7 @@ export function LocationPickerScreen({ authToken, onBack, onSelectAddress, onUse
           <Text style={{ fontSize: fontSizes.size15, fontFamily: fontFamilies.semiBold, color: colors.violetTone58 }}>Use current location</Text>
         </Pressable>
 
-        <View style={{ height: 8, backgroundColor: colors.violetTone96_6 }} />
+        <View style={{ height: 8, backgroundColor: colors.violetTone98_3 }} />
 
         {isSearchActive ? (
           <>
@@ -204,7 +204,7 @@ export function LocationPickerScreen({ authToken, onBack, onSelectAddress, onUse
                       {suggestion.subtitle ? <Text selectable style={{ fontSize: fontSizes.size13, lineHeight: 19, color: colors.mauveTone38_2 }}>{suggestion.subtitle}</Text> : null}
                     </View>
                   </Pressable>
-                  {index < suggestions.length - 1 ? <View style={{ height: 1, marginLeft: 56, backgroundColor: colors.violetTone93_2 }} /> : null}
+                  {index < suggestions.length - 1 ? <View style={{ height: 1, marginLeft: 56, backgroundColor: colors.violetTone98_3 }} /> : null}
                 </View>
               ))
             )}
@@ -243,7 +243,7 @@ export function LocationPickerScreen({ authToken, onBack, onSelectAddress, onUse
                       <Text selectable style={{ fontSize: fontSizes.size13, lineHeight: 19, color: colors.mauveTone38_2 }}>{formatSavedAddress(address)}</Text>
                     </View>
                   </Pressable>
-                  {index < displayedAddresses.length - 1 ? <View style={{ height: 1, marginLeft: 56, backgroundColor: colors.violetTone93_2 }} /> : null}
+                  {index < displayedAddresses.length - 1 ? <View style={{ height: 1, marginLeft: 56, backgroundColor: colors.violetTone98_3 }} /> : null}
                 </View>
               ))
             )}
@@ -253,7 +253,7 @@ export function LocationPickerScreen({ authToken, onBack, onSelectAddress, onUse
                 <Pressable accessibilityRole="button" onPress={() => setShowAllSaved(true)} style={({ pressed }) => ({ alignSelf: 'flex-start', paddingHorizontal: 20, paddingTop: 4, paddingBottom: 10, opacity: pressed ? 0.55 : 1 })}>
                   <Text style={{ fontSize: fontSizes.size14, fontFamily: fontFamilies.semiBold, color: colors.violetTone58 }}>View more</Text>
                 </Pressable>
-                <View style={{ width: '100%', height: 8, alignSelf: 'stretch', backgroundColor: colors.violetTone96_6 }} />
+                <View style={{ width: '100%', height: 8, alignSelf: 'stretch', backgroundColor: colors.violetTone98_3 }} />
               </>
             ) : null}
 
@@ -275,7 +275,7 @@ export function LocationPickerScreen({ authToken, onBack, onSelectAddress, onUse
                         {location.subtitle ? <Text selectable style={{ fontSize: fontSizes.size13, lineHeight: 19, color: colors.mauveTone38_2 }}>{location.subtitle}</Text> : null}
                       </View>
                     </Pressable>
-                    {index < displayedRecents.length - 1 ? <View style={{ height: 1, marginLeft: 56, backgroundColor: colors.violetTone93_2 }} /> : null}
+                    {index < displayedRecents.length - 1 ? <View style={{ height: 1, marginLeft: 56, backgroundColor: colors.violetTone98_3 }} /> : null}
                   </View>
                 ))}
                 {!showAllRecents && recentLocations.length > 2 ? (
@@ -283,7 +283,7 @@ export function LocationPickerScreen({ authToken, onBack, onSelectAddress, onUse
                     <Pressable accessibilityRole="button" onPress={() => setShowAllRecents(true)} style={({ pressed }) => ({ alignSelf: 'flex-start', paddingHorizontal: 20, paddingTop: 4, paddingBottom: 10, opacity: pressed ? 0.55 : 1 })}>
                       <Text style={{ fontSize: fontSizes.size14, fontFamily: fontFamilies.semiBold, color: colors.violetTone58 }}>View more</Text>
                     </Pressable>
-                    <View style={{ width: '100%', height: 8, alignSelf: 'stretch', backgroundColor: colors.violetTone96_6 }} />
+                    <View style={{ width: '100%', height: 8, alignSelf: 'stretch', backgroundColor: colors.violetTone98_3 }} />
                   </>
                 ) : null}
               </>
@@ -302,7 +302,7 @@ export function LocationPickerScreen({ authToken, onBack, onSelectAddress, onUse
           gap: 4,
           backgroundColor: colors.white,
           borderTopWidth: 1,
-          borderTopColor: colors.violetTone93_2,
+          borderTopColor: colors.violetTone98_3,
           boxShadow: `0 -3px 10px ${colors.mauveTone9Alpha6}`,
         }}
       >

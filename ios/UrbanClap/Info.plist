@@ -50,6 +50,8 @@
 	<string>Allow $(PRODUCT_NAME) to access your location</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Allow Urban Clap to use your location to show services available near you.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>Allow Urban Clap to access your contacts so you can pick a number for booking updates.</string>
 	<key>NSMotionUsageDescription</key>
 	<string>Allow $(PRODUCT_NAME) to detect your current motion activity</string>
 	<key>RCTNewArchEnabled</key>

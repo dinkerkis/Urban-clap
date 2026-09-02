@@ -75,7 +75,7 @@ export function CategoryDetailScreen({ category, onBack, onSubcategoryPress }: C
           </Text>
         </View>
 
-        <View style={{ height: 1, backgroundColor: colors.mauveTone90_3 }} />
+        <View style={{ height: 1, backgroundColor: colors.violetTone98_3 }} />
 
         {category.subcategories.length > 0 ? (
           <View>
