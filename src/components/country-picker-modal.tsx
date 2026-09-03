@@ -1,4 +1,4 @@
-import { colors, fontSizes, typography } from '../theme';
+import { colors, typography } from '../theme';
 import { Modal, Pressable, View } from 'react-native';
 import { Text } from './app-text';
 
@@ -65,7 +65,6 @@ export function CountryPickerModal({ onClose, onSelect, selectedCountry, visible
                   opacity: pressed ? 0.55 : 1,
                 })}
               >
-                <Text style={{ fontSize: fontSizes.size21 }}>{country.flag}</Text>
                 <Text style={{ flex: 1, ...typography.body, color: colors.text }}>
                   {country.name} ({country.callingCode})
                 </Text>

@@ -22,6 +22,7 @@ export function getCategoryImageUrl(path?: string): string | undefined {
 
 export async function fetchCategories(signal?: AbortSignal): Promise<ApiCategory[]> {
   const payload = await apiRequest<CategoriesResponse>(apiEndpoints.categories.list, {
+    cache: 'no-store',
     logScope: 'Categories API',
     signal,
     defaultErrorMessage: 'Unable to load categories. Please try again.',

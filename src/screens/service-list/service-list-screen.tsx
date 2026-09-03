@@ -503,7 +503,7 @@ export function ServiceListScreen({ cart, cartItemsById, categoryTitle, subcateg
           ) : null}
       </View>
 
-      {sections.length > 0 ? (
+      {sections.length > 0 && !hideSectionPicker ? (
         <Pressable
           onPress={openMenu}
           style={({ pressed }) => ({

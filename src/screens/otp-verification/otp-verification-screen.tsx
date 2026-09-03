@@ -88,16 +88,20 @@ export function OtpVerificationScreen({ callingCode, onBack, onVerified, phoneNu
         contentContainerStyle={{ flexGrow: 1 }}
       >
         <AuthHeader onPress={onBack} />
-        <View style={{ width: '100%', maxWidth: 560, alignSelf: 'center', padding: 24, paddingTop: 42, gap: 24 }}>
-          <VerificationMessageIcon />
-          <View style={{ gap: 8 }}>
-            <Text style={{ ...typography.title, color: colors.text }}>Enter verification code</Text>
-            <Text style={{ ...typography.body, color: colors.textSecondary }}>
-              A 6-digit verification code has been sent to
-            </Text>
-            <Text selectable style={{ ...typography.body, fontFamily: fontFamilies.semiBold, color: colors.text }}>
-              {callingCode} {phoneNumber}
-            </Text>
+        <View style={{ width: '100%', maxWidth: 560, alignSelf: 'center', padding: 24, paddingTop: 24, gap: 24 }}>
+          <View style={{ gap: 14 }}>
+            <VerificationMessageIcon />
+            <View style={{ gap: 4 }}>
+              <Text style={{ ...typography.title, color: colors.text }}>Enter verification code</Text>
+              <View style={{ gap: 4 }}>
+                <Text style={{ ...typography.body, color: colors.textSecondary }}>
+                  A 6-digit verification code has been sent to
+                </Text>
+                <Text selectable style={{ ...typography.body, fontFamily: fontFamilies.semiBold, color: colors.text }}>
+                  {callingCode} {phoneNumber}
+                </Text>
+              </View>
+            </View>
           </View>
 
           <OtpInput error={Boolean(errorMessage)} onChange={handleChange} value={otp} />

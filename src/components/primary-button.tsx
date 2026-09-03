@@ -8,11 +8,13 @@ import { LoadingDots } from './loading-dots';
 type Props = {
   disabled?: boolean;
   label: string;
+  labelFontFamily?: string;
   loading?: boolean;
+  minHeight?: number;
   onPress: () => void;
 };
 
-export function PrimaryButton({ disabled = false, label, loading = false, onPress }: Props) {
+export function PrimaryButton({ disabled = false, label, labelFontFamily, loading = false, minHeight = 58, onPress }: Props) {
   const isDisabled = disabled || loading;
 
   return (
@@ -21,7 +23,7 @@ export function PrimaryButton({ disabled = false, label, loading = false, onPres
       disabled={isDisabled}
       onPress={onPress}
       style={({ pressed }) => ({
-        minHeight: 58,
+        minHeight,
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 12,
@@ -39,6 +41,7 @@ export function PrimaryButton({ disabled = false, label, loading = false, onPres
         <Text
           style={{
             ...typography.button,
+            fontFamily: labelFontFamily ?? typography.button.fontFamily,
             color: disabled ? colors.disabledText : colors.white,
           }}
         >

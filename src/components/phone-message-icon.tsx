@@ -9,15 +9,15 @@ export function PhoneMessageIcon() {
       accessible
       accessibilityRole="image"
       accessibilityLabel="Phone verification by text message"
-      style={{ width: 58, height: 48 }}
+      style={{ width: 48, height: 40 }}
     >
       <View
         style={{
           position: 'absolute',
-          left: 31,
-          top: 3,
-          width: 20,
-          height: 18,
+          left: 26,
+          top: 2,
+          width: 17,
+          height: 15,
           borderRadius: 3,
           borderCurve: 'continuous',
           backgroundColor: colors.blueTone83,
@@ -28,8 +28,8 @@ export function PhoneMessageIcon() {
             position: 'absolute',
             left: 2,
             bottom: -2,
-            width: 6,
-            height: 6,
+            width: 5,
+            height: 5,
             backgroundColor: colors.blueTone83,
             transform: [{ rotate: '45deg' }],
           }}
@@ -40,7 +40,7 @@ export function PhoneMessageIcon() {
         source={require('../../assets/phone-call.png')}
         contentFit="contain"
         tintColor={colors.primary as string}
-        style={{ position: 'absolute', left: 0, bottom: 1, width: 41, height: 41 }}
+        style={{ position: 'absolute', left: 0, bottom: 1, width: 34, height: 34 }}
       />
     </View>
   );

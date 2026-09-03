@@ -60,16 +60,16 @@ export function PhoneLoginScreen({ onContinue }: Props) {
           maxWidth: 560,
           alignSelf: 'center',
           paddingHorizontal: 24,
-          paddingTop: process.env.EXPO_OS === 'android' ? Math.max(insets.top, 12) : 28,
+          paddingTop: process.env.EXPO_OS === 'android' ? Math.max(insets.top, 8) : 16,
           paddingBottom: 24,
         }}
       >
         <View>
-          <View style={{ gap: 30 }}>
+          <View style={{ gap: 20 }}>
             <View style={{ gap: 20 }}>
               <PhoneMessageIcon />
-              <View style={{ gap: 10 }}>
-                <Text style={{ ...typography.hero, color: colors.text }}>Enter your phone number</Text>
+              <View style={{ gap: 6 }}>
+                <Text style={{ ...typography.hero, fontSize: fontSizes.size22, lineHeight: 28, color: colors.text }}>Enter your phone number</Text>
                 <Text style={{ ...typography.body, color: colors.textSecondary }}>
                   We’ll send you a text with a verification code. Standard tariff may apply.
                 </Text>
@@ -79,12 +79,12 @@ export function PhoneLoginScreen({ onContinue }: Props) {
             <View style={{ gap: 9 }}>
               <View
                 style={{
-                  height: 64,
+                  height: 48,
                   flexDirection: 'row',
                   alignItems: 'center',
                   borderWidth: 1,
                   borderColor: colors.border,
-                  borderRadius: 14,
+                  borderRadius: 8,
                   borderCurve: 'continuous',
                   overflow: 'hidden',
                   backgroundColor: colors.surface,
@@ -97,9 +97,8 @@ export function PhoneLoginScreen({ onContinue }: Props) {
                     Keyboard.dismiss();
                     setIsCountryPickerOpen(true);
                   }}
-                  style={{ height: '100%', minWidth: 122, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 }}
+                  style={{ height: '100%', minWidth: 84, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}
                 >
-                  <Text style={{ fontSize: fontSizes.size17 }}>{country.flag}</Text>
                   <Text selectable style={{ ...typography.input, fontFamily: fontFamilies.semiBold, color: colors.text }}>{country.callingCode}</Text>
                   <View
                     accessibilityElementsHidden
@@ -114,7 +113,7 @@ export function PhoneLoginScreen({ onContinue }: Props) {
                     }}
                   />
                 </Pressable>
-                <View style={{ width: 1, height: '52%', backgroundColor: colors.border }} />
+                <View style={{ width: 1, height: '100%', backgroundColor: colors.border }} />
                 <TextInput
                   autoCorrect={false}
                   keyboardType="phone-pad"
@@ -148,10 +147,9 @@ export function PhoneLoginScreen({ onContinue }: Props) {
           width: '100%',
           maxWidth: 560,
           alignSelf: 'center',
-          paddingHorizontal: 24,
+          paddingHorizontal: 16,
           paddingTop: 12,
           paddingBottom: process.env.EXPO_OS === 'ios' ? 34 : Math.max(insets.bottom + 14, 30),
-          gap: 14,
           backgroundColor: colors.background,
         }}
       >
@@ -159,7 +157,10 @@ export function PhoneLoginScreen({ onContinue }: Props) {
           By continuing, you agree to our <Text style={{ color: colors.primary, textDecorationLine: 'underline' }}>T&amp;C</Text> and{' '}
           <Text style={{ color: colors.primary, textDecorationLine: 'underline' }}>Privacy</Text> policy
         </Text>
-        <PrimaryButton disabled={!isValid} label="Continue" loading={isSending} onPress={() => void continueToOtp()} />
+        <View style={{ height: 1, marginTop: 6, marginHorizontal: -16, backgroundColor: colors.border }} />
+        <View style={{ marginTop: 8 }}>
+          <PrimaryButton disabled={!isValid} label="Continue" labelFontFamily={fontFamilies.regular} loading={isSending} minHeight={48} onPress={() => void continueToOtp()} />
+        </View>
       </View>
       <CountryPickerModal
         onClose={() => setIsCountryPickerOpen(false)}

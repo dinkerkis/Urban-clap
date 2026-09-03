@@ -15,6 +15,8 @@ export function AuthHeader({ onPress }: Props) {
         justifyContent: 'flex-start',
         paddingHorizontal: 20,
         paddingTop: process.env.EXPO_OS === 'ios' ? 48 : 0,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.border,
       }}
     >
       <Pressable
