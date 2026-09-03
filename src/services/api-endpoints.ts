@@ -14,15 +14,15 @@ export const apiEndpoints = {
     decrement: (itemId: string) => `/mobile/cart/${encodeURIComponent(itemId)}/decrement`,
   },
   addresses: {
-    list: '/address',
-    add: '/address',
-    byId: (addressId: string) => `/address/${encodeURIComponent(addressId)}`,
-    setDefault: (addressId: string) => `/address/${encodeURIComponent(addressId)}/default`,
+    list: '/mobile/address',
+    add: '/mobile/address',
+    byId: (addressId: string) => `/mobile/address/${encodeURIComponent(addressId)}`,
+    setDefault: (addressId: string) => `/mobile/address/${encodeURIComponent(addressId)}/default`,
   },
   nativeProducts: {
-    list: '/native-products/mobile',
-    description: '/native-products/description/mobile',
-    detail: (productId: string) => `/native-products/${encodeURIComponent(productId)}/mobile`,
+    list: '/mobile/native-product',
+    description: '/mobile/native-product/description',
+    detail: (productId: string) => `/mobile/native-product/${encodeURIComponent(productId)}`,
     byCategory: (categoryId: string) => `/mobile/native-category/${encodeURIComponent(categoryId)}/products`,
   },
   home: {
