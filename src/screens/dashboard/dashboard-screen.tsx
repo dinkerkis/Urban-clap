@@ -394,6 +394,7 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
       <CartScreen
         authToken={authToken}
         cart={cartState.quantities}
+        categoryGroups={cartState.categoryGroups}
         categoryTitle={page.categoryTitle}
         consultationMode={page.consultationMode}
         errorMessage={cartState.errorMessage}
@@ -509,6 +510,7 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
       <CartScreen
         authToken={authToken}
         cart={cartState.quantities}
+        categoryGroups={cartState.categoryGroups}
         errorMessage={cartState.errorMessage}
         isLoading={cartState.isLoading}
         itemsSubtotal={cartState.itemsSubtotal}
@@ -966,6 +968,7 @@ export function DashboardScreen({ anniversaryDate, authToken, dob, email, name, 
             <CartScreen
               authToken={authToken}
               cart={cartState.quantities}
+              categoryGroups={cartState.categoryGroups}
               categoryTitle={route.params.category.title}
               consultationMode={route.params.consultationMode}
               errorMessage={cartState.errorMessage}

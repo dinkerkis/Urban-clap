@@ -1,5 +1,6 @@
 import { apiRequest, getApiAssetUrl, requireApiData, type ApiResponse } from './api-client';
 import { apiEndpoints } from './api-endpoints';
+import { cleanString, cleanStringArray as stringArray, finiteNumber as parseFiniteNumber, isRecord } from './normalization-utils';
 
 export type NativeDescriptionImage = {
   sort_order: number;
@@ -117,26 +118,12 @@ type NativeDescriptionData = {
   descriptionMedia?: unknown[];
 };
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
-}
-
-function cleanString(value: unknown): string | undefined {
-  if (typeof value !== 'string') return undefined;
-  const cleaned = value.trim();
-  return cleaned || undefined;
-}
-
 function finiteNumber(value: unknown, fallback = 0): number {
-  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+  return parseFiniteNumber(value, fallback);
 }
 
 function optionalFiniteNumber(value: unknown): number | undefined {
-  return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
-}
-
-function stringArray(value: unknown): string[] {
-  return Array.isArray(value) ? value.flatMap((item) => cleanString(item) ?? []) : [];
+  return parseFiniteNumber(value);
 }
 
 function normalizeRating(value: unknown): NativeProductRating | undefined {

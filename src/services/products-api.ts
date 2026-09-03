@@ -1,6 +1,7 @@
 import { getCategoryImageUrl } from './categories-api';
 import { apiRequest, ApiClientError } from './api-client';
 import { apiEndpoints } from './api-endpoints';
+import { cleanString, cleanStringArray, finiteNumber, isRecord } from './normalization-utils';
 
 export type ApiProductVariant = {
   image?: string | null;
@@ -57,24 +58,6 @@ type ProductsWithCategoryResponse = {
   product_details?: ApiProductCategory[];
   success: boolean;
 };
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
-}
-
-function cleanString(value: unknown): string | undefined {
-  if (typeof value !== 'string') return undefined;
-  const cleaned = value.trim();
-  return cleaned || undefined;
-}
-
-function finiteNumber(value: unknown): number | undefined {
-  return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
-}
-
-function cleanStringArray(value: unknown): string[] {
-  return Array.isArray(value) ? value.flatMap((item) => cleanString(item) ?? []) : [];
-}
 
 function normalizeProduct(value: unknown): ApiProduct | null {
   if (!isRecord(value)) return null;

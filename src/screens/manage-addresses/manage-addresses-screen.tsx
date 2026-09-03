@@ -15,7 +15,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BackIcon } from '../../components/back-icon';
 import { CloseButton as SharedCloseButton, CLOSE_BUTTON_ABOVE_OFFSET, CLOSE_BUTTON_INSET } from '../../components/close-icon';
 import { EditIcon } from '../../components/edit-icon';
+import { GoogleMark } from '../../components/google-mark';
 import { LoadingDots } from '../../components/loading-dots';
+import { SearchIcon } from '../../components/search-icon';
+import { TargetIcon } from '../../components/target-icon';
 import { countries, defaultCountry, type Country } from '../../config/countries';
 import { useAddresses } from '../../hooks/use-addresses';
 import { fetchCurrentLocation, formatLocationDisplay, reverseGeocodeLocation } from '../../hooks/use-current-location';
@@ -83,36 +86,6 @@ type Props = {
 
 function CloseButton({ onPress }: { onPress: () => void }) {
   return <SharedCloseButton color={TEXT} onPress={onPress} style={{ position: 'absolute', zIndex: 5, right: CLOSE_BUTTON_INSET, top: CLOSE_BUTTON_ABOVE_OFFSET }} />;
-}
-
-function SearchIcon() {
-  return <Image source={require('../../../assets/search.png')} contentFit="contain" tintColor={colors.violetTone42} style={{ width: 18, height: 18 }} />;
-}
-
-function TargetIcon() {
-  return (
-    <View style={{ width: 20, height: 20, alignItems: 'center', justifyContent: 'center' }}>
-      <View style={{ width: 16, height: 16, borderRadius: 8, borderWidth: 1.6, borderColor: PURPLE }} />
-      <View style={{ position: 'absolute', width: 6, height: 6, borderRadius: 3, backgroundColor: PURPLE }} />
-      <View style={{ position: 'absolute', top: 0, width: 1.5, height: 3.5, backgroundColor: PURPLE }} />
-      <View style={{ position: 'absolute', bottom: 0, width: 1.5, height: 3.5, backgroundColor: PURPLE }} />
-      <View style={{ position: 'absolute', left: 0, width: 3.5, height: 1.5, backgroundColor: PURPLE }} />
-      <View style={{ position: 'absolute', right: 0, width: 3.5, height: 1.5, backgroundColor: PURPLE }} />
-    </View>
-  );
-}
-
-function GoogleMark() {
-  return (
-    <Text style={{ marginLeft: -2, fontSize: fontSizes.size12, fontFamily: fontFamilies.bold, letterSpacing: -0.3 }}>
-      <Text style={{ color: colors.blueTone61 }}>G</Text>
-      <Text style={{ color: colors.redTone56 }}>o</Text>
-      <Text style={{ color: colors.yellowTone50 }}>o</Text>
-      <Text style={{ color: colors.blueTone61 }}>g</Text>
-      <Text style={{ color: colors.greenTone43 }}>l</Text>
-      <Text style={{ color: colors.redTone56 }}>e</Text>
-    </Text>
-  );
 }
 
 export function LocationSearchSheet({ onClose, onSelect }: { addresses: ReturnType<typeof useAddresses>['addresses']; onClose: () => void; onSelect: (place: SelectedPlace) => Promise<void> | void }) {
@@ -214,7 +187,7 @@ export function LocationSearchSheet({ onClose, onSelect }: { addresses: ReturnTy
             <View style={{ width: 22, height: 22, alignItems: 'center', justifyContent: 'center' }}>
               <LoadingDots gap={5} size={5} />
             </View>
-          ) : <TargetIcon />}
+          ) : <TargetIcon size={20} />}
           <Text style={{ fontSize: fontSizes.size15, fontFamily: fontFamilies.semiBold, color: PURPLE }}>Use current location</Text>
         </Pressable>
         <View style={{ height: 8, marginHorizontal: -18, backgroundColor: colors.violetTone98_3 }} />

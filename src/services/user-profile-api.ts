@@ -1,5 +1,6 @@
 import { apiRequest, ApiClientError, requireApiData, type ApiResponse } from './api-client';
 import { apiEndpoints } from './api-endpoints';
+import { isRecord } from './normalization-utils';
 
 export type UpdateUserProfilePayload = {
   anniversaryDate?: string;
@@ -36,10 +37,6 @@ export type UserProfile = {
 export type UpdateUserProfileResult =
   | { kind: 'updated'; data: UpdatedUserProfile; message: string }
   | { kind: 'email_verification_required'; message: string };
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return Boolean(value) && typeof value === 'object';
-}
 
 function parseUpdatedProfile(value: unknown): UpdatedUserProfile | null {
   if (!isRecord(value)) return null;

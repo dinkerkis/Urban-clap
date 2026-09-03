@@ -7,7 +7,9 @@ import { Text } from '../../components/app-text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BackIcon } from '../../components/back-icon';
+import { GoogleMark } from '../../components/google-mark';
 import { LoadingDots } from '../../components/loading-dots';
+import { TargetIcon } from '../../components/target-icon';
 import { useAddresses } from '../../hooks/use-addresses';
 import { usePlaceSuggestions } from '../../hooks/use-place-suggestions';
 import { formatAddressLabel, formatSavedAddress, setDefaultAddress, type UserAddress } from '../../services/address-api';
@@ -20,19 +22,6 @@ type LocationPickerScreenProps = {
   onSelectAddress: (title: string, subtitle: string) => void;
   onUseCurrentLocation: () => void;
 };
-
-function TargetIcon() {
-  return (
-    <View style={{ width: 22, height: 22, alignItems: 'center', justifyContent: 'center' }}>
-      <View style={{ width: 18, height: 18, borderRadius: 9, borderWidth: 1.7, borderColor: colors.violetTone58 }} />
-      <View style={{ position: 'absolute', width: 7, height: 7, borderRadius: 3.5, backgroundColor: colors.violetTone58 }} />
-      <View style={{ position: 'absolute', top: 0, width: 1.6, height: 4, backgroundColor: colors.violetTone58 }} />
-      <View style={{ position: 'absolute', bottom: 0, width: 1.6, height: 4, backgroundColor: colors.violetTone58 }} />
-      <View style={{ position: 'absolute', left: 0, width: 4, height: 1.6, backgroundColor: colors.violetTone58 }} />
-      <View style={{ position: 'absolute', right: 0, width: 4, height: 1.6, backgroundColor: colors.violetTone58 }} />
-    </View>
-  );
-}
 
 function HomeOutlineIcon() {
   return <Image source={require('../../../assets/home.png')} contentFit="contain" tintColor={colors.mauveTone24_2} style={{ width: 17, height: 17 }} />;
@@ -60,19 +49,6 @@ function AddressIcon({ label }: { label?: string | null }) {
   if (normalized === 'home') return <HomeOutlineIcon />;
   if (normalized === 'work') return <WorkOutlineIcon />;
   return <OtherPinIcon />;
-}
-
-function GoogleMark() {
-  return (
-    <Text style={{ fontSize: fontSizes.size12, fontFamily: fontFamilies.bold, letterSpacing: -0.3, marginLeft:-2 }}>
-      <Text style={{ color: colors.blueTone61 }}>G</Text>
-      <Text style={{ color: colors.redTone56 }}>o</Text>
-      <Text style={{ color: colors.yellowTone50 }}>o</Text>
-      <Text style={{ color: colors.blueTone61 }}>g</Text>
-      <Text style={{ color: colors.greenTone43 }}>l</Text>
-      <Text style={{ color: colors.redTone56 }}>e</Text>
-    </Text>
-  );
 }
 
 export function LocationPickerScreen({ authToken, onBack, onSelectAddress, onUseCurrentLocation }: LocationPickerScreenProps) {

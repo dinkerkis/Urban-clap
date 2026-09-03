@@ -2,10 +2,11 @@ import { colors } from '../theme';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { ServiceItem } from '../data/service-catalog';
-import { addCartItem, decrementCartItem, getCart, NATIVE_PRODUCT_TYPE, type CartItem } from '../services/cart-api';
+import { addCartItem, clearCart, decrementCartItem, getCart, NATIVE_PRODUCT_TYPE, type CartCategoryGroup, type CartItem } from '../services/cart-api';
 import { getCategoryImageUrl } from '../services/categories-api';
 
 type CartState = {
+  categoryGroups: CartCategoryGroup[];
   errorMessage: string;
   isLoading: boolean;
   itemsSubtotal: number;
@@ -17,6 +18,7 @@ type CartState = {
 };
 
 const emptyState: CartState = {
+  categoryGroups: [],
   errorMessage: '',
   isLoading: false,
   itemsSubtotal: 0,
@@ -75,10 +77,10 @@ export function useCart(authToken?: string) {
   const [state, setState] = useState<CartState>({ ...emptyState, isLoading: Boolean(authToken) });
   const mutationVersionRef = useRef(0);
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async ({ showLoading = true }: { showLoading?: boolean } = {}) => {
     if (!authToken) return;
     const refreshVersion = mutationVersionRef.current;
-    setState((current) => ({ ...current, errorMessage: '', isLoading: true }));
+    setState((current) => ({ ...current, errorMessage: '', isLoading: showLoading ? true : current.isLoading }));
 
     try {
       const data = await getCart(authToken);
@@ -106,6 +108,7 @@ export function useCart(authToken?: string) {
         const itemsSubtotal = data.itemsSubtotal ?? data.totalPrice ?? 0;
         const grandTotal = data.grandTotal ?? data.totalPrice ?? itemsSubtotal;
         return {
+          categoryGroups: Array.isArray(data.categoryGroups) ? data.categoryGroups : [],
           errorMessage: '',
           isLoading: false,
           itemsSubtotal,
@@ -164,7 +167,8 @@ export function useCart(authToken?: string) {
       totalPrice: data.cartSummary.totalPrice,
       grandTotal: data.cartSummary.totalPrice,
     }));
-  }, [authToken]);
+    await refresh({ showLoading: false });
+  }, [authToken, refresh]);
 
   const decrement = useCallback(async (item: ServiceItem) => {
     if (!item.serverCartItemId) {
@@ -198,28 +202,20 @@ export function useCart(authToken?: string) {
         grandTotal: data.cartSummary.totalPrice,
       };
     });
-  }, [authToken]);
+    await refresh({ showLoading: false });
+  }, [authToken, refresh]);
 
   const clear = useCallback(async () => {
-    const selections = Object.values(state.itemsById).map((item) => ({
-      item,
-      quantity: state.quantities[item.id] ?? 0,
-    }));
-
     try {
-      for (const { item, quantity } of selections) {
-        if (!item.serverCartItemId) throw new Error('A cart item is still syncing. Please try again.');
-        for (let count = 0; count < quantity; count += 1) {
-          await decrementCartItem(item.serverCartItemId, authToken);
-        }
-      }
+      const data = await clearCart(authToken);
+      if (!data.cleared) throw new Error('The server could not clear your cart. Please try again.');
       mutationVersionRef.current += 1;
       setState(emptyState);
     } catch (error) {
       await refresh().catch(() => undefined);
       throw error;
     }
-  }, [authToken, refresh, state.itemsById, state.quantities]);
+  }, [authToken, refresh]);
 
   const items = useMemo(() => Object.values(state.itemsById), [state.itemsById]);
 

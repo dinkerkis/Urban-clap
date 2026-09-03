@@ -9,6 +9,7 @@ export const apiEndpoints = {
   },
   cart: {
     add: '/mobile/cart/add',
+    clear: '/mobile/cart/clear',
     details: '/mobile/cart',
     decrement: (itemId: string) => `/mobile/cart/${encodeURIComponent(itemId)}/decrement`,
   },

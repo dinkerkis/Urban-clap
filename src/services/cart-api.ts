@@ -62,7 +62,12 @@ type DecrementCartData = {
   quantity: number;
 };
 
-async function request<T>(path: string, method: 'GET' | 'PATCH' | 'POST', token?: string, json?: unknown, logScope = 'Cart API'): Promise<T> {
+type ClearCartData = {
+  cartSummary: CartSummary;
+  cleared: boolean;
+};
+
+async function request<T>(path: string, method: 'DELETE' | 'GET' | 'PATCH' | 'POST', token?: string, json?: unknown, logScope = 'Cart API'): Promise<T> {
   const payload = await apiRequest<ApiResponse<T>>(path, {
     method,
     token,
@@ -90,4 +95,8 @@ export function getCart(token: string): Promise<GetCartData> {
 
 export function decrementCartItem(itemId: string, token?: string): Promise<DecrementCartData> {
   return request<DecrementCartData>(apiEndpoints.cart.decrement(itemId), 'PATCH', token);
+}
+
+export function clearCart(token?: string): Promise<ClearCartData> {
+  return request<ClearCartData>(apiEndpoints.cart.clear, 'DELETE', token, undefined, 'Clear Cart API');
 }

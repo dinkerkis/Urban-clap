@@ -13,11 +13,13 @@ import { LoadingDots } from '../../components/loading-dots';
 import type { ServiceItem } from '../../data/service-catalog';
 import { useAddresses } from '../../hooks/use-addresses';
 import { formatAddressLabel, formatSavedAddress, setDefaultAddress, type UserAddress } from '../../services/address-api';
+import type { CartCategoryGroup } from '../../services/cart-api';
 import { AddressDetailsSheet, ContactDetailsModal, formatContactPhone, LocationSearchSheet, type SelectedPlace } from '../manage-addresses/manage-addresses-screen';
 
 type CartScreenProps = {
   authToken?: string;
   cart: Record<string, number>;
+  categoryGroups?: CartCategoryGroup[];
   categoryTitle?: string;
   consultationMode?: boolean;
   errorMessage: string;
@@ -44,6 +46,7 @@ const formatPrice = (value: number) => `₹${Math.max(0, value).toLocaleString('
 export function CartScreen({
   authToken,
   cart,
+  categoryGroups = [],
   categoryTitle,
   consultationMode = false,
   errorMessage,
@@ -66,6 +69,7 @@ export function CartScreen({
 }: CartScreenProps) {
   const insets = useSafeAreaInsets();
   const [showBillSummary, setShowBillSummary] = useState(false);
+  const [selectedCategoryGroup, setSelectedCategoryGroup] = useState<CartCategoryGroup | null>(null);
   const [addressSheet, setAddressSheet] = useState<'saved' | 'search' | 'details' | 'slot' | null>(null);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [selectedPlace, setSelectedPlace] = useState<SelectedPlace | null>(null);
@@ -89,6 +93,19 @@ export function CartScreen({
     return groups;
   }, []);
   const hasMultipleCategories = groupedCartItems.length > 1;
+  const billCategoryGroups = categoryGroups.length > 0
+    ? categoryGroups
+    : groupedCartItems.map((group) => {
+        const subtotal = group.items.reduce((total, item) => total + (item.serverLineTotal ?? item.price * (cart[item.id] ?? 0)), 0);
+        return {
+          category_id: group.id,
+          category_name: group.name,
+          categoryTotal: group.total ?? subtotal,
+          charges: { govtTax: 0, platformFee: 0, visitationFee: 0 },
+          items: [],
+          subtotal,
+        };
+      });
   const displayedContactName = contactOverride?.name || checkoutAddress?.contactName?.trim() || name?.trim() || 'User';
   const rawContactPhone = contactOverride?.phone || checkoutAddress?.contactPhone?.trim() || phone?.trim() || '';
   const displayedContactPhone = formatContactPhone(rawContactPhone);
@@ -350,17 +367,22 @@ export function CartScreen({
               <View style={{ marginTop: 8, paddingHorizontal: 22, paddingTop: 24, paddingBottom: 18, backgroundColor: colors.white }}>
                 <Text selectable style={{ fontSize: fontSizes.size22, lineHeight: 29, fontFamily: fontFamilies.bold, color: colors.mauveTone9 }}>Bill summary</Text>
                 <View style={{ paddingTop: 16, gap: 14 }}>
-                  {groupedCartItems.map((group) => {
-                    const categoryTotal = group.total ?? group.items.reduce((total, item) => total + (item.serverLineTotal ?? item.price * (cart[item.id] ?? 0)), 0);
+                  {billCategoryGroups.map((group) => {
                     return (
-                      <View key={group.id} style={{ minHeight: 28, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                      <Pressable
+                        key={group.category_id}
+                        accessibilityRole="button"
+                        accessibilityLabel={`View ${group.category_name} bill details`}
+                        onPress={() => setSelectedCategoryGroup(group)}
+                        style={({ pressed }) => ({ minHeight: 28, flexDirection: 'row', alignItems: 'center', gap: 12, opacity: pressed ? 0.6 : 1 })}
+                      >
                         <View style={{ flex: 1 }}>
                           <DottedUnderline dotColor={colors.mauveTone77}>
-                            <Text selectable numberOfLines={1} style={{ fontSize: fontSizes.size14, lineHeight: 20, color: colors.black }}>{group.name}</Text>
+                            <Text selectable numberOfLines={1} style={{ fontSize: fontSizes.size14, lineHeight: 20, color: colors.black }}>{group.category_name}</Text>
                           </DottedUnderline>
                         </View>
-                        <Text selectable style={{ fontSize: fontSizes.size14, lineHeight: 20, color: colors.mauveTone15_3, fontVariant: ['tabular-nums'] }}>{formatPrice(categoryTotal)}</Text>
-                      </View>
+                        <Text selectable style={{ fontSize: fontSizes.size14, lineHeight: 20, color: colors.mauveTone15_3, fontVariant: ['tabular-nums'] }}>{formatPrice(group.categoryTotal)}</Text>
+                      </Pressable>
                     );
                   })}
                 </View>
@@ -454,7 +476,7 @@ export function CartScreen({
       <Modal animationType="slide" transparent visible={showBillSummary} onRequestClose={() => setShowBillSummary(false)}>
         <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: colors.mauveTone8Alpha80 }}>
           <CloseButton accessibilityLabel="Close bill summary" color={colors.mauveTone9} floating onPress={() => setShowBillSummary(false)} />
-          <View style={{ paddingTop: 24, paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 12), borderTopLeftRadius: 24, borderTopRightRadius: 24, backgroundColor: colors.white }}>
+          <View style={{ paddingTop: 24, paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 12), borderTopLeftRadius: 18, borderTopRightRadius: 18, backgroundColor: colors.white }}>
             <Text selectable style={{ fontSize: fontSizes.size24, lineHeight: 31, fontFamily: fontFamilies.bold, color: colors.mauveTone9 }}>Bill summary</Text>
             <BillRow label="Item total" value={displayedItemsSubtotal} />
             {displayedTaxesAndCharges > 0 ? <BillRow label="Taxes & charges" value={displayedTaxesAndCharges} /> : null}
@@ -466,6 +488,34 @@ export function CartScreen({
               <Text style={{ fontSize: fontSizes.size15, fontFamily: fontFamilies.semiBold, color: colors.white }}>Okay, got it</Text>
             </Pressable>
           </View>
+        </View>
+      </Modal>
+
+      <Modal animationType="slide" transparent visible={Boolean(selectedCategoryGroup)} onRequestClose={() => setSelectedCategoryGroup(null)}>
+        <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: colors.mauveTone8Alpha80 }}>
+          <CloseButton accessibilityLabel="Close category bill details" color={colors.mauveTone9} floating onPress={() => setSelectedCategoryGroup(null)} />
+          {selectedCategoryGroup ? (
+            <View style={{ paddingTop: 24, paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 12), borderTopLeftRadius: 18, borderTopRightRadius: 18, backgroundColor: colors.white }}>
+              <Text selectable style={{ fontSize: fontSizes.size24, lineHeight: 31, fontFamily: fontFamilies.bold, color: colors.mauveTone9 }}>{selectedCategoryGroup.category_name}</Text>
+              <View style={{ paddingTop: 8 }}>
+                <BillRow compact label="Item total" minHeight={36} value={selectedCategoryGroup.subtotal} />
+              </View>
+              {selectedCategoryGroup.charges.visitationFee > 0 ? <BillRow compact label="Visitation fee" value={selectedCategoryGroup.charges.visitationFee} /> : null}
+              {selectedCategoryGroup.charges.platformFee > 0 ? <BillRow compact dottedLabel label="Platform fee" minHeight={36} value={selectedCategoryGroup.charges.platformFee} /> : null}
+              {selectedCategoryGroup.charges.govtTax > 0 ? (
+                <View style={{ paddingBottom: 6 }}>
+                  <BillRow compact dottedLabel label="Est. Govt. taxes" minHeight={36} value={selectedCategoryGroup.charges.govtTax} />
+                </View>
+              ) : null}
+              <View style={{ height: 1, backgroundColor: colors.violetTone98_3 }} />
+              <BillRow bold compact label="Total bill" value={selectedCategoryGroup.categoryTotal} />
+              <View style={{ height: 1, backgroundColor: colors.violetTone98_3 }} />
+              <BillRow bold compact label="Amount to pay" value={selectedCategoryGroup.categoryTotal} />
+              <Pressable accessibilityRole="button" onPress={() => setSelectedCategoryGroup(null)} style={({ pressed }) => ({ height: 48, marginTop: 10, alignItems: 'center', justifyContent: 'center', borderRadius: 8, backgroundColor: pressed ? colors.violetTone51 : colors.violetTone58 })}>
+                <Text style={{ fontSize: fontSizes.size15, fontFamily: fontFamilies.semiBold, color: colors.white }}>Okay, got it</Text>
+              </Pressable>
+            </View>
+          ) : null}
         </View>
       </Modal>
 
@@ -641,10 +691,14 @@ function SavedAddressSheet({ addresses, isProceeding, selectedAddressId, onAddAn
   );
 }
 
-function BillRow({ bold = false, label, value }: { bold?: boolean; label: string; value: number }) {
+function BillRow({ bold = false, compact = false, dottedLabel = false, label, minHeight, value }: { bold?: boolean; compact?: boolean; dottedLabel?: boolean; label: string; minHeight?: number; value: number }) {
+  const labelText = <Text selectable style={{ fontSize: fontSizes.size15, fontFamily: bold ? fontFamilies.semiBold : fontFamilies.medium, color: colors.mauveTone9 }}>{label}</Text>;
+
   return (
-    <View style={{ minHeight: 58, flexDirection: 'row', alignItems: 'center' }}>
-      <Text selectable style={{ flex: 1, fontSize: fontSizes.size15, fontFamily: bold ? fontFamilies.semiBold : fontFamilies.medium, color: colors.mauveTone9 }}>{label}</Text>
+    <View style={{ minHeight: minHeight ?? (compact ? 50 : 58), flexDirection: 'row', alignItems: 'center' }}>
+      <View style={{ flex: 1 }}>
+        {dottedLabel ? <DottedUnderline dotColor={colors.mauveTone77}>{labelText}</DottedUnderline> : labelText}
+      </View>
       <Text selectable style={{ fontSize: fontSizes.size15, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9, fontVariant: ['tabular-nums'] }}>{formatPrice(value)}</Text>
     </View>
   );

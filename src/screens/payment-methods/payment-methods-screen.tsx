@@ -7,15 +7,12 @@ import { Text } from '../../components/app-text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BackIcon } from '../../components/back-icon';
+import { ChevronRightIcon } from '../../components/chevron-right-icon';
 import { CloseButton, CLOSE_BUTTON_ABOVE_OFFSET, CLOSE_BUTTON_INSET } from '../../components/close-icon';
 
 type PaymentMethodsScreenProps = {
   onBack: () => void;
 };
-
-function ChevronRight() {
-  return <View style={{ width: 8, height: 8, borderTopWidth: 1.4, borderRightWidth: 1.4, borderColor: colors.violetTone98_3, transform: [{ rotate: '45deg' }] }} />;
-}
 
 function CardIcon({ size = 22 }: { size?: number }) {
   return <Image source={require('../../../assets/payment.png')} contentFit="contain" tintColor={colors.violetTone58} style={{ width: size, height: size }} />;
@@ -148,7 +145,7 @@ export function PaymentMethodsScreen({ onBack }: PaymentMethodsScreenProps) {
           <Pressable onPress={() => setModalVisible(true)} style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', opacity: pressed ? 0.6 : 1 })}>
             <View style={{ width: 40 }}><CardIcon /></View>
             <Text style={{ flex: 1, fontSize: fontSizes.size15, lineHeight: 22, color: colors.mauveTone19_3 }}>Add a card</Text>
-            <ChevronRight />
+                  <ChevronRightIcon />
           </Pressable>
         </View>
       </ScrollView>

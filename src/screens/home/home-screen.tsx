@@ -10,6 +10,7 @@ import { scheduleOnRN } from 'react-native-worklets';
 
 import { DEFAULT_OFFER_HEADER_COLOR, OfferCarousel } from '../../components/offer-carousel';
 import { LoadingDots } from '../../components/loading-dots';
+import { SearchIcon } from '../../components/search-icon';
 import type { ServiceCategory } from '../../data/service-catalog';
 import { useCurrentLocation } from '../../hooks/use-current-location';
 import { useHomePromotionalBanner } from '../../hooks/use-home-promotional-banner';
@@ -65,17 +66,6 @@ function ChevronDownIcon() {
   );
 }
 
-function SearchIcon() {
-  return (
-    <Image
-      source={require('../../../assets/search.png')}
-      contentFit="contain"
-      tintColor={colors.violetTone42}
-      style={{ width: 18, height: 18 }}
-    />
-  );
-}
-
 function SearchBar({ displayedSuggestion, onChangeText, search, sticky = false }: { displayedSuggestion: string; onChangeText: (value: string) => void; search: string; sticky?: boolean }) {
   return (
     <View
@@ -97,10 +87,16 @@ function SearchBar({ displayedSuggestion, onChangeText, search, sticky = false }
       <View style={{ flex: 1, height: 40, justifyContent: 'center' }}>
         {!search ? (
           <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, flexDirection: 'row', alignItems: 'center' }}>
-            <Text style={{ fontSize: fontSizes.size13, color: colors.violetTone57 }}>Search for '</Text>
-            <View style={{ height: 20, flex: 1, overflow: 'hidden', justifyContent: 'center' }}>
-              <Text numberOfLines={1} style={{ fontSize: fontSizes.size13, color: colors.violetTone57 }}>{`${displayedSuggestion}'`}</Text>
-            </View>
+            {displayedSuggestion ? (
+              <>
+                <Text style={{ fontSize: fontSizes.size13, color: colors.violetTone57 }}>Search for '</Text>
+                <View style={{ height: 20, flex: 1, overflow: 'hidden', justifyContent: 'center' }}>
+                  <Text numberOfLines={1} style={{ fontSize: fontSizes.size13, color: colors.violetTone57 }}>{`${displayedSuggestion}'`}</Text>
+                </View>
+              </>
+            ) : (
+              <Text style={{ fontSize: fontSizes.size13, color: colors.violetTone57 }}>Search for services</Text>
+            )}
           </View>
         ) : null}
         <TextInput
@@ -149,7 +145,8 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
   const categoryHeight = 64;
   const categoryImageWidth = 64;
   const categoryImageHeight = 48;
-  const normalizedSearch = search.trim().toLowerCase();
+  // Keep the field typeable while search/filter behavior is temporarily inactive.
+  const normalizedSearch = '';
   const bannerSlides = promotionalBanner?.slides ?? [];
   const headerBackgroundUrl = promotionalBanner?.backgroundImageUrl;
   const stickyBannerColor = lightenHexColor(promotionalBanner?.backgroundColor ?? DEFAULT_OFFER_HEADER_COLOR);
@@ -320,7 +317,7 @@ export function HomeScreen({ categories, errorMessage, isLoading, locationSubtit
                   onPress={() => onCategoryPress(category)}
                   style={({ pressed }) => ({ width: categoryWidth, alignItems: 'center', gap: 6, opacity: pressed ? 0.62 : 1 })}
                 >
-                  <View style={{ width: categoryWidth, height: categoryHeight, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderRadius: 8, borderCurve: 'continuous', backgroundColor: colors.neutralTone95_2 }}>
+                  <View style={{ width: categoryWidth, height: categoryHeight, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderRadius: 8, borderCurve: 'continuous', backgroundColor: colors.violetTone98_3 }}>
                     <Text style={{ fontSize: fontSizes.size22 }}>{category.icon}</Text>
                     {category.imageUrl ? (
                       <Image

@@ -7,6 +7,7 @@ import { Text } from '../../components/app-text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BackIcon } from '../../components/back-icon';
+import { ChevronRightIcon } from '../../components/chevron-right-icon';
 import { CloseButton, CLOSE_BUTTON_ABOVE_OFFSET, CLOSE_BUTTON_INSET } from '../../components/close-icon';
 
 type SettingsScreenProps = {
@@ -43,10 +44,6 @@ function ScreenHeader({ onBack, title }: { onBack: () => void; title: string }) 
       </View>
     </View>
   );
-}
-
-function ChevronRight() {
-  return <View style={{ width: 8, height: 8, borderTopWidth: 1.4, borderRightWidth: 1.4, borderColor: colors.violetTone98_3, transform: [{ rotate: '45deg' }] }} />;
 }
 
 function DownloadDataModal({ initialEmail, visible, onClose }: { initialEmail?: string; visible: boolean; onClose: () => void }) {
@@ -144,11 +141,11 @@ export function SettingsScreen({ email, onBack, onDeleteAccount }: SettingsScree
           <Text style={{ paddingBottom: 8, fontSize: fontSizes.size21, lineHeight: 27, fontFamily: fontFamilies.bold, color: colors.mauveTone11 }}>Privacy & data</Text>
           <Pressable onPress={() => setDownloadVisible(true)} style={({ pressed }) => ({ minHeight: 44, flexDirection: 'row', alignItems: 'center', opacity: pressed ? 0.6 : 1 })}>
             <Text style={{ flex: 1, fontSize: fontSizes.size15, lineHeight: 22, color: colors.mauveTone19_3 }}>Download data</Text>
-            <ChevronRight />
+            <ChevronRightIcon />
           </Pressable>
           <Pressable onPress={onDeleteAccount} style={({ pressed }) => ({ minHeight: 44, flexDirection: 'row', alignItems: 'center', opacity: pressed ? 0.6 : 1 })}>
             <Text style={{ flex: 1, fontSize: fontSizes.size15, lineHeight: 22, color: colors.mauveTone19_3 }}>Delete account</Text>
-            <ChevronRight />
+            <ChevronRightIcon />
           </Pressable>
         </View>
       </ScrollView>

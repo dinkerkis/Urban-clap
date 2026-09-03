@@ -4,14 +4,11 @@ import { Text } from '../../components/app-text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BackIcon } from '../../components/back-icon';
+import { ChevronRightIcon } from '../../components/chevron-right-icon';
 
 type AboutScreenProps = {
   onBack: () => void;
 };
-
-function ChevronRight() {
-  return <View style={{ width: 8, height: 8, borderTopWidth: 1.4, borderRightWidth: 1.4, borderColor: colors.violetTone98_3, transform: [{ rotate: '45deg' }] }} />;
-}
 
 function TermsIcon() {
   return (
@@ -64,7 +61,7 @@ export function AboutScreen({ onBack }: AboutScreenProps) {
         >
           <TermsIcon />
           <Text style={{ flex: 1, fontSize: fontSizes.size16, lineHeight: 23, color: colors.mauveTone19_3 }}>Terms and conditions</Text>
-          <ChevronRight />
+            <ChevronRightIcon />
         </Pressable>
       </ScrollView>
     </View>

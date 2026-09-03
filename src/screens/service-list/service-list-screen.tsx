@@ -10,6 +10,7 @@ import { BackIcon } from '../../components/back-icon';
 import { CloseButton, CLOSE_BUTTON_GAP } from '../../components/close-icon';
 import { DottedUnderline } from '../../components/dotted-underline';
 import { EstimateNoteIcon } from '../../components/estimate-note-icon';
+import { SearchIcon } from '../../components/search-icon';
 import type { ServiceItem, ServiceSubcategory } from '../../data/service-catalog';
 import { useCategoryProducts, type ProductSection } from '../../hooks/use-category-products';
 
@@ -50,17 +51,6 @@ function getSectionColumnCount(categoryTitle: string) {
 function shouldShowEstimateFooter(screenTitle: string) {
   const normalizedTitle = screenTitle.trim().toLocaleLowerCase();
   return normalizedTitle.includes('rooms') && normalizedTitle.includes('walls') && normalizedTitle.includes('painting');
-}
-
-function SearchIcon() {
-  return (
-    <Image
-      source={require('../../../assets/search.png')}
-      contentFit="contain"
-      tintColor={colors.mauveTone9_2}
-      style={{ width: 18, height: 18 }}
-    />
-  );
 }
 
 function ShareIcon() {
@@ -481,7 +471,7 @@ export function ServiceListScreen({ cart, cartItemsById, categoryTitle, subcateg
               onPress={onSearchPress}
               style={({ pressed }) => ({ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, borderWidth: alwaysShowNavButtonBorders || stickyHeaderVisible ? 1 : 0, borderColor: colors.mauveTone89_4, backgroundColor: colors.white, opacity: pressed ? 0.62 : 1 })}
             >
-              <SearchIcon />
+              <SearchIcon color={colors.mauveTone9_2} />
             </Pressable>
 
             <Pressable

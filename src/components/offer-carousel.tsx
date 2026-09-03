@@ -4,16 +4,21 @@ import type { LayoutChangeEvent } from 'react-native';
 import { Text } from './app-text';
 import { Pressable, View } from 'react-native';
 import Animated, {
+  cancelAnimation,
   Easing,
   FadeInDown,
   FadeOutUp,
   runOnJS,
   useAnimatedStyle,
+  useReducedMotion,
   useSharedValue,
+  withDelay,
+  withSequence,
   withTiming,
 } from 'react-native-reanimated';
 
 import { colors, fontFamilies, fontSizes } from '../theme';
+import { BackIcon } from './back-icon';
 import type { BannerHeadingColor, PromotionalBannerSlide } from '../services/home-promotional-banner-api';
 
 const AUTO_SCROLL_INTERVAL_MS = 4_500;
@@ -119,6 +124,37 @@ function BannerImage({ uri, height }: { height: number; uri: string }) {
       contentPosition="right center"
       style={{ width: '100%', height }}
     />
+  );
+}
+
+function ActionArrow({ color }: { color: string }) {
+  const prefersReducedMotion = useReducedMotion();
+  const translateX = useSharedValue(0);
+
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+
+    translateX.set(
+      withDelay(
+        1_000,
+        withSequence(
+          withTiming(7, { duration: 450, easing: Easing.bezier(0.77, 0, 0.175, 1) }),
+          withTiming(0, { duration: 500, easing: Easing.bezier(0.23, 1, 0.32, 1) }),
+        ),
+      ),
+    );
+
+    return () => cancelAnimation(translateX);
+  }, [prefersReducedMotion, translateX]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.get() }, { rotate: '180deg' }],
+  }));
+
+  return (
+    <Animated.View style={animatedStyle}>
+      <BackIcon color={color} size={14} />
+    </Animated.View>
   );
 }
 
@@ -266,21 +302,11 @@ export function OfferCarousel({ embeddedOnPurple = false, slides }: OfferCarouse
             ) : null}
             {actionLabel ? (
               <View style={{ marginTop: 18, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <Text selectable style={{ fontSize: fontSizes.size15, lineHeight: 20, fontFamily: fontFamilies.extraBold, color: activeSlide.textColor }}>
+                <Text selectable style={{ fontSize: fontSizes.size15, lineHeight: 20, fontFamily: fontFamilies.semiBold, color: activeSlide.textColor }}>
                   {actionLabel}
                 </Text>
                 {activeSlide.showActionArrow ? (
-                  <View
-                    style={{
-                      width: 7,
-                      height: 7,
-                      marginTop: 1,
-                      borderRightWidth: 2.2,
-                      borderTopWidth: 2.2,
-                      borderColor: activeSlide.textColor,
-                      transform: [{ rotate: '45deg' }],
-                    }}
-                  />
+                  <ActionArrow key={`action-arrow-${activeIndex}`} color={activeSlide.textColor} />
                 ) : null}
               </View>
             ) : null}

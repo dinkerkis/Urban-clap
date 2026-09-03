@@ -5,6 +5,7 @@ import { Text } from '../../components/app-text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BackIcon } from '../../components/back-icon';
+import { ChevronRightIcon } from '../../components/chevron-right-icon';
 import { EditIcon } from '../../components/edit-icon';
 
 type ProfileScreenProps = {
@@ -44,21 +45,6 @@ type MenuItem = {
 
 function showComingSoon(label: string) {
   Alert.alert(label, 'This section will be available soon.');
-}
-
-function ChevronRight() {
-  return (
-    <View
-      style={{
-        width: 7,
-        height: 7,
-        borderTopWidth: 1.4,
-        borderRightWidth: 1.4,
-        borderColor: colors.violetTone18,
-        transform: [{ rotate: '45deg' }],
-      }}
-    />
-  );
 }
 
 export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteProfile, onHelpSupport, onLogout, onManageAddresses, onManagePaymentMethods, onMyBookings, onMyCart, onMyPlans, onMyRating, onNativeDevices, onPassesMembership, onSettings, onWallet }: ProfileScreenProps) {
@@ -242,7 +228,7 @@ export function ProfileScreen({ email, name, phone, onAbout, onBack, onCompleteP
               ) : null}
             </View>
             <Text style={{ flex: 1, fontSize: fontSizes.size15, lineHeight: 21, fontFamily: fontFamilies.regular, color: colors.mauveTone19_4 }}>{item.label}</Text>
-            <ChevronRight />
+                  <ChevronRightIcon color={colors.violetTone18} size={7} />
           </Pressable>
         ))}
       </View>
