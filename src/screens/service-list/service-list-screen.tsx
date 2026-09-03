@@ -158,6 +158,7 @@ function ProductRow({ cartItem, hidePriceUnderline, item, quantity, showEstimate
   const productImageSize = 128;
   const displayItem = quantity > 0 ? cartItem : item;
   const variantsCount = item.variants?.length ?? 0;
+  const hasShortDescription = Boolean(item.shortDescription?.trim());
   const priceRow = (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
       <Text selectable style={{ fontSize: fontSizes.size13, lineHeight: 19, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9_2 }}>{quantity === 0 && item.variants?.length ? 'Starts at ' : ''}₹{displayItem.price.toLocaleString('en-IN')}</Text>
@@ -183,7 +184,7 @@ function ProductRow({ cartItem, hidePriceUnderline, item, quantity, showEstimate
               </DottedUnderline>
             </View>
           ) : null}
-          {hidePriceUnderline ? priceRow : <DottedUnderline fullWidth lineMarginTop={10} dotColor={colors.mauveTone86}>{priceRow}</DottedUnderline>}
+          {hidePriceUnderline || !hasShortDescription ? priceRow : <DottedUnderline fullWidth lineMarginTop={10} dotColor={colors.mauveTone86}>{priceRow}</DottedUnderline>}
           {item.description ? <Text selectable numberOfLines={3} style={{ fontSize: fontSizes.size13, lineHeight: 19, color: colors.mauveTone38_2 }}>{item.description}</Text> : null}
           <Text style={{ paddingTop: 5, fontSize: fontSizes.size14, lineHeight: 19, fontFamily: fontFamilies.semiBold, color: colors.violetTone58 }}>{showEstimateLabel ? 'View details and estimate' : 'View details'}</Text>
         </View>

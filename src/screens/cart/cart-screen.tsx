@@ -41,6 +41,18 @@ type CartScreenProps = {
   grandTotal?: number;
 };
 
+type SelectedSlot = {
+  date: string;
+  time: string;
+};
+
+type CartDisplayGroup = {
+  id: string;
+  items: ServiceItem[];
+  name: string;
+  total?: number;
+};
+
 const formatPrice = (value: number) => `₹${Math.max(0, value).toLocaleString('en-IN')}`;
 
 export function CartScreen({
@@ -70,11 +82,13 @@ export function CartScreen({
   const insets = useSafeAreaInsets();
   const [showBillSummary, setShowBillSummary] = useState(false);
   const [selectedCategoryGroup, setSelectedCategoryGroup] = useState<CartCategoryGroup | null>(null);
-  const [addressSheet, setAddressSheet] = useState<'saved' | 'search' | 'details' | 'slot' | null>(null);
+  const [addressSheet, setAddressSheet] = useState<'saved' | 'search' | 'details' | 'slot-list' | 'slot' | null>(null);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [selectedPlace, setSelectedPlace] = useState<SelectedPlace | null>(null);
   const [selectedSlotDate, setSelectedSlotDate] = useState<string | null>(null);
   const [selectedSlotTime, setSelectedSlotTime] = useState<string | null>(null);
+  const [selectedSlotCategoryId, setSelectedSlotCategoryId] = useState<string | null>(null);
+  const [categorySlots, setCategorySlots] = useState<Record<string, SelectedSlot>>({});
   const [checkoutAddress, setCheckoutAddress] = useState<UserAddress | null>(null);
   const [contactEditorVisible, setContactEditorVisible] = useState(false);
   const [contactOverride, setContactOverride] = useState<{ name: string; phone: string } | null>(null);
@@ -85,7 +99,7 @@ export function CartScreen({
   const displayedItemsSubtotal = consultationMode ? (cartItems.length > 0 ? 49 : 0) : (itemsSubtotal ?? totalPrice);
   const displayedTotalPrice = consultationMode ? displayedItemsSubtotal : (grandTotal ?? totalPrice);
   const displayedTaxesAndCharges = Math.max(0, displayedTotalPrice - displayedItemsSubtotal);
-  const groupedCartItems = displayedCartItems.reduce<Array<{ id: string; name: string; items: ServiceItem[]; total?: number }>>((groups, item) => {
+  const groupedCartItems = displayedCartItems.reduce<CartDisplayGroup[]>((groups, item) => {
     const id = item.cartCategoryId || 'selected-services';
     const existing = groups.find((group) => group.id === id);
     if (existing) existing.items.push(item);
@@ -109,9 +123,10 @@ export function CartScreen({
   const displayedContactName = contactOverride?.name || checkoutAddress?.contactName?.trim() || name?.trim() || 'User';
   const rawContactPhone = contactOverride?.phone || checkoutAddress?.contactPhone?.trim() || phone?.trim() || '';
   const displayedContactPhone = formatContactPhone(rawContactPhone);
-  const checkoutReady = Boolean(checkoutAddress && selectedSlotDate && selectedSlotTime);
+  const allCategorySlotsSelected = hasMultipleCategories && groupedCartItems.every((group) => Boolean(categorySlots[group.id]));
+  const checkoutReady = Boolean(checkoutAddress && (hasMultipleCategories ? allCategorySlotsSelected : selectedSlotDate && selectedSlotTime));
   const actionBottom = showBottomTab ? 64 + insets.bottom : 0;
-  const actionHeight = checkoutReady ? 226 : checkoutAddress ? 168 : 112;
+  const actionHeight = checkoutReady ? (hasMultipleCategories ? 264 : 226) : checkoutAddress ? 168 : 112;
   const removeConsultation = async (item: ServiceItem, quantity: number) => {
     for (let count = 0; count < quantity; count += 1) await onRemove(item);
   };
@@ -138,9 +153,32 @@ export function CartScreen({
   };
 
   const openSlotSheet = () => {
-    setSelectedSlotDate(null);
-    setSelectedSlotTime(null);
+    if (hasMultipleCategories) {
+      setCategorySlots({});
+      setSelectedSlotCategoryId(null);
+      setAddressSheet('slot-list');
+    } else {
+      setSelectedSlotDate(null);
+      setSelectedSlotTime(null);
+      setAddressSheet('slot');
+    }
+  };
+
+  const openCategorySlot = (categoryId: string) => {
+    const existingSlot = categorySlots[categoryId];
+    setSelectedSlotCategoryId(categoryId);
+    setSelectedSlotDate(existingSlot?.date ?? null);
+    setSelectedSlotTime(existingSlot?.time ?? null);
     setAddressSheet('slot');
+  };
+
+  const saveSelectedCategorySlot = () => {
+    if (!selectedSlotCategoryId || !selectedSlotDate || !selectedSlotTime) return;
+    setCategorySlots((current) => ({
+      ...current,
+      [selectedSlotCategoryId]: { date: selectedSlotDate, time: selectedSlotTime },
+    }));
+    setAddressSheet('slot-list');
   };
 
   const selectCheckoutAddress = async (address: UserAddress) => {
@@ -442,9 +480,17 @@ export function CartScreen({
           {checkoutAddress ? (
             <>
               <CheckoutDetailRow icon={<Image source={require('../../../assets/addresses.png')} contentFit="contain" style={{ width: 18, height: 18 }} />} label={`${formatAddressLabel(checkoutAddress.label)} - ${formatSavedAddress(checkoutAddress)}`} onPress={() => void openAddressAndSlot()} />
-              {checkoutReady && selectedSlotDate && selectedSlotTime ? (
+              {checkoutReady ? (
                 <>
-                  <CheckoutDetailRow icon={<Image source={require('../../../assets/time.png')} contentFit="contain" style={{ width: 16, height: 16 }} />} label={formatCheckoutSlot(selectedSlotDate, selectedSlotTime)} onPress={() => setAddressSheet('slot')} />
+                  {hasMultipleCategories ? (
+                    <CheckoutSlotsRow
+                      groups={groupedCartItems}
+                      slots={categorySlots}
+                      onPress={() => setAddressSheet('slot-list')}
+                    />
+                  ) : selectedSlotDate && selectedSlotTime ? (
+                    <CheckoutDetailRow icon={<Image source={require('../../../assets/time.png')} contentFit="contain" style={{ width: 16, height: 16 }} />} label={formatCheckoutSlot(selectedSlotDate, selectedSlotTime)} onPress={() => setAddressSheet('slot')} />
+                  ) : null}
                   <Pressable accessibilityRole="button" onPress={() => Alert.alert('Payment', 'Payment flow will be connected here.')} style={({ pressed }) => ({ height: 48, marginTop: 8, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: pressed ? colors.violetTone51 : colors.violetTone58 })}>
                     <Text style={{ fontSize: fontSizes.size15, fontFamily: fontFamilies.bold, color: colors.white }}>Proceed to pay</Text>
                   </Pressable>
@@ -453,7 +499,7 @@ export function CartScreen({
               ) : (
                 <Pressable
                   accessibilityRole="button"
-                  onPress={() => setAddressSheet('slot')}
+                  onPress={() => setAddressSheet(hasMultipleCategories ? 'slot-list' : 'slot')}
                   style={({ pressed }) => ({ height: 48, marginTop: 8, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: pressed ? colors.violetTone51 : colors.violetTone58 })}
                 >
                   <Text style={{ fontSize: fontSizes.size15, fontFamily: fontFamilies.semiBold, color: colors.white }}>Select slot</Text>
@@ -570,7 +616,35 @@ export function CartScreen({
           />
         ) : null}
       </Modal>
-      <Modal animationType="slide" transparent visible={addressSheet === 'slot'} onRequestClose={() => setAddressSheet(null)}>
+      <Modal
+        animationType="slide"
+        transparent
+        visible={addressSheet === 'slot-list' || (hasMultipleCategories && addressSheet === 'slot')}
+        onRequestClose={() => setAddressSheet(addressSheet === 'slot' ? 'slot-list' : null)}
+      >
+        <CategorySlotsSheet
+          groups={groupedCartItems}
+          hideClose={addressSheet === 'slot'}
+          slots={categorySlots}
+          onClose={() => setAddressSheet(null)}
+          onConfirm={() => setAddressSheet(null)}
+          onSelect={openCategorySlot}
+        />
+        {hasMultipleCategories && addressSheet === 'slot' ? (
+          <View style={{ position: 'absolute', inset: 0 }}>
+            <SlotSelectionSheet
+              serviceName={groupedCartItems.find((group) => group.id === selectedSlotCategoryId)?.name}
+              selectedDate={selectedSlotDate}
+              selectedTime={selectedSlotTime}
+              onClose={() => setAddressSheet('slot-list')}
+              onDateSelect={setSelectedSlotDate}
+              onTimeSelect={setSelectedSlotTime}
+              onProceed={saveSelectedCategorySlot}
+            />
+          </View>
+        ) : null}
+      </Modal>
+      <Modal animationType="slide" transparent visible={!hasMultipleCategories && addressSheet === 'slot'} onRequestClose={() => setAddressSheet(null)}>
         <SlotSelectionSheet
           selectedDate={selectedSlotDate}
           selectedTime={selectedSlotTime}
@@ -602,7 +676,71 @@ function CheckoutDetailRow({ icon, label, onPress }: { icon: ReactNode; label: s
   );
 }
 
-function SlotSelectionSheet({ selectedDate, selectedTime, onClose, onDateSelect, onProceed, onTimeSelect }: { selectedDate: string | null; selectedTime: string | null; onClose: () => void; onDateSelect: (value: string) => void; onProceed: () => void; onTimeSelect: (value: string) => void }) {
+function CheckoutSlotsRow({ groups, slots, onPress }: { groups: CartDisplayGroup[]; slots: Record<string, SelectedSlot>; onPress: () => void }) {
+  const visibleGroups = groups.filter((group) => slots[group.id]).slice(0, 2);
+  const remainingCount = Math.max(0, groups.length - visibleGroups.length);
+
+  return (
+    <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => ({ minHeight: 62, paddingVertical: 7, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: colors.violetTone98_3, opacity: pressed ? 0.65 : 1 })}>
+      <View style={{ width: 30, alignItems: 'flex-start', justifyContent: 'center' }}>
+        <Image source={require('../../../assets/time.png')} contentFit="contain" style={{ width: 16, height: 16 }} />
+      </View>
+      <View style={{ flex: 1, gap: 2 }}>
+        {visibleGroups.map((group) => {
+          const slot = slots[group.id];
+          return <Text key={group.id} numberOfLines={1} style={{ fontSize: fontSizes.size12, lineHeight: 17, color: colors.mauveTone24 }}>{group.name} - {formatCheckoutSlot(slot.date, slot.time)}</Text>;
+        })}
+        {remainingCount > 0 ? <Text style={{ fontSize: fontSizes.size12, lineHeight: 17, fontFamily: fontFamilies.semiBold, color: colors.mauveTone24 }}>+{remainingCount} more {remainingCount === 1 ? 'slot' : 'slots'}</Text> : null}
+      </View>
+      <View style={{ width: 32, alignItems: 'flex-end' }}><EditIcon size={15} /></View>
+    </Pressable>
+  );
+}
+
+function CategorySlotsSheet({ groups, hideClose = false, slots, onClose, onConfirm, onSelect }: { groups: CartDisplayGroup[]; hideClose?: boolean; slots: Record<string, SelectedSlot>; onClose: () => void; onConfirm: () => void; onSelect: (categoryId: string) => void }) {
+  const insets = useSafeAreaInsets();
+  const canConfirm = groups.length > 0 && groups.every((group) => Boolean(slots[group.id]));
+
+  return (
+    <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: colors.mauveTone8Alpha80 }}>
+      {!hideClose ? <CloseButton accessibilityLabel="Close category slot selection" color={colors.mauveTone9} floating onPress={onClose} /> : null}
+      <View style={{ maxHeight: '78%', paddingTop: 22, paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 12) + 8, borderTopLeftRadius: 18, borderTopRightRadius: 18, backgroundColor: colors.white }}>
+        <Text style={{ fontSize: fontSizes.size20, lineHeight: 27, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9 }}>Select slots</Text>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: 18, gap: 12 }}>
+          {groups.map((group) => {
+            const slot = slots[group.id];
+            const duration = group.items.map((item) => item.duration).find(Boolean);
+            return (
+              <View key={group.id} style={{ minHeight: 76, paddingHorizontal: 14, paddingVertical: 10, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 10, borderWidth: 1, borderColor: colors.mauveTone89_3, backgroundColor: colors.white }}>
+                <View style={{ flex: 1 }}>
+                  <Text numberOfLines={2} style={{ fontSize: fontSizes.size16, lineHeight: 21, fontFamily: fontFamilies.medium, color: colors.mauveTone9 }}>{group.name}</Text>
+                  {slot ? (
+                    <View style={{ marginTop: 5 }}>
+                      <Text style={{ fontSize: fontSizes.size12, lineHeight: 17, color: colors.mauveTone43 }}>Professional will arrive by</Text>
+                      <Text numberOfLines={1} style={{ fontSize: fontSizes.size12, lineHeight: 17, fontFamily: fontFamilies.medium, color: colors.greenTone43 }}>{formatCheckoutSlot(slot.date, slot.time)}</Text>
+                    </View>
+                  ) : (
+                    <Text numberOfLines={2} style={{ marginTop: 5, fontSize: fontSizes.size12, lineHeight: 17, color: colors.mauveTone43 }}>
+                      {duration ? `Service will take approx. ${duration}` : 'Select a convenient time'}
+                    </Text>
+                  )}
+                </View>
+                <Pressable accessibilityRole="button" onPress={() => onSelect(group.id)} style={({ pressed }) => ({ minWidth: 70, height: 38, paddingHorizontal: 13, alignItems: 'center', justifyContent: 'center', borderRadius: 8, borderWidth: 1, borderColor: colors.mauveTone89_3, backgroundColor: pressed ? colors.violetTone98 : colors.white })}>
+                  <Text style={{ fontSize: fontSizes.size14, fontFamily: fontFamilies.semiBold, color: colors.mauveTone15_3 }}>{slot ? 'Edit' : 'Select'}</Text>
+                </Pressable>
+              </View>
+            );
+          })}
+        </ScrollView>
+        <Pressable accessibilityRole="button" accessibilityState={{ disabled: !canConfirm }} disabled={!canConfirm} onPress={onConfirm} style={({ pressed }) => ({ height: 48, marginTop: 20, alignItems: 'center', justifyContent: 'center', borderRadius: 8, backgroundColor: canConfirm ? colors.violetTone58 : colors.violetTone85_2, opacity: pressed ? 0.72 : 1 })}>
+          <Text style={{ fontSize: fontSizes.size15, fontFamily: fontFamilies.bold, color: colors.white }}>Confirm</Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+
+function SlotSelectionSheet({ serviceName, selectedDate, selectedTime, onClose, onDateSelect, onProceed, onTimeSelect }: { serviceName?: string; selectedDate: string | null; selectedTime: string | null; onClose: () => void; onDateSelect: (value: string) => void; onProceed: () => void; onTimeSelect: (value: string) => void }) {
   const insets = useSafeAreaInsets();
   const dates = Array.from({ length: 4 }, (_, index) => {
     const date = new Date();
@@ -613,14 +751,26 @@ function SlotSelectionSheet({ selectedDate, selectedTime, onClose, onDateSelect,
       value: date.toISOString().slice(0, 10),
     };
   });
-  const times = ['04:00 PM', '07:00 PM'];
+  const times = [
+    '08:00 AM', '08:30 AM', '09:00 AM', '09:30 AM',
+    '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM',
+    '12:00 PM', '12:30 PM', '01:00 PM', '01:30 PM',
+    '02:00 PM', '02:30 PM', '03:00 PM', '03:30 PM',
+    '04:00 PM', '04:30 PM', '05:00 PM',
+  ];
   const canProceed = Boolean(selectedDate && selectedTime);
 
   return (
     <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: colors.mauveTone8Alpha80 }}>
       <CloseButton accessibilityLabel="Close slot selection" color={colors.mauveTone9} floating onPress={onClose} />
-      <View style={{ paddingTop: 22, paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 12) + 8, borderTopLeftRadius: 18, borderTopRightRadius: 18, backgroundColor: colors.white }}>
-        <Text style={{ fontSize: fontSizes.size19, lineHeight: 25, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9 }}>When should the professional arrive?</Text>
+      <View style={{ minHeight: serviceName ? '74%' : undefined, paddingTop: 22, paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 12) + 8, borderTopLeftRadius: 18, borderTopRightRadius: 18, backgroundColor: colors.white }}>
+        {serviceName ? (
+          <>
+            <Text numberOfLines={2} style={{ fontSize: fontSizes.size20, lineHeight: 27, fontFamily: fontFamilies.semiBold, color: colors.black }}>{serviceName}</Text>
+            <View style={{ height: 1, marginTop: 12, marginBottom: 16, backgroundColor: colors.violetTone98_3 }} />
+          </>
+        ) : null}
+        <Text style={{ fontSize: fontSizes.size16, lineHeight: 22, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9 }}>When should the professional arrive?</Text>
         <Text style={{ marginTop: 7, fontSize: fontSizes.size14, lineHeight: 20, color: colors.mauveTone43 }}>Service will take approx. 1 hr</Text>
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10, paddingVertical: 24 }}>
@@ -636,19 +786,19 @@ function SlotSelectionSheet({ selectedDate, selectedTime, onClose, onDateSelect,
         </ScrollView>
 
         <Text style={{ fontSize: fontSizes.size18, lineHeight: 24, fontFamily: fontFamilies.semiBold, color: colors.mauveTone9 }}>Select start time of service</Text>
-        <View style={{ marginTop: 22, flexDirection: 'row', gap: 12 }}>
+        <View style={{ marginTop: 18, flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
           {times.map((time) => {
             const selected = selectedTime === time;
             return (
-              <Pressable key={time} onPress={() => onTimeSelect(time)} style={({ pressed }) => ({ width: 126, height: 54, alignItems: 'center', justifyContent: 'center', borderRadius: 9, borderWidth: selected ? 1.5 : 1, borderColor: selected ? colors.violetTone58 : colors.mauveTone88, backgroundColor: selected ? colors.violetTone98 : colors.white, opacity: pressed ? 0.72 : 1 })}>
-                <Text style={{ fontSize: fontSizes.size15, fontFamily: selected ? fontFamilies.semiBold : fontFamilies.regular, color: selected ? colors.violetTone58 : colors.mauveTone31 }}>{time}</Text>
+              <Pressable key={time} onPress={() => onTimeSelect(time)} style={({ pressed }) => ({ width: '31.5%', height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 8, borderWidth: selected ? 1.5 : 1, borderColor: selected ? colors.violetTone58 : colors.mauveTone88, backgroundColor: selected ? colors.violetTone98 : colors.white, opacity: pressed ? 0.72 : 1 })}>
+                <Text style={{ fontSize: fontSizes.size12, fontFamily: selected ? fontFamilies.semiBold : fontFamilies.regular, color: selected ? colors.violetTone58 : colors.mauveTone31 }}>{time}</Text>
               </Pressable>
             );
           })}
         </View>
 
         <Pressable accessibilityRole="button" accessibilityState={{ disabled: !canProceed }} disabled={!canProceed} onPress={onProceed} style={({ pressed }) => ({ height: 48, marginTop: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 8, backgroundColor: canProceed ? colors.violetTone58 : colors.violetTone85_2, opacity: pressed ? 0.72 : 1 })}>
-          <Text style={{ fontSize: fontSizes.size15, fontFamily: fontFamilies.bold, color: colors.white }}>Proceed to checkout</Text>
+          <Text style={{ fontSize: fontSizes.size15, fontFamily: fontFamilies.bold, color: colors.white }}>{serviceName ? 'Save slot' : 'Proceed to checkout'}</Text>
         </Pressable>
       </View>
     </View>

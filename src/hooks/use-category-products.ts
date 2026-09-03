@@ -54,6 +54,7 @@ export function useCategoryProducts(categoryId: string) {
             id: product._id,
             title: product.name,
             description: product.shortDescription || product.description || '',
+            shortDescription: product.shortDescription,
             fullDescription: product.description,
             price: product.basePrice,
             originalPrice: product.basePrice,
